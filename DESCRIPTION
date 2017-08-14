@@ -1,0 +1,13 @@
+Package: fasster
+Version: 0.1.0.9000
+Title: Fast Additive Seasonal Switching with Trend and Exogenous Regressors
+Description: Implementation of the FASSTER model for forecasting time series with multiple seasonalities.
+Depends: R (>= 3.4.1)
+Authors@R: person("Mitchell", "O'Hara-Wild", email = "mail@mitchelloharawild.com", role = c("aut", "cre"))
+URL: https://github.com/mitchelloharawild/fasster
+BugReports: https://github.com/mitchelloharawild/fasster/issues
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+ByteCompile: true
+RoxygenNote: 6.0.1.9000
