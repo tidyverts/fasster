@@ -149,7 +149,7 @@ build_FASSTER <- function(formula, data, X = NULL){
   ## Set up xreg
   if(length(attr(mt, "term.labels")) > length(specialIdx)){
     if(!is.null(specialIdx)){
-      mt <- mt[-c(specialIdx-1)]
+      mt <- mt[-specialIdx]
     }
     xreg <- model.matrix(mt, data)
     if(!is.null(X)){
