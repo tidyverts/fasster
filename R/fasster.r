@@ -106,6 +106,28 @@ build_FASSTER <- function(formula, data, X = NULL){
 
   specialIdx <- unlist(attr(mt, "specials"))
 
+  ## Set up specials
+  if(length(specialIdx) > 0){
+    for(term in specialTerms$poly){
+      dlmTerms <- append(dlmTerms, list(dlmModPoly(term[[1]])))
+    }
+    for(term in specialTerms$seas){
+      dlmTerms <- append(dlmTerms, list(dlmModSeas(term[[1]])))
+    }
+    for(term in specialTerms$trig){
+      dlmTerms <- append(dlmTerms, list(dlmModTrig(term[[1]])))
+    }
+
+    while(length(dlmTerms) > 1){
+      dlmTerms[[1]] <- dlmTerms[[1]] + dlmTerms[[2]]
+      dlmTerms[[2]] <- NULL
+    }
+    if(!is.null(X)){ ## Add switching
+      dlmTerms[[1]]$JFF <- dlmTerms[[1]]$FF
+      dlmTerms[[1]]$X <- X
+    }
+  }
+
   ## Set up xreg
   if(length(attr(mt, "term.labels")) > length(specialIdx)){
     if(!is.null(specialIdx)){
