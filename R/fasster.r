@@ -138,10 +138,8 @@ build_FASSTER <- function(formula, data, X = NULL){
       dlmTerms <- append(dlmTerms, list(dlmModTrig(term[[1]])))
     }
 
-    while(length(dlmTerms) > 1){
-      dlmTerms[[1]] <- dlmTerms[[1]] + dlmTerms[[2]]
-      dlmTerms[[2]] <- NULL
-    }
+    dlmTerms <- reduce_dlm_list(dlmTerms)
+
     if(!is.null(X)){ ## Add switching
       dlmTerms[[1]]$JFF <- dlmTerms[[1]]$FF
       dlmTerms[[1]]$X <- X
@@ -157,8 +155,11 @@ build_FASSTER <- function(formula, data, X = NULL){
     if(!is.null(X)){
       xreg <- xreg*X # xreg switching
     }
-    dlmTerms <- append(dlmTerms, dlmModReg(xreg))
+    dlmTerms <- append(dlmTerms, list(dlmModReg(xreg, addInt = FALSE)))
+    dlmTerms <- reduce_dlm_list(dlmTerms)
   }
+
+  dlmTerms[[1]]
 }
 
 #' Fast Additive Seasonal Switching with Trend and Exogenous Regressors
@@ -189,8 +190,10 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7*24) + xreg, 
   infix_model <- formula_parse_infix(model, "%G%")
   model_struct <- formula_parse_groups(infix_model)
 
-  out <- build_FASSTER_group(model_struct, data)
-  #
+  out <- build_FASSTER_group(model_struct, data) %>%
+    ungroup_struct()
+
+  browser()
   # stlFreq <- specialTerms[-1] %>% # Remove poly special
   #   map(~ .x %>% map_dbl(~ .x[[1]])) %>% # Extract first argument of seasonal specials
   #   unlist()
