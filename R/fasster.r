@@ -32,7 +32,7 @@ formula_parse_groups <- function(.formula){
 
   ## Add current layer's formula
   if(length(attr(sub_mt, "variables")) > 1){
-    parse[["model"]] <- formula(sub_mt)
+    parse[[".model"]] <- formula(sub_mt)
   }
 
   ## Explore more groups
@@ -67,14 +67,22 @@ build_FASSTER_group <- function(model_struct, data, groups=NULL){
     groupX <- spread_groups(groupData)
   }
 
-  model_struct[["model"]] <- build_FASSTER(model_struct[["model"]], data, X = NULL)
-  model_struct
+  if(!is.null(model_struct[[".model"]])){
+    model_struct[[".model"]] <- build_FASSTER(model_struct[[".model"]], data, X = NULL)
+  }
+
+  ## Recursively explore groups
+  for(next_group in names(model_struct)){
+    if(next_group!=".model"){
+      model_struct[[next_group]] <- build_FASSTER_group(model_struct[[next_group]], data, groups=c(groups, next_group))
+    }
+  }
 }
 
 #' @importFrom rlang eval_tidy
 build_FASSTER <- function(formula, data, X = NULL){
   dlmTerms <- list()
-
+  browser()
   ## Deparse model specification
   triggerwords <- c("constant", "intercept", "slope", "trend")
   specials <- c("poly", "trig", "seas")#, "fourier", "seasonality", "seasonal")
@@ -89,8 +97,6 @@ build_FASSTER <- function(formula, data, X = NULL){
   specialTerms <- attr(mt, "specials") %>%
     as.list %>%
     map(~ .x %>% lapply(extractSpecialArgs))
-
-  browser()
 
   specialIdx <- unlist(attr(mt, "specials"))
 
@@ -133,7 +139,7 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7*24) + xreg, 
   infix_model <- formula_parse_infix(model, "%G%")
   model_struct <- formula_parse_groups(infix_model)
 
-  # out <- build_FASSTER_group(model_struct, data)
+  out <- build_FASSTER_group(model_struct, data)
   #
   # stlFreq <- specialTerms[-1] %>% # Remove poly special
   #   map(~ .x %>% map_dbl(~ .x[[1]])) %>% # Extract first argument of seasonal specials
