@@ -63,12 +63,18 @@ build_FASSTER_group <- function(model_struct, data, groups=NULL){
     terms_groups <- terms(groupVar, data=data)
     attr(terms_groups, "intercept") <- 0
     groupData <- model.matrix(terms_groups, data) %>% as.data.frame %>% interaction
-
-    groupX <- spread_groups(groupData)
   }
 
   if(!is.null(model_struct[[".model"]])){
-    model_struct[[".model"]] <- build_FASSTER(model_struct[[".model"]], data, X = NULL)
+    if(is.null(groups)){
+      groupX <- NULL
+    }
+    else{
+      groupX <- groupData %>% spread_groups %>% as.data.frame
+    }
+    model_struct[[".model"]] <- groupX %>% map(
+      ~ build_FASSTER(model_struct[[".model"]], data, X = .x)
+    )
   }
 
   ## Recursively explore groups
@@ -77,12 +83,12 @@ build_FASSTER_group <- function(model_struct, data, groups=NULL){
       model_struct[[next_group]] <- build_FASSTER_group(model_struct[[next_group]], data, groups=c(groups, next_group))
     }
   }
+  return(model_struct)
 }
 
 #' @importFrom rlang eval_tidy
 build_FASSTER <- function(formula, data, X = NULL){
   dlmTerms <- list()
-  browser()
   ## Deparse model specification
   triggerwords <- c("constant", "intercept", "slope", "trend")
   specials <- c("poly", "trig", "seas")#, "fourier", "seasonality", "seasonal")
@@ -106,9 +112,11 @@ build_FASSTER <- function(formula, data, X = NULL){
       mt <- mt[-c(specialIdx-1)]
     }
     xreg <- model.matrix(mt, data)
-    dlmTerms <- append(dlmTerms, dlmModReg(xreg)) ## TODO: Multiply model matrix by group indicator for grouping
+    if(!is.null(X)){
+      xreg <- xreg*X # xreg switching
+    }
+    dlmTerms <- append(dlmTerms, dlmModReg(xreg))
   }
-
 }
 
 #' Fast Additive Seasonal Switching with Trend and Exogenous Regressors
