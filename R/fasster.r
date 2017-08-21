@@ -67,13 +67,13 @@ reduce_dlm_list <- function(dlmList){
 ungroup_struct <- function(fasster_struct){
   for(model in seq_along(fasster_struct)){
     if(names(fasster_struct)[model] != ".model"){
-      ungroup_struct(fasster_struct[[model]])
+      fasster_struct[[model]] <- ungroup_struct(fasster_struct[[model]])
     }
     else{
-      fasster_struct <- reduce_dlm_list(fasster_struct[[model]])
+      fasster_struct[[model]] <- reduce_dlm_list(fasster_struct[[model]])[[1]]
     }
   }
-  fasster_struct[[1]]
+  reduce_dlm_list(fasster_struct)[[1]]
 }
 
 build_FASSTER_group <- function(model_struct, data, groups=NULL){
@@ -142,7 +142,7 @@ build_FASSTER <- function(formula, data, X = NULL){
 
     if(!is.null(X)){ ## Add switching
       dlmTerms[[1]]$JFF <- dlmTerms[[1]]$FF
-      dlmTerms[[1]]$X <- X
+      dlmTerms[[1]]$X <- matrix(X, ncol = 1)
     }
   }
 
@@ -193,13 +193,11 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7*24) + xreg, 
   out <- build_FASSTER_group(model_struct, data) %>%
     ungroup_struct()
 
-  browser()
   # stlFreq <- specialTerms[-1] %>% # Remove poly special
   #   map(~ .x %>% map_dbl(~ .x[[1]])) %>% # Extract first argument of seasonal specials
   #   unlist()
   #
   # initialOptim <- fasster_stl(y, groupData, s.window=s.window, stlFreq)
-
 
   ## Build modelFn
   # For each model group (including no-group), build a seperate dlm structure
@@ -217,5 +215,5 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7*24) + xreg, 
   }
 
   ## Fit model
-  fit <- dlmFilter(y, out)
+  dlmFilter(y, out)
 }
