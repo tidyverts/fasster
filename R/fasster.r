@@ -67,7 +67,7 @@ build_FASSTER_group <- function(model_struct, data, groups=NULL){
 
   if(!is.null(model_struct[[".model"]])){
     if(is.null(groups)){
-      groupX <- NULL
+      groupX <- list(NULL)
     }
     else{
       groupX <- groupData %>% spread_groups %>% as.data.frame
