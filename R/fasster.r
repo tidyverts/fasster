@@ -19,3 +19,32 @@ formula_parse_infix <- function(.formula, infix=NULL){
   .formula
 }
 
+formula_parse_groups <- function(.formula){
+  #browser()
+  parse <- list()
+  .formula <- formula_parse_infix(.formula, "%G%")
+  mt <- terms(.formula, specials = ".infix.G", allowDotAsName=TRUE)
+  groupIdx <- attr(mt, "specials")[[".infix.G"]]
+
+  if(is.null(groupIdx)){
+    ## No more groups
+    parse[["formula"]] <- .formula
+  }
+  else{
+    ## Explore groups
+    sub_mt <- delete.response(mt)[-c(groupIdx-1)]
+    if(length(attr(sub_mt, "variables")) > 0){
+      parse[["formula"]] <- .formula
+    }
+    parse[["formula"]] <-
+    for(pos in groupIdx){
+      groupCall <- as.list(attr(mt, "variables")[[1L + pos]])
+      while(class(groupCall[[3]]) == "("){
+        groupCall[[3]] <- groupCall[[3]][[2]]
+      }
+      parse[[deparse(groupCall[[2]])]] <- formula_parse_groups(as.formula(paste("~", deparse(groupCall[[3]], width.cutoff = 500))))
+    }
+  }
+
+  parse
+}
