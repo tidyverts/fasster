@@ -56,6 +56,26 @@ spread_groups <- function(object){
   out
 }
 
+reduce_dlm_list <- function(dlmList){
+  while(length(dlmList) > 1){
+    dlmList[[1]] <- dlmList[[1]] + dlmList[[2]]
+    dlmList[[2]] <- NULL
+  }
+  dlmList
+}
+
+ungroup_struct <- function(fasster_struct){
+  for(model in seq_along(fasster_struct)){
+    if(names(fasster_struct)[model] != ".model"){
+      ungroup_struct(fasster_struct[[model]])
+    }
+    else{
+      fasster_struct <- reduce_dlm_list(fasster_struct[[model]])
+    }
+  }
+  fasster_struct[[1]]
+}
+
 build_FASSTER_group <- function(model_struct, data, groups=NULL){
   if(!is.null(groups)){
     ## Grouped model
