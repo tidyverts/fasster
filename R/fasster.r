@@ -180,7 +180,7 @@ build_FASSTER <- function(formula, data, X = NULL){
 #' @importFrom dplyr select
 #' @importFrom rlang eval_tidy f_rhs
 #'
-fasster <- function(data, model = y ~ intercept + trig(24) + trig(7*24) + xreg, groupVar, lambda=NULL, approx=TRUE, s.window = 50, ...){
+fasster <- function(data, model = y ~ intercept + trig(24) + trig(7*24) + xreg, groupVar, lambda=NULL, heuristic=TRUE, s.window = 50, ...){
   series <- all.vars(model)[1]
   y <- data[,series]
   if(!is.null(lambda))
@@ -192,6 +192,32 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7*24) + xreg, 
 
   out <- build_FASSTER_group(model_struct, data) %>%
     ungroup_struct()
+
+  if(heuristic){
+    ## Generate optimisation Z
+    Z <- out$FF[rep(1, length(y)),]
+    Z[,out$JFF!=0] <- out$X[,out$JFF]
+    G_i <- out$GG
+    for(i in seq_along(y)){
+      Z[i, ] <- Z[i,] %*% G_i
+      G_i <- G_i%*%out$GG
+    }
+
+    ## Fit heuristic models
+    step_len <- NCOL(Z)*5 ## TODO: Add error checking
+    vt <- numeric(length(y) - step_len)
+    xt <- matrix(nrow=length(y) - step_len, ncol=NCOL(Z))
+    for(i in seq_len(length(y) - step_len)){
+      idx <- seq_len(step_len) + i - 1
+      optimFit <- lm(y[idx] ~ 0 + Z[idx,])
+      xt[i,] <- coef(optimFit)
+      vt[i] <- residuals(optimFit)[1]
+    }
+    wt <- xt[seq_len(NROW(xt)-1),] - (xt[seq_len(NROW(xt)-1)+1,] %*%out$GG)
+
+    out$V <- var(vt)
+    out$W <- var(wt)
+  }
 
   # stlFreq <- specialTerms[-1] %>% # Remove poly special
   #   map(~ .x %>% map_dbl(~ .x[[1]])) %>% # Extract first argument of seasonal specials
@@ -207,12 +233,12 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7*24) + xreg, 
   # - NoGroup (with specific model, compute number of required params)
   # -- noGroupMod
 
-  if(!approx){
-    # Setup function
-    # Run dlmMLE (perhaps after fasster_stl)
-    stop("Not yet implemented")
-    getOptim <- dlmMLE(data[,series], 0, fn)
-  }
+  # if(!approx){
+  #   # Setup function
+  #   # Run dlmMLE (perhaps after fasster_stl)
+  #   stop("Not yet implemented")
+  #   getOptim <- dlmMLE(data[,series], 0, fn)
+  # }
 
   ## Fit model
   dlmFilter(y, out)
