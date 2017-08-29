@@ -180,7 +180,7 @@ build_FASSTER <- function(formula, data, X = NULL){
 #' @importFrom dplyr select
 #' @importFrom rlang eval_tidy f_rhs
 #'
-fasster <- function(data, model = y ~ intercept + trig(24) + trig(7*24) + xreg, groupVar, lambda=NULL, heuristic=TRUE, s.window = 50, ...){
+fasster <- function(data, model = y ~ intercept + trig(24) + trig(7*24) + xreg, groupVar, lambda=NULL, heuristic=TRUE, fast=TRUE, s.window = 50, ...){
   series <- all.vars(model)[1]
   y <- data[,series]
   if(!is.null(lambda))
@@ -209,9 +209,15 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7*24) + xreg, 
     xt <- matrix(nrow=length(y) - step_len, ncol=NCOL(Z))
     for(i in seq_len(length(y) - step_len)){
       idx <- seq_len(step_len) + i - 1
-      optimFit <- lm(y[idx] ~ 0 + Z[idx,])
-      xt[i,] <- coef(optimFit)
-      vt[i] <- residuals(optimFit)[1]
+      if(fast){
+        xt[i,] <- solve(t(Z[idx,])%*%Z[idx,])%*%t(Z[idx,])%*%y[idx]
+        vt[i] <- (y[idx] - Z[idx,]%*%xt[i,])[1]
+      }
+      else{
+        optimFit <- lm(y[idx] ~ 0 + Z[idx,])
+        xt[i,] <- coef(optimFit)
+        vt[i] <- residuals(optimFit)[1]
+      }
     }
     wt <- xt[seq_len(NROW(xt)-1),] - (xt[seq_len(NROW(xt)-1)+1,] %*%out$GG)
 
