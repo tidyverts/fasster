@@ -157,18 +157,18 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
   infix_model <- formula_parse_infix(model, "%G%")
   model_struct <- formula_parse_groups(infix_model)
 
-  out <- build_FASSTER_group(model_struct, data) %>%
+  dlmModel <- build_FASSTER_group(model_struct, data) %>%
     ungroup_struct()
 
   if (heuristic) {
     ## Generate optimisation Z
-    ZF <- out$FF[rep(1, length(y)), ]
-    ZF[, out$JFF != 0] <- out$X[, out$JFF]
-    G_i <- out$GG
+    ZF <- dlmModel$FF[rep(1, length(y)), ]
+    ZF[, dlmModel$JFF != 0] <- dlmModel$X[, dlmModel$JFF]
+    G_i <- dlmModel$GG
     Z <- ZF
     for (i in seq_along(y)) {
       Z[i, ] <- ZF[i, ] %*% G_i
-      G_i <- G_i %*% out$GG
+      G_i <- G_i %*% dlmModel$GG
     }
 
     ## Fit heuristic models
@@ -184,26 +184,12 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
       # xt[i,] <- solve(t(Z[idx,])%*%Z[idx,])%*%t(Z[idx,])%*%y[idx]
       # vt[i] <- (y[idx] - Z[idx,]%*%xt[i,])[1]
     }
-    wt <- xt[seq_len(NROW(xt) - 1), ] - (xt[seq_len(NROW(xt) - 1) + 1, ] %*% out$GG)
+    wt <- xt[seq_len(NROW(xt) - 1), ] - (xt[seq_len(NROW(xt) - 1) + 1, ] %*% dlmModel$GG)
 
-    out$m0 <- xt[1, ]
-    out$V <- var(vt)
-    out$W <- out$C0 <- var(wt)
+    dlmModel$m0 <- xt[1, ]
+    dlmModel$V <- var(vt)
+    dlmModel$W <- dlmModel$C0 <- var(wt)
   }
-
-  # stlFreq <- specialTerms[-1] %>% # Remove poly special
-  #   map(~ .x %>% map_dbl(~ .x[[1]])) %>% # Extract first argument of seasonal specials
-  #   unlist()
-  #
-  # initialOptim <- fasster_stl(y, groupData, s.window=s.window, stlFreq)
-
-  ## Build modelFn
-  # For each model group (including no-group), build a seperate dlm structure
-  # - GroupVar (with specific model, compute number of required params)
-  # -- GroupLevelMod (attach groupX)
-  # -- GroupLevelMod (attach groupX)
-  # - NoGroup (with specific model, compute number of required params)
-  # -- noGroupMod
 
   # if(!approx){
   #   # Setup function
@@ -213,7 +199,7 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
   # }
 
   ## Fit model
-  filtered <- dlmFilter(y, out)
+  filtered <- dlmFilter(y, dlmModel)
   filtered$V <- (filtered$y - filtered$f) %>%
     as.numeric() %>%
     var()
