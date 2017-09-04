@@ -1,9 +1,12 @@
 #' @keywords internal
-"_PACKAGE"
+NULL
 
-#' @importFrom magrittr %>%
+#' @importFrom dplyr %>%
 #' @export
 dplyr::`%>%`
+
+#' @import stats
+NULL
 
 formula_parse_infix <- function(.formula, infix=NULL) {
   fn_name <- deparse(.formula[[1]])
@@ -112,6 +115,8 @@ build_FASSTER_group <- function(model_struct, data, groups=NULL) {
 }
 
 #' @importFrom rlang eval_tidy
+#' @importFrom purrr map
+#' @importFrom dlm dlmModPoly dlmModSeas dlmModTrig dlmModReg
 build_FASSTER <- function(formula, data, X = NULL) {
   dlmTerms <- list()
   ## Deparse model specification
@@ -172,21 +177,19 @@ build_FASSTER <- function(formula, data, X = NULL) {
 #'
 #' @param data A data.frame
 #' @param model The fitted model
-#' @param grouping The column in data for which the model switches.
 #' @param lambda Box-Cox transformation parameter. Ignored if NULL. Otherwise, data transformed before model is estimated. When lambda is specified, additive.only is set to TRUE.
-#' @param approx If `TRUE`, the fitted parameters for the model be approximated using stl decomposition. Otherwise, the parameters are optimised via the MLE.
-#' @param ...
+#' @param heuristic Should the lm heuristic be used
+#' @param ... Not used
 #'
 #' @return Returns a fitted FASSTER model
 #' @export
 #'
 #' @examples
 #'
-#' @importFrom lazyeval f_capture
-#' @importFrom dplyr select
-#' @importFrom rlang eval_tidy f_rhs
-#'
-fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg, groupVar, lambda=NULL, heuristic=TRUE, s.window = 50, ...) {
+#' @importFrom purrr safely
+#' @importFrom forecast BoxCox
+#' @importFrom dlm dlmFilter
+fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg, lambda=NULL, heuristic=TRUE, ...) {
   series <- all.vars(model)[1]
   y <- data[, series]
   if (!is.null(lambda))

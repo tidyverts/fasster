@@ -1,6 +1,8 @@
 
-#' @import dlm
+#' @importFrom dlm dlmSvd2var
+#' @importFrom forecast forecast
 #' @export
+forecast.fasster <- function(object, newdata=NULL, h=NULL, level=c(80, 95)) {
   mod <- object
   X <- newdata
   fit <- mod
