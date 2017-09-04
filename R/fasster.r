@@ -180,7 +180,7 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
       idx <- seq_len(step_len) + i - 1
       optimFit <- lsfit(Z[idx, ], y[idx], intercept = FALSE, tolerance = 1e-6)
       xt[i, ] <- optimFit$coefficients
-      vt[i] <- (y[idx] - ZF[idx, ] %*% xt[i, ])[1]
+      vt[i] <- (y[idx] - as.matrix(ZF[idx, ]) %*% xt[i, ])[1]
       # xt[i,] <- solve(t(Z[idx,])%*%Z[idx,])%*%t(Z[idx,])%*%y[idx]
       # vt[i] <- (y[idx] - Z[idx,]%*%xt[i,])[1]
     }
