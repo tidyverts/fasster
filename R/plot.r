@@ -3,8 +3,8 @@
 #' @importFrom ggplot2 fortify
 #' @export
 fortify.fasster <- function(model, data=NULL, ...) {
-  modTrigPlotData <- cbind(model$states, model$y, model$f)
-  colnames(modTrigPlotData) <- c(colnames(model$states), "Data", "Fitted")
+  modTrigPlotData <- cbind(model$model$states, model$model$y, model$model$f)
+  colnames(modTrigPlotData) <- c(colnames(model$model$states), "Data", "Fitted")
   return(modTrigPlotData)
 }
 
