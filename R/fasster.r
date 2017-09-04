@@ -1,5 +1,5 @@
 #' @keywords internal
-NULL
+"_PACKAGE"
 
 #' @importFrom dplyr %>%
 #' @export
@@ -200,8 +200,10 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
 
   ## Fit model
   filtered <- dlmFilter(y, dlmModel)
-  filtered$V <- (filtered$y - filtered$f) %>%
+  resid <- filtered$y - filtered$f
+  filtered$mod$V <- resid %>%
     as.numeric() %>%
     var()
-  return(filtered)
+
+  return(structure(list(model = filtered, x = filtered$y, fitted = filtered$f, call = match.call(), series = series, residuals = resid), class = "fasster"))
 }

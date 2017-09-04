@@ -10,7 +10,7 @@ test_that("Test grouping", {
   USAccDeaths %>%
     data.frame() %>%
     fasster(`.` ~ poly(1) + trig(12)) %>%
-    forecast.fasster() %>%
+    forecast() %>%
     autoplot()
   ## 902177.7
   ## 239660.5

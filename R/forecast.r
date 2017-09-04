@@ -3,7 +3,7 @@
 #' @importFrom forecast forecast
 #' @export
 forecast.fasster <- function(object, newdata=NULL, h=NULL, level=c(80, 95)) {
-  mod <- object
+  mod <- object$model
   X <- newdata
   fit <- mod
   if (inherits(mod, "dlmFiltered")) {
@@ -75,6 +75,6 @@ forecast.fasster <- function(object, newdata=NULL, h=NULL, level=c(80, 95)) {
       upper[, i] <- f + qq * sqrt(Q)
     }
 
-  ans <- structure(list(model = fit, mean = f, level = level, x = fit$y, upper = upper, lower = lower, fitted = fit$f, method = "TVDLM", series = "series", residuals = fit$y - fit$f), class = "forecast")
+  ans <- structure(list(model = fit, mean = f, level = level, x = fit$y, upper = upper, lower = lower, fitted = fit$f, method = "FASSTER", series = "series", residuals = fit$y - fit$f), class = "forecast")
   return(ans)
 }
