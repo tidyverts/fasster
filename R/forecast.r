@@ -22,7 +22,10 @@ forecast.fasster <- function(object, newdata=NULL, h=NULL, level=c(80, 95)) {
     mod <- modFuture
   }
 
-  nAhead <- if(!is.null(X)){
+  nAhead <- if(!is.null(mod$X)){
+    if(is.null(X)){
+      stop("X must be given")
+    }
     NROW(X)
   }
   else{
