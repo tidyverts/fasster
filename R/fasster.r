@@ -162,7 +162,7 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
 
   if (heuristic) {
     ## Generate optimisation Z
-    ZF <- dlmModel$FF[rep(1, length(y)), ]
+    ZF <- as.matrix(dlmModel$FF[rep(1, length(y)), ])
     ZF[, dlmModel$JFF != 0] <- dlmModel$X[, dlmModel$JFF]
     G_i <- dlmModel$GG
     Z <- ZF
