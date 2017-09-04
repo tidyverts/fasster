@@ -22,7 +22,17 @@ forecast.fasster <- function(object, newdata=NULL, h=NULL, level=c(80, 95)) {
     mod <- modFuture
   }
 
-  nAhead <- NROW(X)
+  nAhead <- if(!is.null(X)){
+    NROW(X)
+  }
+  else{
+    if(is.null(h)){
+      24
+    }
+    else{
+      h
+    }
+  }
   ytsp <- tsp(mod$m0)
   p <- length(mod$m0)
   m <- nrow(mod$FF)
@@ -42,8 +52,7 @@ forecast.fasster <- function(object, newdata=NULL, h=NULL, level=c(80, 95)) {
     XW <- mod$W
     XW[mod$JW != 0] <- X[it, mod$JW]
 
-    # browser()
-    # KF
+    # Kalman Filter Forecast
     a[it + 1, ] <- XGG %*% a[it, ]
     R[[it + 1]] <- XGG %*% R[[it]] %*% t(XGG) + XW
     f[it, ] <- XFF %*% a[it + 1, ]
