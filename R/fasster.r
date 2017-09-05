@@ -176,5 +176,5 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
     as.numeric() %>%
     var()
 
-  return(structure(list(model = filtered, formula = model, x = filtered$y, fitted = filtered$f, call = match.call(), series = series, residuals = resid), class = "fasster"))
+  return(structure(list(model = filtered, formula = model, x = filtered$y, fitted = filtered$f, call = match.call(), series = series, residuals = resid, optimFit = list(vt=filtered$mod$vt, wt=filtered$mod$xt)), class = "fasster"))
 }
