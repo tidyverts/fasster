@@ -159,32 +159,7 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
     ungroup_struct()
 
   if (heuristic) {
-    ## Generate optimisation Z
-    ZF <- as.matrix(dlmModel$FF[rep(1, length(y)), ])
-    ZF[, dlmModel$JFF != 0] <- dlmModel$X[, dlmModel$JFF]
-    G_i <- dlmModel$GG
-    Z <- ZF
-    for (i in seq_along(y)) {
-      Z[i, ] <- ZF[i, ] %*% G_i
-      G_i <- G_i %*% dlmModel$GG
-    }
-
-    ## Fit heuristic models
-    skipped <- 0
-    step_len <- NCOL(Z) * 5 ## TODO: Add error checking
-    vt <- numeric(length(y) - step_len)
-    xt <- matrix(nrow = length(y) - step_len, ncol = NCOL(Z))
-    for (i in seq_len(length(y) - step_len)) {
-      idx <- seq_len(step_len) + i - 1
-      optimFit <- lsfit(Z[idx, ], y[idx], intercept = FALSE, tolerance = 1e-6)
-      xt[i, ] <- optimFit$coefficients
-      vt[i] <- (y[idx] - as.matrix(ZF[idx, ]) %*% xt[i, ])[1]
-    }
-    wt <- xt[seq_len(NROW(xt) - 1), ] - (xt[seq_len(NROW(xt) - 1) + 1, ] %*% dlmModel$GG)
-
-    dlmModel$m0 <- xt[1, ]
-    dlmModel$V <- var(vt)
-    dlmModel$W <- dlmModel$C0 <- var(wt)
+    dlmModel <- dlm_lmHeuristic(y, dlmModel)
   }
 
   # if(!approx){

@@ -35,3 +35,33 @@
 #'   #   invoke(rbind, .) %>%
 #'   #   var_stl_decomp()
 #' }
+dlm_lmHeuristic <- function(y, dlmModel){
+
+  ## Generate optimisation Z
+  ZF <- as.matrix(dlmModel$FF[rep(1, length(y)), ])
+  ZF[, dlmModel$JFF != 0] <- dlmModel$X[, dlmModel$JFF]
+  G_i <- dlmModel$GG
+  Z <- ZF
+  for (i in seq_along(y)) {
+    Z[i, ] <- ZF[i, ] %*% G_i
+    G_i <- G_i %*% dlmModel$GG
+  }
+
+  ## Fit heuristic models
+  step_len <- NCOL(Z) * 3 ## TODO: Add error checking
+  dlmModel$vt <- numeric(length(y) - step_len)
+  dlmModel$xt <- matrix(nrow = length(y) - step_len, ncol = NCOL(Z))
+  for (i in seq_len(length(y) - step_len)) {
+    idx <- seq_len(step_len) + i - 1
+    optimFit <- lsfit(Z[idx, ], y[idx], intercept = FALSE, tolerance = 1e-6)
+    dlmModel$xt[i, ] <- optimFit$coefficients
+    dlmModel$vt[i] <- (y[idx] - as.matrix(ZF[idx, ]) %*% dlmModel$xt[i, ])[1]
+  }
+  wt <- dlmModel$xt[seq_len(NROW(dlmModel$xt) - 1), ] - (dlmModel$xt[seq_len(NROW(dlmModel$xt) - 1) + 1, ] %*% dlmModel$GG)
+
+  dlmModel$m0 <- dlmModel$xt[1, ]
+  dlmModel$V <- var(dlmModel$vt)
+  dlmModel$W <- dlmModel$C0 <- var(wt)
+
+  return(dlmModel)
+}
