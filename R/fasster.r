@@ -154,9 +154,7 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
     y <- BoxCox(y, lambda)
 
   # Parse formula into structure
-  infix_model <- formula_parse_infix(model, "%G%")
-  model_struct <- formula_parse_groups(infix_model)
-
+  model_struct <- formula_parse_groups(model)
   dlmModel <- build_FASSTER_group(model_struct, data) %>%
     ungroup_struct()
 
