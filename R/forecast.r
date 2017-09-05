@@ -4,7 +4,18 @@
 #' @export
 forecast.fasster <- function(object, newdata=NULL, h=NULL, level=c(80, 95)) {
   mod <- object$model
-  X <- newdata
+
+  if(!is.null(newdata)){
+    # Build model on newdata
+    model_struct <- formula_parse_groups(object$formula)
+    dlmModel <- build_FASSTER_group(model_struct, newdata) %>%
+      ungroup_struct()
+    X <- dlmModel$X
+  }
+  else{
+    X <- NULL
+  }
+
   fit <- mod
   if (inherits(mod, "dlmFiltered")) {
     modFuture <- mod$mod
