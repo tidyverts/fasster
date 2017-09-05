@@ -179,8 +179,6 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
       optimFit <- lsfit(Z[idx, ], y[idx], intercept = FALSE, tolerance = 1e-6)
       xt[i, ] <- optimFit$coefficients
       vt[i] <- (y[idx] - as.matrix(ZF[idx, ]) %*% xt[i, ])[1]
-      # xt[i,] <- solve(t(Z[idx,])%*%Z[idx,])%*%t(Z[idx,])%*%y[idx]
-      # vt[i] <- (y[idx] - Z[idx,]%*%xt[i,])[1]
     }
     wt <- xt[seq_len(NROW(xt) - 1), ] - (xt[seq_len(NROW(xt) - 1) + 1, ] %*% dlmModel$GG)
 
@@ -203,5 +201,5 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
     as.numeric() %>%
     var()
 
-  return(structure(list(model = filtered, x = filtered$y, fitted = filtered$f, call = match.call(), series = series, residuals = resid), class = "fasster"))
+  return(structure(list(model = filtered, formula = model, x = filtered$y, fitted = filtered$f, call = match.call(), series = series, residuals = resid), class = "fasster"))
 }
