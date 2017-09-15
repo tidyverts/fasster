@@ -79,7 +79,7 @@ build_FASSTER <- function(formula, data, X = NULL) {
   dlmTerms <- list()
   ## Deparse model specification
   triggerwords <- c("constant", "intercept", "slope", "trend")
-  specials <- c("poly", "trig", "seas") # , "fourier", "seasonality", "seasonal")
+  specials <- c("poly", "trig", "seas", "ARMA") # , "fourier", "seasonality", "seasonal")
 
   mt <- terms(formula, data = data, specials = specials)
   attr(mt, "intercept") <- 0
@@ -102,6 +102,9 @@ build_FASSTER <- function(formula, data, X = NULL) {
     }
     for (term in specialTerms$seas) {
       dlmTerms <- append(dlmTerms, list(dlmModSeas(term[[1]])))
+    }
+    for (term in specialTerms$ARMA) {
+      dlmTerms <- append(dlmTerms, list(dlmModARMA(term[[1]], term[[2]])))
     }
     for (term in specialTerms$trig) {
       dlmTerms <- append(dlmTerms, list(dlmModTrig(term[[1]])))
