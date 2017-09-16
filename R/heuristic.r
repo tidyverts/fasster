@@ -53,9 +53,9 @@ dlm_lmHeuristic <- function(y, dlmModel){
   dlmModel$xt <- matrix(nrow = length(y) - step_len, ncol = NCOL(Z))
   for (i in seq_len(length(y) - step_len)) {
     idx <- seq_len(step_len) + i - 1
-    optimFit <- lsfit(Z[idx, ], y[idx], intercept = FALSE, tolerance = 1e-6)
+    optimFit <- .lm.fit(Z[idx, ], y[idx], tol = 1e-6)
     dlmModel$xt[i, ] <- optimFit$coefficients
-    dlmModel$vt[i] <- (y[idx] - as.matrix(ZF[idx, ]) %*% dlmModel$xt[i, ])[1]
+    dlmModel$vt[i] <- optimFit$residuals[1]
   }
   wt <- dlmModel$xt[seq_len(NROW(dlmModel$xt) - 1), ] - (dlmModel$xt[seq_len(NROW(dlmModel$xt) - 1) + 1, ] %*% dlmModel$GG)
 
