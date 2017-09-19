@@ -144,7 +144,7 @@ build_FASSTER <- function(formula, data, X = NULL) {
 #' @param data A data.frame
 #' @param model The fitted model
 #' @param lambda Box-Cox transformation parameter. Ignored if NULL. Otherwise, data transformed before model is estimated. When lambda is specified, additive.only is set to TRUE.
-#' @param heuristic Should the lm heuristic be used
+#' @param include How many terms should be included to fit the model
 #' @param ... Not used
 #'
 #' @return Returns a fitted FASSTER model
@@ -155,20 +155,22 @@ build_FASSTER <- function(formula, data, X = NULL) {
 #' @importFrom purrr safely
 #' @importFrom forecast BoxCox
 #' @importFrom dlm dlmFilter
-fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg, lambda=NULL, heuristic=TRUE, ...) {
+fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg, lambda=NULL, include=NULL, ...) {
   series <- all.vars(model)[1]
   y <- data[, series]
   if (!is.null(lambda))
     y <- BoxCox(y, lambda)
 
+  if (is.null(include)){
+    include <- NROW(y)
+  }
+
   # Parse formula into structure
   model_struct <- formula_parse_groups(model)
-  dlmModel <- build_FASSTER_group(model_struct, data) %>%
+  dlmModel <- build_FASSTER_group(model_struct, tail(data, include)) %>%
     ungroup_struct()
 
-  if (heuristic) {
-    dlmModel <- dlm_lmHeuristic(y, dlmModel)
-  }
+  dlmModel <- dlm_lmHeuristic(tail(y, include), dlmModel)
 
   # if(!approx){
   #   # Setup function
@@ -177,8 +179,10 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
   #   getOptim <- dlmMLE(data[,series], 0, fn)
   # }
 
-  ## Fit model
-  filtered <- dlmFilter(y, dlmModel)
+  # Fit model
+  filtered <- dlmFilter(tail(y, include), dlmModel)
+
+  # Update model variance
   resid <- filtered$y - filtered$f
   filtered$mod$V <- resid %>%
     as.numeric() %>%
