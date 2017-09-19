@@ -152,9 +152,8 @@ build_FASSTER <- function(formula, data, X = NULL) {
 #'
 #' @examples
 #'
-#' @importFrom purrr safely
 #' @importFrom forecast BoxCox
-#' @importFrom dlm dlmFilter
+#' @importFrom dlm dlmFilter dlmSvd2var
 fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg, lambda=NULL, include=NULL, ...) {
   series <- all.vars(model)[1]
   y <- data[, series]
@@ -188,5 +187,21 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
     as.numeric() %>%
     var()
 
-  return(structure(list(model = dlmModel, formula = model, x = filtered$y, fitted = filtered$f, call = match.call(), series = series, residuals = resid, optimFit = list(vt=filtered$mod$vt, wt=filtered$mod$xt)), class = "fasster"))
+  # Model to start forecasting from
+  modFuture <- filtered$mod
+  lastObsIndex <- NROW(filtered$m)
+  modFuture$C0 <- with(filtered, dlmSvd2var(
+    U.C[[lastObsIndex]],
+    D.C[lastObsIndex, ]
+  ))
+  if (is.ts(filtered$m))
+    modFuture$m0 <- window(filtered$m, start = end(filtered$m))
+  else {
+    modFuture$m0 <- window(filtered$m, start = lastObsIndex)
+    tsp(modFuture$m0) <- NULL
+  }
+
+  return(structure(list(model = dlmModel, model_future = modFuture, formula = model, x = filtered$y, fitted = filtered$f, call = match.call(), series = series, residuals = resid, optimFit = list(vt=filtered$mod$vt, wt=filtered$mod$xt)), class = "fasster"))
+}
+
 }

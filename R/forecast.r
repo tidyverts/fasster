@@ -3,7 +3,7 @@
 #' @importFrom forecast forecast
 #' @export
 forecast.fasster <- function(object, newdata=NULL, h=NULL, level=c(80, 95)) {
-  mod <- object$model
+  mod <- object$model_future
 
   if(!is.null(newdata)){
     # Build model on newdata
@@ -17,21 +17,6 @@ forecast.fasster <- function(object, newdata=NULL, h=NULL, level=c(80, 95)) {
   }
 
   fit <- mod
-  if (inherits(mod, "dlmFiltered")) {
-    modFuture <- mod$mod
-    lastObsIndex <- NROW(mod$m)
-    modFuture$C0 <- with(mod, dlmSvd2var(
-      U.C[[lastObsIndex]],
-      D.C[lastObsIndex, ]
-    ))
-    if (is.ts(mod$m))
-      modFuture$m0 <- window(mod$m, start = end(mod$m))
-      else {
-      modFuture$m0 <- window(mod$m, start = lastObsIndex)
-      tsp(modFuture$m0) <- NULL
-    }
-    mod <- modFuture
-  }
 
   nAhead <- if(!is.null(mod$X)){
     if(is.null(X)){
