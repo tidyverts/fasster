@@ -107,7 +107,12 @@ build_FASSTER <- function(formula, data, X = NULL) {
       dlmTerms <- append(dlmTerms, list(dlmModARMA(term[[1]], term[[2]])))
     }
     for (term in specialTerms$trig) {
-      dlmTerms <- append(dlmTerms, list(dlmModTrig(term[[1]])))
+      if(length(term) > 1){
+        dlmTerms <- append(dlmTerms, list(dlmModTrig(term[[1]], term[[2]])))
+      }
+      else{
+        dlmTerms <- append(dlmTerms, list(dlmModTrig(term[[1]])))
+      }
     }
 
     dlmTerms <- reduce_dlm_list(dlmTerms)
