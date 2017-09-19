@@ -74,6 +74,6 @@ forecast.fasster <- function(object, newdata=NULL, h=NULL, level=c(80, 95)) {
       upper[, i] <- f + qq * sqrt(Q)
     }
 
-  ans <- structure(list(model = fit, mean = f, level = level, x = object$x, upper = upper, lower = lower, fitted = fit$f, method = "FASSTER", series = object$series, residuals = fit$y - fit$f), class = c("forecast"))
+  ans <- structure(list(model = fit, mean = f, level = level, x = object$x, upper = upper, lower = lower, fitted = fit$f, method = "FASSTER", series = object$series, residuals = residuals(object)), class = c("forecast"))
   return(ans)
 }
