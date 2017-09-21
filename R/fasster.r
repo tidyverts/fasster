@@ -133,6 +133,7 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL) {
     dlmTerms <- reduce_dlm_list(dlmTerms)
   }
 
+  colnames(dlmTerms[[1]]$FF) <- make.unique(specialPathList)
   dlmTerms[[1]]
 }
 
