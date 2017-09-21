@@ -45,12 +45,12 @@ build_FASSTER_group <- function(model_struct, data, groups=NULL) {
     attr(terms_groups, "intercept") <- 0
     groupData <- model.matrix(terms_groups, data) %>%
       as.data.frame() %>%
-      interaction()
+      interaction(sep="/")
   }
 
   if (!is.null(model_struct[[".model"]])) {
     if (is.null(groups)) {
-      groupX <- list(NULL)
+      groupX <- list(ungrouped = NULL)
     }
     else {
       groupX <- groupData %>%
@@ -58,8 +58,8 @@ build_FASSTER_group <- function(model_struct, data, groups=NULL) {
         as.data.frame()
     }
     model_struct[[".model"]] <- groupX %>%
-      map(
-        ~ build_FASSTER(model_struct[[".model"]], data, X = .x)
+      imap(
+        ~ build_FASSTER(model_struct[[".model"]], data, X = .x, group = .y)
       )
   }
 
@@ -75,7 +75,7 @@ build_FASSTER_group <- function(model_struct, data, groups=NULL) {
 #' @importFrom rlang eval_tidy
 #' @importFrom purrr map
 #' @importFrom dlm dlmModPoly dlmModSeas dlmModTrig dlmModReg
-build_FASSTER <- function(formula, data, X = NULL) {
+build_FASSTER <- function(formula, data, X = NULL, group = NULL) {
   dlmTerms <- list()
   ## Deparse model specification
   triggerwords <- c("constant", "intercept", "slope", "trend")
@@ -96,24 +96,20 @@ build_FASSTER <- function(formula, data, X = NULL) {
   specialIdx <- unlist(attr(mt, "specials"))
 
   ## Set up specials
+  specialPathList <- NULL
   if (length(specialIdx) > 0) {
-    for (term in specialTerms$poly) {
-      dlmTerms <- append(dlmTerms, list(dlmModPoly(term[[1]])))
-    }
-    for (term in specialTerms$seas) {
-      dlmTerms <- append(dlmTerms, list(dlmModSeas(term[[1]])))
-    }
-    for (term in specialTerms$ARMA) {
-      dlmTerms <- append(dlmTerms, list(dlmModARMA(term[[1]], term[[2]])))
-    }
-    for (term in specialTerms$trig) {
-      if(length(term) > 1){
-        dlmTerms <- append(dlmTerms, list(dlmModTrig(term[[1]], term[[2]])))
-      }
-      else{
-        dlmTerms <- append(dlmTerms, list(dlmModTrig(term[[1]])))
-      }
-    }
+    dlmTerms <- specialTerms %>%
+      imap(~ .x %>% map2(.y,
+                         ~ do.call(switch(.y,
+                                          poly = dlmModPoly,
+                                          seas = dlmModSeas,
+                                          ARMA = dlmModARMA,
+                                          trig = dlmModTrig), .x))) %>%
+      unlist(recursive=FALSE)
+
+    specialPathList <- dlmTerms %>%
+      map2(specialIdx, ~ rep(paste0(group, ":", attr(mt, "term.labels")[.y]), length(.x[["FF"]]))) %>%
+      unlist()
 
     dlmTerms <- reduce_dlm_list(dlmTerms)
 
@@ -129,6 +125,7 @@ build_FASSTER <- function(formula, data, X = NULL) {
       mt <- mt[-specialIdx]
     }
     xreg <- model.matrix(mt, data)
+    specialPathList <- c(specialPathList, paste0(group, ":", colnames(xreg)))
     if (!is.null(X)) {
       xreg <- xreg * X # xreg switching
     }
