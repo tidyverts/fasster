@@ -79,14 +79,14 @@ dlm_lmHeuristic_saturated <- function(y, dlmModel, dlmModelSaturated){
 dlm_filterSmoothHeuristic <- function(y, dlmModel){
   filtered <- dlmFilter(y, dlmModel)
   smoothed <- dlmSmooth(filtered)
+  dlmModel$m0 <- smoothed$s[1,]
   dlmModel$C0 <- with(smoothed, dlmSvd2var(
     U.S[[1]],
     D.S[1, ]
   ))
-  dlmModel$W <-dlmModel$C0 <- with(smoothed, dlmSvd2var(
+  dlmModel$W <- with(smoothed, dlmSvd2var(
     U.S[[length(U.S)]],
     D.S[length(U.S), ]
   ))
-  dlmModel$m0 <- smoothed$s[1,]
   dlmModel
 }
