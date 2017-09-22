@@ -4,7 +4,7 @@
 #' @export
 fortify.fasster <- function(model, data=NULL, ...) {
   modTrigPlotData <- cbind(model$states, model$x, model$fitted)
-  colnames(modTrigPlotData) <- c(colnames(regular$model$FF), "Data", "Fitted")
+  colnames(modTrigPlotData) <- c(colnames(model$model$FF), "Data", "Fitted")
   return(modTrigPlotData)
 }
 
