@@ -50,7 +50,7 @@ build_FASSTER_group <- function(model_struct, data, groups=NULL) {
 
   if (!is.null(model_struct[[".model"]])) {
     if (is.null(groups)) {
-      groupX <- list(ungrouped = NULL)
+      groupX <- list(.root = NULL)
     }
     else {
       groupX <- groupData %>%
@@ -76,6 +76,10 @@ build_FASSTER_group <- function(model_struct, data, groups=NULL) {
 #' @importFrom purrr map
 #' @importFrom dlm dlmModPoly dlmModSeas dlmModTrig dlmModReg
 build_FASSTER <- function(formula, data, X = NULL, group = NULL) {
+  if(group == ".root"){
+    group <- NULL
+  }
+
   dlmTerms <- list()
   ## Deparse model specification
   triggerwords <- c("constant", "intercept", "slope", "trend")
@@ -108,7 +112,7 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL) {
       unlist(recursive=FALSE)
 
     specialPathList <- dlmTerms %>%
-      map2(specialIdx, ~ rep(paste0(group, ":", attr(mt, "term.labels")[.y]), length(.x[["FF"]]))) %>%
+      map2(specialIdx, ~ rep(paste0(group, attr(mt, "term.labels")[.y], collapse = ":"), length(.x[["FF"]]))) %>%
       unlist()
 
     dlmTerms <- reduce_dlm_list(dlmTerms)
@@ -133,7 +137,7 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL) {
     dlmTerms <- reduce_dlm_list(dlmTerms)
   }
 
-  colnames(dlmTerms[[1]]$FF) <- make.unique(specialPathList)
+  colnames(dlmTerms[[1]]$FF) <- specialPathList
   dlmTerms[[1]]
 }
 
