@@ -19,3 +19,8 @@ autoplot.fasster <- function(object, facet=FALSE, ...) {
   }
   autoplot(modTrigPlotData, ...) + facet_grid(as.numeric(series %in% c("Data", "Fitted")) ~ .)
 }
+
+#' @export
+ggfitted <- function(object, ...){
+  fortify(object)[,c("Data", "Fitted")] %>% autoplot
+}
