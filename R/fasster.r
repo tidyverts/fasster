@@ -165,8 +165,10 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
 
   series <- all.vars(model)[1]
   y <- data[, series]
-  if (!is.null(lambda))
+  if (!is.null(lambda)){
+    stop("Not yet implemented")
     y <- BoxCox(y, lambda)
+  }
 
   if (is.null(include)){
     include <- NROW(y)
