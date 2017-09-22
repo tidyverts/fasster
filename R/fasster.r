@@ -160,7 +160,7 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "reg
 #'
 #' @importFrom forecast BoxCox
 #' @importFrom dlm dlmFilter dlmSvd2var
-fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg, lambda=NULL, heuristic=c("lm", "saturated", "filterSmooth"), include=NULL, ...) {
+fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg, lambda=NULL, heuristic=c("filterSmooth", "lm", "saturated"), include=NULL, ...) {
   heuristic <- match.arg(heuristic)
 
   series <- all.vars(model)[1]
