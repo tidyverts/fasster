@@ -37,7 +37,8 @@ ungroup_struct <- function(fasster_struct) {
   reduce_dlm_list(fasster_struct)[[1]]
 }
 
-build_FASSTER_group <- function(model_struct, data, groups=NULL) {
+#' @importFrom purrr imap
+build_FASSTER_group <- function(model_struct, data, groups=NULL, internal = "regular") {
   if (!is.null(groups)) {
     ## Grouped model
     groupVar <- as.formula(paste("~", paste(groups, collapse = " + ")))
@@ -58,24 +59,22 @@ build_FASSTER_group <- function(model_struct, data, groups=NULL) {
         as.data.frame()
     }
     model_struct[[".model"]] <- groupX %>%
-      imap(
-        ~ build_FASSTER(model_struct[[".model"]], data, X = .x, group = .y)
-      )
+      imap(~ build_FASSTER(model_struct[[".model"]], data, X = .x, group = .y, internal=internal))
   }
 
   ## Recursively explore groups
   for (next_group in names(model_struct)) {
     if (next_group != ".model") {
-      model_struct[[next_group]] <- build_FASSTER_group(model_struct[[next_group]], data, groups = c(groups, next_group))
+      model_struct[[next_group]] <- build_FASSTER_group(model_struct[[next_group]], data, groups = c(groups, next_group), internal=internal)
     }
   }
   return(model_struct)
 }
 
 #' @importFrom rlang eval_tidy
-#' @importFrom purrr map
+#' @importFrom purrr map map2 imap
 #' @importFrom dlm dlmModPoly dlmModSeas dlmModTrig dlmModReg
-build_FASSTER <- function(formula, data, X = NULL, group = NULL) {
+build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "regular") {
   if(group == ".root"){
     group <- NULL
   }
@@ -98,6 +97,11 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL) {
       lapply(extractSpecialArgs))
 
   specialIdx <- unlist(attr(mt, "specials"))
+
+  if(internal == "saturate"){
+    specialTerms$trig <- specialTerms$trig %>% map(~ list(.x[[1]]))
+    specialTerms$seas <- specialTerms$seas %>% map(~ list(.x[[1]]))
+  }
 
   ## Set up specials
   specialPathList <- NULL
@@ -156,7 +160,9 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL) {
 #'
 #' @importFrom forecast BoxCox
 #' @importFrom dlm dlmFilter dlmSvd2var
-fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg, lambda=NULL, include=NULL, ...) {
+fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg, lambda=NULL, heuristic=c("lm", "saturated", "filterSmooth"), include=NULL, ...) {
+  heuristic <- match.arg(heuristic)
+
   series <- all.vars(model)[1]
   y <- data[, series]
   if (!is.null(lambda))
@@ -171,8 +177,13 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
   dlmModel <- build_FASSTER_group(model_struct, tail(data, include)) %>%
     ungroup_struct()
 
-  dlmModel <- dlm_lmHeuristic(tail(y, include), dlmModel)
-
+  if(heuristic == "lm")
+    dlmModel <- dlm_lmHeuristic(tail(y, include), dlmModel)
+  else if(heuristic == "saturated")
+    dlmModel <- dlm_lmHeuristic_saturated(tail(y, include), dlmModel,
+                                          ungroup_struct(build_FASSTER_group(model_struct, tail(data, include), internal = "saturate")))
+  else if(heuristic == "filterSmooth")
+    stop("Not yet implemented")
   # if(!approx){
   #   # Setup function
   #   # Run dlmMLE (perhaps after fasster_stl)
@@ -202,8 +213,8 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
     modFuture$m0 <- window(filtered$m, start = lastObsIndex)
     tsp(modFuture$m0) <- NULL
   }
-
-  return(structure(list(model = dlmModel, model_future = modFuture, formula = model, x = filtered$y, fitted = filtered$f, call = match.call(), series = series, residuals = resid, optimFit = list(vt=filtered$mod$vt, wt=filtered$mod$xt)), class = "fasster"))
+  # optimFit = list(vt=filtered$mod$vt, wt=filtered$mod$xt)
+  return(structure(list(model = dlmModel, model_future = modFuture, formula = model, x = filtered$y, fitted = filtered$f, call = match.call(), series = series, residuals = resid, states = filtered$a), class = "fasster"))
 }
 
 #' @export
