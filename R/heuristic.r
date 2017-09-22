@@ -75,18 +75,25 @@ dlm_lmHeuristic_saturated <- function(y, dlmModel, dlmModelSaturated){
   return(dlmModel)
 }
 
+smoothedFits <- function(smooth, mod){
+  XFF <- mod$FF[rep(1, NROW(smooth$s) - 1), ]
+  XFF[,mod$JFF != 0] <- mod$X[, mod$JFF]
+  diag(XFF%*%t(head(smooth$s,-1))) ## Inefficient
+}
+
 #' @importFrom dlm dlmSmooth dlmSvd2var
 dlm_filterSmoothHeuristic <- function(y, dlmModel){
+  dlmModel$W <- diag(1, NROW(dlmModel$W))
   filtered <- dlmFilter(y, dlmModel)
   smoothed <- dlmSmooth(filtered)
+
   dlmModel$m0 <- smoothed$s[1,]
   dlmModel$C0 <- with(smoothed, dlmSvd2var(
     U.S[[1]],
     D.S[1, ]
   ))
-  dlmModel$W <- with(smoothed, dlmSvd2var(
-    U.S[[length(U.S)]],
-    D.S[length(U.S), ]
-  ))
+  wt <- smoothed$s[seq_len(NROW(smoothed$s) - 1), ] - (smoothed$s[seq_len(NROW(smoothed$s) - 1) + 1, ] %*% dlmModel$GG)
+  dlmModel$W <- var(wt)#with(smoothed, dlmSvd2var(U.S[[length(U.S)]],D.S[NROW(D.S), ]))
+  dlmModel$V <- var(smoothedFits(smoothed, dlmModel) - y)
   dlmModel
 }

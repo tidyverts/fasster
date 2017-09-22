@@ -209,6 +209,8 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
     U.C[[lastObsIndex]],
     D.C[lastObsIndex, ]
   ))
+  wt <- filtered$a[seq_len(NROW(filtered$a) - 1), ] - (filtered$a[seq_len(NROW(filtered$a) - 1) + 1, ] %*% dlmModel$GG)
+  modFuture$W <- var(wt)
   if (is.ts(filtered$m))
     modFuture$m0 <- window(filtered$m, start = end(filtered$m))
   else {
