@@ -185,7 +185,7 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
     dlmModel <- dlm_lmHeuristic_saturated(tail(y, include), dlmModel,
                                           ungroup_struct(build_FASSTER_group(model_struct, tail(data, include), internal = "saturate")))
   else if(heuristic == "filterSmooth")
-    stop("Not yet implemented")
+    dlmModel <- dlm_filterSmoothHeuristic(tail(y, include), dlmModel)
   # if(!approx){
   #   # Setup function
   #   # Run dlmMLE (perhaps after fasster_stl)
