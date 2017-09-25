@@ -165,6 +165,9 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
 
   series <- all.vars(model)[1]
   y <- data[, series]
+  if(!is.null(dim(y))){
+    y <- y[[1]]
+  }
   if (!is.null(lambda)){
     stop("Not yet implemented")
     y <- BoxCox(y, lambda)
