@@ -22,5 +22,5 @@ autoplot.fasster <- function(object, facet=FALSE, ...) {
 
 #' @export
 ggfitted <- function(object, ...){
-  fortify(object)[,c("Data", "Fitted")] %>% autoplot
+  ts(fortify(object)[,c("Data", "Fitted")]) %>% autoplot
 }
