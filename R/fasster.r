@@ -44,9 +44,9 @@ build_FASSTER_group <- function(model_struct, data, groups=NULL, internal = "reg
     groupVar <- as.formula(paste("~", paste(groups, collapse = " + ")))
     terms_groups <- terms(groupVar, data = data)
     attr(terms_groups, "intercept") <- 0
-    groupData <- model.matrix(terms_groups, data) %>%
+    groupData <- model.frame(terms_groups, data) %>%
       as.data.frame() %>%
-      interaction(sep="/")
+      interaction(sep="/", drop=TRUE)
   }
 
   if (!is.null(model_struct[[".model"]])) {
