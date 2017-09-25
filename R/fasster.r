@@ -163,6 +163,12 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "reg
 fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg, lambda=NULL, heuristic=c("filterSmooth", "lm", "saturated"), include=NULL, ...) {
   heuristic <- match.arg(heuristic)
 
+  if(inherits(data, "formula")){
+    model <- data
+    data[[3]] <- 1
+    data <- model.frame(data)
+  }
+
   series <- all.vars(model)[1]
   y <- data[, series]
   if(!is.null(dim(y))){
