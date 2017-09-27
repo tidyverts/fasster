@@ -73,7 +73,7 @@ build_FASSTER_group <- function(model_struct, data, groups=NULL, internal = "reg
 
 #' @importFrom rlang eval_tidy
 #' @importFrom purrr map map2 imap
-#' @importFrom dlm dlmModPoly dlmModSeas dlmModTrig dlmModReg
+#' @importFrom dlm dlmModPoly dlmModSeas dlmModTrig dlmModReg dlmModARMA
 build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "regular") {
   if(group == ".root"){
     group <- NULL
@@ -195,12 +195,6 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
                                           ungroup_struct(build_FASSTER_group(model_struct, tail(data, include), internal = "saturate")))
   else if(heuristic == "filterSmooth")
     dlmModel <- dlm_filterSmoothHeuristic(tail(y, include), dlmModel)
-  # if(!approx){
-  #   # Setup function
-  #   # Run dlmMLE (perhaps after fasster_stl)
-  #   stop("Not yet implemented")
-  #   getOptim <- dlmMLE(data[,series], 0, fn)
-  # }
 
   # Fit model
   filtered <- dlmFilter(tail(y, include), dlmModel)
@@ -226,7 +220,7 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
     modFuture$m0 <- window(filtered$m, start = lastObsIndex)
     tsp(modFuture$m0) <- NULL
   }
-  # optimFit = list(vt=filtered$mod$vt, wt=filtered$mod$xt)
+
   return(structure(list(model = dlmModel, model_future = modFuture, formula = model, x = filtered$y, fitted = filtered$f, call = match.call(), series = series, residuals = resid, states = filtered$a), class = "fasster"))
 }
 
