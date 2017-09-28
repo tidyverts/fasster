@@ -81,8 +81,7 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "reg
 
   dlmTerms <- list()
   ## Deparse model specification
-  triggerwords <- c("constant", "intercept", "slope", "trend")
-  specials <- c("poly", "trig", "seas", "ARMA", "custom") # , "fourier", "seasonality", "seasonal")
+  specials <- c("poly", "trig", "fourier", "seas", "seasonality",  "seasonal", "ARMA", "custom")
 
   mt <- terms(formula, data = data, specials = specials)
   attr(mt, "intercept") <- 0
@@ -111,8 +110,11 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "reg
                          ~ do.call(switch(.y,
                                           poly = dlmModPoly,
                                           seas = dlmModSeas,
-                                          ARMA = dlmModARMA,
+                                          seasonal = dlmModSeas,
+                                          seasonality = dlmModSeas,
                                           trig = dlmModTrig,
+                                          fourier = dlmModTrig,
+                                          ARMA = dlmModARMA,
                                           custom = dlm), .x))) %>%
       unlist(recursive=FALSE)
 
