@@ -163,8 +163,12 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "reg
 #'
 #' @importFrom forecast BoxCox
 #' @importFrom dlm dlmFilter dlmSvd2var
-fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg, lambda=NULL, heuristic=c("filterSmooth", "lm", "saturated"), include=NULL, ...) {
+fasster <- function(data, model = y ~ groupVar %G% (poly(1) + trig(24,8)) + xreg, heuristic=c("filterSmooth", "lm", "saturated"), include=NULL, lambda=NULL, biasadj=FALSE, ...) {
   heuristic <- match.arg(heuristic)
+
+  if(missing(model)){
+    stop("Model formula missing")
+  }
 
   if(inherits(data, "formula")){
     model <- data
@@ -177,8 +181,8 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
   if(!is.null(dim(y))){
     y <- y[[1]]
   }
+
   if (!is.null(lambda)){
-    stop("Not yet implemented")
     y <- BoxCox(y, lambda)
   }
 
@@ -224,7 +228,13 @@ fasster <- function(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg
     tsp(modFuture$m0) <- NULL
   }
 
-  return(structure(list(model = dlmModel, model_future = modFuture, formula = model, x = filtered$y, fitted = filtered$f, call = match.call(), series = series, residuals = resid, states = filtered$a), class = "fasster"))
+  fitted <- filtered$f
+  if(!is.null(lambda)){
+    fitted <- InvBoxCox(fitted,lambda, biasadj, var(resid))
+    attr(lambda, "biasadj") <- biasadj
+  }
+
+  return(structure(list(model = dlmModel, model_future = modFuture, formula = model, x = filtered$y, fitted = filtered$f, lambda = lambda, call = match.call(), series = series, residuals = resid, states = filtered$a), class = "fasster"))
 }
 
 #' @export
