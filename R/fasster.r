@@ -82,7 +82,7 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "reg
   dlmTerms <- list()
   ## Deparse model specification
   triggerwords <- c("constant", "intercept", "slope", "trend")
-  specials <- c("poly", "trig", "seas", "ARMA") # , "fourier", "seasonality", "seasonal")
+  specials <- c("poly", "trig", "seas", "ARMA", "custom") # , "fourier", "seasonality", "seasonal")
 
   mt <- terms(formula, data = data, specials = specials)
   attr(mt, "intercept") <- 0
@@ -112,7 +112,8 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "reg
                                           poly = dlmModPoly,
                                           seas = dlmModSeas,
                                           ARMA = dlmModARMA,
-                                          trig = dlmModTrig), .x))) %>%
+                                          trig = dlmModTrig,
+                                          custom = dlm), .x))) %>%
       unlist(recursive=FALSE)
 
     specialPathList <- dlmTerms %>%
