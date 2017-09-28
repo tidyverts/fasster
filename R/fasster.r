@@ -161,7 +161,7 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "reg
 #'
 #' @examples
 #'
-#' @importFrom forecast BoxCox
+#' @importFrom forecast BoxCox InvBoxCox
 #' @importFrom dlm dlmFilter dlmSvd2var
 fasster <- function(data, model = y ~ groupVar %G% (poly(1) + trig(24,8)) + xreg, heuristic=c("filterSmooth", "lm", "saturated"), include=NULL, lambda=NULL, biasadj=FALSE, ...) {
   heuristic <- match.arg(heuristic)
@@ -230,7 +230,7 @@ fasster <- function(data, model = y ~ groupVar %G% (poly(1) + trig(24,8)) + xreg
 
   fitted <- filtered$f
   if(!is.null(lambda)){
-    fitted <- InvBoxCox(fitted,lambda, biasadj, var(resid))
+    fitted <- InvBoxCox(fitted,lambda, biasadj, filtered$mod$V)
     attr(lambda, "biasadj") <- biasadj
   }
 
