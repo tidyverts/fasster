@@ -4,6 +4,7 @@
 #' @export
 forecast.fasster <- function(object, newdata=NULL, h=NULL, level=c(80, 95)) {
   mod <- object$model_future
+  ytsp <- tsp(object$x)
 
   if(!is.null(newdata)){
     # Build model on newdata
@@ -26,13 +27,18 @@ forecast.fasster <- function(object, newdata=NULL, h=NULL, level=c(80, 95)) {
   }
   else{
     if(is.null(h)){
-      24
+      if(is.ts(object$x)){
+        frequency(object$x) * 2
+      }
+      else{
+        24
+      }
     }
     else{
       h
     }
   }
-  ytsp <- tsp(mod$m0)
+
   p <- length(mod$m0)
   m <- nrow(mod$FF)
   a <- rbind(mod$m0, matrix(0, nAhead, p))
