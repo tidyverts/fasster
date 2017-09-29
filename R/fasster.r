@@ -219,7 +219,7 @@ fasster <- function(data, model = y ~ groupVar %G% (poly(1) + trig(24,8)) + xreg
     U.C[[lastObsIndex]],
     D.C[lastObsIndex, ]
   ))
-  wt <- filtered$a[seq_len(NROW(filtered$a) - 1), ] - (filtered$a[seq_len(NROW(filtered$a) - 1) + 1, ] %*% dlmModel$GG)
+  wt <- matrix(filtered$a)[seq_len(NROW(filtered$a) - 1), ] - (matrix(filtered$a)[seq_len(NROW(filtered$a) - 1) + 1, ] %*% dlmModel$GG)
   modFuture$W <- var(wt)
   if (is.ts(filtered$m))
     modFuture$m0 <- window(filtered$m, start = end(filtered$m))
