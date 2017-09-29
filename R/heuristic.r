@@ -76,9 +76,13 @@ dlm_lmHeuristic_saturated <- function(y, dlmModel, dlmModelSaturated){
 }
 
 smoothedFits <- function(smooth, mod){
-  XFF <- matrix(mod$FF[rep(1, NROW(smooth$s) - 1), ])
-  XFF[,mod$JFF != 0] <- mod$X[, mod$JFF]
-  diag(XFF%*%t(head(smooth$s,-1))) ## Inefficient
+  fitted <- numeric(NROW(smooth$s) - 1)
+  for(i in seq_along(fitted)){
+    XFF <- mod$FF
+    XFF[mod$JFF != 0] <- mod$X[i, mod$JFF]
+    fitted[i] <- XFF%*% smooth$s[i + 1,]
+  }
+  fitted
 }
 
 #' @importFrom dlm dlmSmooth dlmSvd2var
