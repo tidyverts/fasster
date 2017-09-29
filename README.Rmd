@@ -45,8 +45,8 @@ devtools::install_github("mitchelloharawild/fasster")
 ## Usage
 
 *fasster* allows flexible model specification by allowing the user to specify the model structure with standard formula conventions.
-```{r}
-fasster(log(fdeaths) ~ log(mdeaths)) %>% ggfitted
+```{r xreg}
+fasster(fdeaths ~ mdeaths) %>% ggfitted
 ```
 
 Commonly used state space components can be added using the following convenience functions:
@@ -58,12 +58,13 @@ Commonly used state space components can be added using the following convenienc
 * Exogenous regressors can be added by referring to their name
 
 For example, to create a model with trend and monthly seasonality, you can use:
-```{r}
+```{r component}
 fit <- fasster(USAccDeaths ~ poly(1) + trig(12))
+fit %>% ggfitted
 ```
 
 *fasster* conforms to the object structure from the *forecast* package, allowing common visualisation and analysis tools to be applied on FASSTER models.
-```{r}
+```{r forecast}
 library(forecast)
 fit %>% accuracy
 
@@ -76,7 +77,7 @@ The tools made available by *fasster* are designed to integrate seamlessly with 
 
 The interface for creating a FASSTER model introduces a new formula construct, `%G%`, known as the group operator. This allows modelling of more complex patterns such as multiple seasonality by modelling the components for each group seperately and switching between them.
 
-```{r}
+```{r complex}
 tibble(taylor) %>%
   mutate(DateTime = seq(ymd_h("2000-6-5 00"), by="30 mins", length.out=length(taylor)),
          DayType = ifelse(wday(DateTime) %in% 2:6, "Weekday", "Weekend")) %>% 

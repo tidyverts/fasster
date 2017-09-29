@@ -29,10 +29,10 @@ Usage
 *fasster* allows flexible model specification by allowing the user to specify the model structure with standard formula conventions.
 
 ``` r
-fasster(log(fdeaths) ~ log(mdeaths)) %>% ggfitted
+fasster(fdeaths ~ mdeaths) %>% ggfitted
 ```
 
-![](man/figure/unnamed-chunk-3-1.png)
+![](man/figure/xreg-1.png)
 
 Commonly used state space components can be added using the following convenience functions:
 
@@ -46,7 +46,10 @@ For example, to create a model with trend and monthly seasonality, you can use:
 
 ``` r
 fit <- fasster(USAccDeaths ~ poly(1) + trig(12))
+fit %>% ggfitted
 ```
+
+![](man/figure/component-1.png)
 
 *fasster* conforms to the object structure from the *forecast* package, allowing common visualisation and analysis tools to be applied on FASSTER models.
 
@@ -63,7 +66,7 @@ fit %>%
   autoplot
 ```
 
-![](man/figure/unnamed-chunk-5-1.png)
+![](man/figure/forecast-1.png)
 
 The tools made available by *fasster* are designed to integrate seamlessly with the tidyverse of packages, enabling familiar data manipulation and visualisation capabilities.
 
@@ -77,4 +80,4 @@ tibble(taylor) %>%
   ggfitted
 ```
 
-![](man/figure/unnamed-chunk-6-1.png)
+![](man/figure/complex-1.png)
