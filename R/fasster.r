@@ -207,6 +207,10 @@ fasster <- function(data, model = y ~ groupVar %G% (poly(1) + trig(24,8)) + xreg
   # Fit model
   filtered <- dlmFilter(tail(y, include), dlmModel)
 
+  if(!is.matrix(filtered$a)){
+    filtered$a <- matrix(filtered$a)
+  }
+
   # Update model variance
   resid <- filtered$y - filtered$f
   filtered$mod$V <- resid %>%
@@ -220,7 +224,7 @@ fasster <- function(data, model = y ~ groupVar %G% (poly(1) + trig(24,8)) + xreg
     U.C[[lastObsIndex]],
     D.C[lastObsIndex, ]
   ))
-  wt <- matrix(filtered$a)[seq_len(NROW(filtered$a) - 1), ] - (matrix(filtered$a)[seq_len(NROW(filtered$a) - 1) + 1, ] %*% dlmModel$GG)
+  wt <- filtered$a[seq_len(NROW(filtered$a) - 1), ] - (filtered$a[seq_len(NROW(filtered$a) - 1) + 1, ] %*% dlmModel$GG)
   modFuture$W <- var(wt)
   if (is.ts(filtered$m))
     modFuture$m0 <- window(filtered$m, start = end(filtered$m))

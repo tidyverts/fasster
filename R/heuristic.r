@@ -86,13 +86,17 @@ dlm_filterSmoothHeuristic <- function(y, dlmModel){
   dlmModel$W <- diag(1, NROW(dlmModel$W))
   filtered <- dlmFilter(y, dlmModel)
   smoothed <- dlmSmooth(filtered)
+  if(!is.matrix(smoothed$s)){
+    smoothed$s <- matrix(smoothed$s)
+  }
 
-  dlmModel$m0 <- matrix(smoothed$s)[1,]
+  dlmModel$m0 <- smoothed$s[1,]
   dlmModel$C0 <- with(smoothed, dlmSvd2var(
     U.S[[1]],
     D.S[1, ]
   ))
-  wt <- matrix(smoothed$s)[seq_len(NROW(smoothed$s) - 1), ] - (matrix(smoothed$s)[seq_len(NROW(smoothed$s) - 1) + 1, ] %*% dlmModel$GG)
+
+  wt <- smoothed$s[seq_len(NROW(smoothed$s) - 1), ] - (smoothed$s[seq_len(NROW(smoothed$s) - 1) + 1, ] %*% dlmModel$GG)
   dlmModel$W <- var(wt)#with(smoothed, dlmSvd2var(U.S[[length(U.S)]],D.S[NROW(D.S), ]))
   dlmModel$V <- var(smoothedFits(smoothed, dlmModel) - y, na.rm = TRUE)
   dlmModel
