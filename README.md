@@ -87,7 +87,7 @@ Like other forecasting functions, if additional information is required (such as
 
 ``` r
 fit %>% 
-  forecast(newdata = tibble(DateTime = seq(ymd_h("2000-8-27 00"), by="30 mins", length.out=48*7*2)) %>%
+  forecast(newdata = tibble(DateTime = seq(ymd_h("2000-8-28 00"), by="30 mins", length.out=48*7*2)) %>%
                     mutate(DayType = ifelse(wday(DateTime) %in% 2:6, "Weekday", "Weekend"))) %>% 
   autoplot(include = 48*7*4)
 ```
