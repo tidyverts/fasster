@@ -168,18 +168,19 @@ fasster <- function(data, model = y ~ groupVar %G% (poly(1) + trig(24,8)) + xreg
 
   if(inherits(data, "formula")){
     model <- data
-    data <- model.frame(data)
-    y <- model.response(data)
-  }
-  else if(missing(model)){
-    stop("Model formula missing")
+    data <- get_all_vars(data)
   }
   else{
-    series <- all.vars(model)[1]
-    y <- data[, series]
-    if(!is.null(dim(y))){
-      y <- y[[1]]
+    if(missing(model)){
+      stop("Model formula missing")
     }
+    data <- get_all_vars(model, data)
+  }
+
+  series <- all.vars(model)[1]
+  y <- data[, series]
+  if(!is.null(dim(y))){
+    y <- y[[1]]
   }
 
   if (!is.null(lambda)){
