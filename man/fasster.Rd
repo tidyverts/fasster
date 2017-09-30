@@ -4,17 +4,18 @@
 \alias{fasster}
 \title{Fast Additive Seasonal Switching with Trend and Exogenous Regressors}
 \usage{
-fasster(data, model = y ~ intercept + trig(24) + trig(7 * 24) + xreg,
-  lambda = NULL, heuristic = TRUE, ...)
+fasster(data, model = y ~ groupVar \%S\% (poly(1) + trig(24, 8)) + xreg,
+  heuristic = c("filterSmooth", "lm", "saturated"), include = NULL,
+  lambda = NULL, biasadj = FALSE, ...)
 }
 \arguments{
 \item{data}{A data.frame}
 
 \item{model}{The fitted model}
 
-\item{lambda}{Box-Cox transformation parameter. Ignored if NULL. Otherwise, data transformed before model is estimated. When lambda is specified, additive.only is set to TRUE.}
+\item{include}{How many terms should be included to fit the model}
 
-\item{heuristic}{Should the lm heuristic be used}
+\item{lambda}{Box-Cox transformation parameter. Ignored if NULL. Otherwise, data transformed before model is estimated. When lambda is specified, additive.only is set to TRUE.}
 
 \item{...}{Not used}
 }

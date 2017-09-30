@@ -163,7 +163,7 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "reg
 #'
 #' @importFrom forecast BoxCox InvBoxCox
 #' @importFrom dlm dlmFilter dlmSvd2var
-fasster <- function(data, model = y ~ groupVar %G% (poly(1) + trig(24,8)) + xreg, heuristic=c("filterSmooth", "lm", "saturated"), include=NULL, lambda=NULL, biasadj=FALSE, ...) {
+fasster <- function(data, model = y ~ groupVar %S% (poly(1) + trig(24,8)) + xreg, heuristic=c("filterSmooth", "lm", "saturated"), include=NULL, lambda=NULL, biasadj=FALSE, ...) {
   heuristic <- match.arg(heuristic)
 
   if(inherits(data, "formula")){

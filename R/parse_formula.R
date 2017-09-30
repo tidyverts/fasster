@@ -16,9 +16,9 @@ formula_parse_groups <- function(.formula) {
     .formula[[2]] <- NULL
   }
   parse <- list()
-  .formula <- formula_parse_infix(.formula, "%G%")
-  mt <- terms(.formula, specials = ".infix.G", allowDotAsName = TRUE)
-  groupIdx <- attr(mt, "specials")[[".infix.G"]]
+  .formula <- formula_parse_infix(.formula, "%S%")
+  mt <- terms(.formula, specials = ".infix.S", allowDotAsName = TRUE)
+  groupIdx <- attr(mt, "specials")[[".infix.S"]]
 
   sub_mt <- if (is.null(groupIdx)) mt
   else mt[-groupIdx]

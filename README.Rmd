@@ -75,18 +75,18 @@ fit %>%
 
 The tools made available by *fasster* are designed to integrate seamlessly with the tidyverse of packages, enabling familiar data manipulation and visualisation capabilities.
 
-The interface for creating a FASSTER model introduces a new formula construct, `%G%`, known as the group operator. This allows modelling of more complex patterns such as multiple seasonality by modelling the components for each group seperately and switching between them.
+The interface for creating a FASSTER model introduces a new formula construct, `%S%`, known as the switch operator. This allows modelling of more complex patterns such as multiple seasonality by modelling the components for each group seperately and switching between them.
 
 ```{r complex}
 fit <- tibble(taylor) %>%
   mutate(DateTime = seq(ymd_h("2000-6-5 00"), by="30 mins", length.out=length(taylor)),
          DayType = ifelse(wday(DateTime) %in% 2:6, "Weekday", "Weekend")) %>% 
-  fasster(taylor ~ DayType %G% (poly(1) + trig(48, 10))) 
+  fasster(taylor ~ DayType %S% (poly(1) + trig(48, 10))) 
 fit %>%
   ggfitted
 ```
 
-Like other forecasting functions, if additional information is required (such as future group switching), it can be provided via the `newdata` argument.
+Like other forecasting functions, if additional information is required (such as future state switching), it can be provided via the `newdata` argument.
 
 ```{r complex_fc}
 fit %>% 
