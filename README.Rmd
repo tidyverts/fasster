@@ -32,7 +32,7 @@ An implementation of the FASSTER (Forecasting with Additive Switching of Seasona
 <!-- The **stable** version can be installed from CRAN: -->
 
 <!-- ```{r, eval = FALSE} -->
-<!-- install.packages("ggquiver") -->
+<!-- install.packages("devtools") -->
 <!-- ``` -->
 
 The **development** version can be installed from GitHub using:
