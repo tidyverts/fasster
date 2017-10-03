@@ -239,7 +239,7 @@ fasster <- function(data, model = y ~ groupVar %S% (poly(1) + trig(24,8)) + xreg
     attr(lambda, "biasadj") <- biasadj
   }
 
-  return(structure(list(model = dlmModel, model_future = modFuture, formula = model, x = filtered$y, fitted = filtered$f, lambda = lambda, call = match.call(), series = series, residuals = resid, states = filtered$a), class = "fasster"))
+  return(structure(list(model = dlmModel, model_future = modFuture, formula = model, x = data[, series], fitted = fitted, lambda = lambda, call = match.call(), series = series, residuals = resid, states = filtered$a), class = "fasster"))
 }
 
 #' @export

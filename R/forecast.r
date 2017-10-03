@@ -2,9 +2,22 @@
 #' @importFrom dlm dlmSvd2var
 #' @importFrom forecast forecast
 #' @export
-forecast.fasster <- function(object, newdata=NULL, h=NULL, level=c(80, 95)) {
+forecast.fasster <- function(object, newdata=NULL, h=NULL, level=c(80, 95), lambda = object$lambda, biasadj = NULL) {
   mod <- object$model_future
   ytsp <- tsp(object$x)
+
+  if (is.null(lambda)) {
+    biasadj <- FALSE
+  }
+  else {
+    if (is.null(biasadj)) {
+      biasadj <- attr(lambda, "biasadj")
+    }
+    if (!is.logical(biasadj)) {
+      warning("biasadj information not found, defaulting to FALSE.")
+      biasadj <- FALSE
+    }
+  }
 
   if(!is.null(newdata)){
     # Build model on newdata
@@ -73,13 +86,19 @@ forecast.fasster <- function(object, newdata=NULL, h=NULL, level=c(80, 95)) {
   Q <- unlist(Q)
   lower <- matrix(NA, ncol = length(level), nrow = nAhead)
   upper <- lower
-  for (i in seq_along(level))
-    {
-      qq <- qnorm(0.5 * (1 + level[i] / 100))
-      lower[, i] <- f - qq * sqrt(Q)
-      upper[, i] <- f + qq * sqrt(Q)
-    }
+  for (i in seq_along(level)){
+    qq <- qnorm(0.5 * (1 + level[i] / 100))
+    lower[, i] <- f - qq * sqrt(Q)
+    upper[, i] <- f + qq * sqrt(Q)
+  }
 
   ans <- structure(list(model = object, mean = f, level = level, x = object$x, upper = upper, lower = lower, fitted = fit$f, method = "FASSTER", series = object$series, residuals = residuals(object)), class = c("forecast"))
+
+  if (!is.null(lambda)) {
+    ans$mean <- InvBoxCox(ans$mean, lambda, biasadj, out)
+    ans$lower <- InvBoxCox(ans$lower, lambda)
+    ans$upper <- InvBoxCox(ans$upper, lambda)
+  }
+
   return(ans)
 }
