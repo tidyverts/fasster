@@ -2,22 +2,19 @@
 % Please edit documentation in R/fasster.r
 \docType{package}
 \name{fasster-package}
-\alias{fasster}
 \alias{fasster-package}
-\title{fasster: Fast Additive Seasonal Switching with Trend and Exogenous Regressors}
+\title{Fast Additive Switching of Seasonality, Trend and Exogenous Regressors}
 \description{
-Implementation of the FASSTER model for forecasting time series with multiple seasonalities.
+Implementation of the FASSTER model for forecasting time series
+with multiple seasonalities using switching states.
 }
-\seealso{
-Useful links:
-\itemize{
-  \item \url{https://github.com/mitchelloharawild/fasster}
-  \item Report bugs at \url{https://github.com/mitchelloharawild/fasster/issues}
-}
-
+\details{
+\tabular{ll}{ Package: \tab fasster\cr Type: \tab Package\cr License: \tab
+GPL3\cr LazyLoad: \tab yes\cr }
 }
 \author{
-\strong{Maintainer}: Mitchell O'Hara-Wild \email{mail@mitchelloharawild.com}
+Mitchell O'Hara-Wild
 
+Maintainer: mail@mitchelloharawild.com
 }
-\keyword{internal}
+\keyword{package}

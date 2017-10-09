@@ -2,29 +2,84 @@
 % Please edit documentation in R/fasster.r
 \name{fasster}
 \alias{fasster}
-\title{Fast Additive Seasonal Switching with Trend and Exogenous Regressors}
+\title{Fast Additive Switching of Seasonality, Trend and Exogenous Regressors}
 \usage{
-fasster(data, model = y ~ groupVar \%S\% (poly(1) + trig(24, 8)) + xreg,
-  heuristic = c("filterSmooth", "lm", "saturated"), include = NULL,
-  lambda = NULL, biasadj = FALSE, ...)
+fasster(data, formula, heuristic = c("filterSmooth", "lmSaturated", "lm"),
+  include = NULL, lambda = NULL, biasadj = FALSE, ...)
 }
 \arguments{
-\item{data}{A data.frame}
+\item{data}{A \code{ts}/\code{mts}, \code{tsibble} or \code{data.frame} that contains the variables in the model.}
 
-\item{model}{The fitted model}
+\item{formula}{An object of class "formula" (refer to 'Formula' for usage)}
+
+\item{heuristic}{Which estimation heuristic should be used (refer to 'Heuristics')}
 
 \item{include}{How many terms should be included to fit the model}
 
 \item{lambda}{Box-Cox transformation parameter. Ignored if NULL. Otherwise, data transformed before model is estimated. When lambda is specified, additive.only is set to TRUE.}
 
+\item{biasadj}{Use adjusted back-transformed mean for Box-Cox transformations. If TRUE, point forecasts and fitted values are mean forecast. Otherwise, these points can be considered the median of the forecast densities.}
+
 \item{...}{Not used}
 }
 \value{
-Returns a fitted FASSTER model
+Returns a fitted FASSTER model, which is consistent with the model structure from the \code{\link[forecast]{forecast}} package.
+
+This object is a list of class "fasster" that contains:
+\describe{
+   \item{model}{The underlying dlm model}
+   \item{model_future}{A model with updated variances appropriate for forecasting}
+   \item{formula}{The specified model formula}
+   \item{fitted}{The fitted values}
+   \item{lambda}{The BoxCox paramater, if used}
+   \item{residuals}{The fitted innovations}
+   \item{states}{The underlying filtered states}
+   \item{call}{The user call used to create the model}
+   \item{x}{The dependent variable}
+   \item{series}{The name of the dependent variable}
+}
 }
 \description{
-Fast Additive Seasonal Switching with Trend and Exogenous Regressors
+Implements FASSTER
 }
+\details{
+The fasster model extends commonly used state space models by introducing a switching component to the measurement equation.
+This is implemented using a time-varying DLM with the switching behaviour encoded in the measurement matrix.
+}
+\section{Formula}{
+
+\code{fasster} inherits the standard formula specification from \link[stats]{lm} for specifying exogenous regressors, including interactions and \code{\link[base]{I}()} functionality as described in \code{\link[stats]{formula}}.
+
+Special DLM components can be specified using special functions defined below:
+\itemize{
+   \item seas(s): Creates seasonal factors with seasonality s
+   \item trig(s): Creates seasonal fourier terms with seasonality s
+   \item poly(n): Creates a polynomial of order n (poly(1) creates a level, poly(2) creates a trend)
+   \item ARMA(ar, ma): Creates ARMA terms with coefficient vectors ar and ma
+   \item custom(dlm): Creates a custom dlm structure, using \code{\link[dlm]{dlm}}
+}
+
+The switching operator, \code{\%S\%} requires the switching factor variable on the LHS, and the model to switch over on the RHS (as built using the above components)
+}
+
+\section{Heuristics}{
+
+Currently three heuristics are usable for estimating the model parameters.
+
+The recommended heuristic is "filterSmooth", which estimates the parameters using the following algorithm:
+\enumerate{
+   \item Filter the data using the specified model with non-zero state variances
+   \item Obtain smoothed states \eqn{(θ^{(s)}t=θ_t|D_T)} to approximate correct behaviour
+   \item The initial state parameters taken from the first smoothed state: \eqn{m_0=E(θ^{(s)}_0)}, \eqn{C_0=\text{Var}(θ^{(s)}_0)}
+   \item Obtain state noise variances from the smoothed variance of \eqn{w_t}: \eqn{W=\text{Var}(w^{(s)}_t)=\text{Var}(θ^{(s)}_t−Gθ^{(s)}_{t−1})}
+   Obtain measurement noise variance from smoothed variance of \eqn{v_t}: \eqn{V=\text{Var}(v^{(s)}_t)=\text{Var}(y_t−F_tθ^{(s)}_t)}
+   \item Repair restricted state variances for seasonal factors and ARMA terms
+}
+
+Alternative heuristics are based on repeated linear models, which approximate the dynamic nature of the fasster model.
+Generally, these heuristics are not recommended, however they can be useful for a well specified model structure.
+}
+
 \examples{
 
 }
