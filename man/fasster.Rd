@@ -83,5 +83,6 @@ Generally, these heuristics are not recommended, however they can be useful for 
 }
 
 \examples{
+fasster(fdeaths ~ mdeaths) \%>\% ggfitted
 
 }
