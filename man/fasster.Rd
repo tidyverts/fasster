@@ -38,6 +38,7 @@ This object is a list of class "fasster" that contains:
    \item{call}{The user call used to create the model}
    \item{x}{The dependent variable}
    \item{series}{The name of the dependent variable}
+   \item{method}{The name of the model used, "FASSTER"}
 }
 }
 \description{
