@@ -187,6 +187,7 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "reg
 #'    \item{call}{The user call used to create the model}
 #'    \item{x}{The dependent variable}
 #'    \item{series}{The name of the dependent variable}
+#'    \item{method}{The name of the model used, "FASSTER"}
 #' }
 #'
 #' @details
@@ -228,6 +229,7 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "reg
 #' @export
 #' @importFrom forecast BoxCox InvBoxCox
 #' @importFrom dlm dlmFilter dlmSvd2var
+#' @importFrom utils tail
 fasster <- function(data, formula, heuristic=c("filterSmooth", "lmSaturated", "lm"), include=NULL, lambda=NULL, biasadj=FALSE, ...) {
   cl <- match.call()
   heuristic <- match.arg(heuristic)
