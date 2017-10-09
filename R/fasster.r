@@ -229,6 +229,7 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "reg
 #' @importFrom forecast BoxCox InvBoxCox
 #' @importFrom dlm dlmFilter dlmSvd2var
 fasster <- function(data, formula, heuristic=c("filterSmooth", "lmSaturated", "lm"), include=NULL, lambda=NULL, biasadj=FALSE, ...) {
+  cl <- match.call()
   heuristic <- match.arg(heuristic)
 
   if(inherits(data, "formula")){
@@ -304,7 +305,9 @@ fasster <- function(data, formula, heuristic=c("filterSmooth", "lmSaturated", "l
     attr(lambda, "biasadj") <- biasadj
   }
 
-  return(structure(list(model = dlmModel, model_future = modFuture, formula = formula, x = data[, series], fitted = fitted, lambda = lambda, call = match.call(), series = series, residuals = resid, states = filtered$a), class = "fasster"))
+  return(structure(list(model = dlmModel, model_future = modFuture, formula = formula, lambda = lambda,
+                        x = data[, series], fitted = fitted, residuals = resid, states = filtered$a,
+                        call = cl, series = series, method="FASSTER"), class = "fasster"))
 }
 
 #' @export
