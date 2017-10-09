@@ -313,7 +313,7 @@ fasster <- function(data, formula, heuristic=c("filterSmooth", "lmSaturated", "l
 }
 
 #' @export
-residuals.fasster <- function(object){
+residuals.fasster <- function(object, ...){
   # %TODO: Add refilter option for full set of residuals
   if(!is.null(object$residuals)){
     object$residuals
