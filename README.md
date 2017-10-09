@@ -57,9 +57,9 @@ fit %>% ggfitted
 library(forecast)
 fit %>% accuracy
 #>                     ME     RMSE      MAE        MPE     MAPE      MASE
-#> Training set -36.11544 323.7525 238.7999 -0.4834674 2.794908 0.5461405
-#>                    ACF1
-#> Training set 0.07681231
+#> Training set -23.18839 257.6792 190.3609 -0.3184972 2.205453 0.4353594
+#>                   ACF1
+#> Training set 0.1695914
 
 fit %>% 
   forecast %>%

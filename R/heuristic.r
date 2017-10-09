@@ -86,7 +86,7 @@ smoothedFits <- function(smooth, mod){
 
 #' @importFrom dlm dlmSmooth dlmSvd2var
 dlm_filterSmoothHeuristic <- function(y, dlmModel){
-  dlmModel$W <- diag(1, NROW(dlmModel$W))
+  #dlmModel$W <- diag(1, NROW(dlmModel$W))
   filtered <- dlmFilter(y, dlmModel)
   smoothed <- dlmSmooth(filtered)
   if(!is.matrix(smoothed$s)){
