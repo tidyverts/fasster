@@ -2,7 +2,7 @@
 fasster <img src="man/figure/logo.png" align="right" />
 =======================================================
 
-[![Travis-CI Build Status](https://travis-ci.org/mitchelloharawild/fasster?branch=master)](https://travis-ci.org/mitchelloharawild/fasster) <!-- [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/fasster)](https://cran.r-project.org/package=fasster) --> <!-- [![Downloads](http://cranlogs.r-pkg.org/badges/fasster?color=brightgreen)](https://cran.r-project.org/package=fasster) -->
+[![Travis-CI Build Status](https://travis-ci.org/mitchelloharawild/fasster.svg?branch=master)](https://travis-ci.org/mitchelloharawild/fasster) <!-- [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/fasster)](https://cran.r-project.org/package=fasster) --> <!-- [![Downloads](http://cranlogs.r-pkg.org/badges/fasster?color=brightgreen)](https://cran.r-project.org/package=fasster) -->
 
 An implementation of the FASSTER (Forecasting with Additive Switching of Seasonality, Trend and Exogenous Regressors) model in R. The *fasster* package implements the FASSTER model for forecasting time-series that can handle multiple seasonal patterns using model switching. It prioritizes flexibility, computational speed and accuracy to provide convenient tools for modelling, predicting and understanding high frequency time-series.
 
