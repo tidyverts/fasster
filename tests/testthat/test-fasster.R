@@ -1,4 +1,3 @@
-library(fpp2)
 context("fasster")
 
 # test_that("Test grouping", {
