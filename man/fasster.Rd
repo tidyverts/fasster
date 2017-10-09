@@ -2,6 +2,7 @@
 % Please edit documentation in R/fasster.r
 \name{fasster}
 \alias{fasster}
+\alias{print.fasster}
 \title{Fast Additive Switching of Seasonality, Trend and Exogenous Regressors}
 \usage{
 fasster(data, formula, heuristic = c("filterSmooth", "lmSaturated", "lm"),

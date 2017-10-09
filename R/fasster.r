@@ -227,6 +227,8 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "reg
 #' @examples
 #'
 #' @export
+#' @aliases print.fasster
+#'
 #' @importFrom forecast BoxCox InvBoxCox
 #' @importFrom dlm dlmFilter dlmSvd2var
 #' @importFrom utils tail
@@ -341,3 +343,8 @@ getResponse.fasster <- function(object, ...){
   object$x
 }
 
+#' @export
+print.fasster <- function(x, ...){
+  cat(paste(x$method, "\n\n"))
+  cat(paste("Call:\n", deparse(x$call), "\n\n"))
+}
