@@ -322,3 +322,14 @@ residuals.fasster <- function(object){
     object$fitted - object$x
   }
 }
+
+#' @inherit forecast::getResponse
+#'
+#' @seealso
+#' \code{\link[forecast]{getResponse}}
+#'
+#' @export
+getResponse.fasster <- function(object, ...){
+  object$x
+}
+
