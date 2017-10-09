@@ -312,6 +312,13 @@ fasster <- function(data, formula, heuristic=c("filterSmooth", "lmSaturated", "l
                         call = cl, series = series, method="FASSTER"), class = "fasster"))
 }
 
+#' @inherit stats::fitted
+#' @export
+fitted.fasster <- function(object, ...){
+  # %TODO: Add refilter option for full set of residuals
+  object$fitted
+}
+
 #' @inherit stats::residuals
 #' @export
 residuals.fasster <- function(object, ...){
