@@ -95,7 +95,7 @@ forecast.fasster <- function(object, newdata=NULL, h=NULL, level=c(80, 95), lamb
   ans <- structure(list(model = object, mean = f, level = level, x = object$x, upper = upper, lower = lower, fitted = fit$f, method = "FASSTER", series = object$series, residuals = residuals(object)), class = c("forecast"))
 
   if (!is.null(lambda)) {
-    ans$mean <- InvBoxCox(ans$mean, lambda, biasadj, out)
+    ans$mean <- InvBoxCox(ans$mean, lambda, biasadj, ans)
     ans$lower <- InvBoxCox(ans$lower, lambda)
     ans$upper <- InvBoxCox(ans$upper, lambda)
   }
