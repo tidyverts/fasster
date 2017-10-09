@@ -14,7 +14,7 @@ Installation
 
 <!-- The **stable** version can be installed from CRAN: -->
 <!-- ```{r, eval = FALSE} -->
-<!-- install.packages("ggquiver") -->
+<!-- install.packages("fasster") -->
 <!-- ``` -->
 The **development** version can be installed from GitHub using:
 
