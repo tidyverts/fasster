@@ -225,6 +225,7 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "reg
 #' Generally, these heuristics are not recommended, however they can be useful for a well specified model structure.
 #'
 #' @examples
+#' fasster(fdeaths ~ mdeaths) %>% ggfitted
 #'
 #' @export
 #' @aliases print.fasster
