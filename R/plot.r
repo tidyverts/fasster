@@ -21,6 +21,7 @@ autoplot.fasster <- function(object, facet=FALSE, ...) {
 }
 
 #' @export
+#' @importFrom forecast getResponse autoplot
 ggfitted <- function(object, ...){
-  ts(fortify(object)[,c("Data", "Fitted")]) %>% autoplot
+  cbind(getResponse(object), fitted(object)) %>% autoplot
 }
