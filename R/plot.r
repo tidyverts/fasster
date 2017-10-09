@@ -20,9 +20,20 @@ autoplot.fasster <- function(object, facet=FALSE, ...) {
   autoplot(modTrigPlotData, ...) + facet_grid(as.numeric(series %in% c("Data", "Fitted")) ~ .)
 }
 
+#' Time-series plot of fitted and observed values
+#'
+#' Plots fitted and observed values with autoplot methods for \code{mts} using ggplot2.
+#'
+#' @param object A time-series model
+#' @param ... Additional arguments to be passed to \code{\link[forecast]{autoplot.mts}}
+#'
+#' @seealso
+#' \code{\link[forecast]{autoplot.mts}}
+#'
+#'
 #' @export
 #' @importFrom forecast getResponse
 #' @importFrom ggplot2 autoplot
 ggfitted <- function(object, ...){
-  cbind(getResponse(object), fitted(object)) %>% autoplot
+  autoplot(cbind(getResponse(object), fitted(object)), ...)
 }
