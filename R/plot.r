@@ -12,11 +12,8 @@ fortify.fasster <- function(model, data=NULL, ...) {
 #'
 #' @importFrom ggplot2 autoplot facet_grid
 #' @export
-autoplot.fasster <- function(object, facet=FALSE, ...) {
+autoplot.fasster <- function(object, ...) {
   modTrigPlotData <- ts(ggplot2::fortify(object))
-  if (facet) {
-    autoplot(modTrigPlotData, facets = TRUE, ...)
-  }
   autoplot(modTrigPlotData, ...) + facet_grid(as.numeric(series %in% c("Data", "Fitted")) ~ .)
 }
 
