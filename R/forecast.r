@@ -55,7 +55,7 @@ forecast.fasster <- function(object, newdata=NULL, h=NULL, level=c(80, 95), lamb
   m <- nrow(mod$FF)
   a <- rbind(mod$m0, matrix(0, nAhead, p))
   R <- vector("list", nAhead + 1)
-  R[[1]] <- mod$C0 * 0 #TODO REMOVE
+  R[[1]] <- mod$C0
   f <- matrix(0, nAhead, m)
   Q <- vector("list", nAhead)
   for (it in 1:nAhead) {
