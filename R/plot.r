@@ -1,4 +1,4 @@
-#' @inheritParams fortify
+#' @inherit ggplot2::fortify
 #'
 #' @importFrom ggplot2 fortify
 #' @export
@@ -8,7 +8,7 @@ fortify.fasster <- function(model, data=NULL, ...) {
   return(modTrigPlotData)
 }
 
-#' @inheritParams autoplot
+#' @inherit ggplot2::autoplot
 #'
 #' @importFrom ggplot2 autoplot facet_grid
 #' @export
