@@ -94,13 +94,14 @@ dlm_filterSmoothHeuristic <- function(y, dlmModel){
   }
 
   dlmModel$m0 <- smoothed$s[1,]
-  # dlmModel$C0 <- with(smoothed, dlmSvd2var(
-  #   U.S[[1]],
-  #   D.S[1, ]
-  # ))
+  dlmModel$C0 <- with(smoothed, dlmSvd2var(
+    U.S[[1]],
+    D.S[1, ]
+  ))
 
-  wt <- smoothed$s[seq_len(NROW(smoothed$s) - 1), ] - (smoothed$s[seq_len(NROW(smoothed$s) - 1) + 1, ] %*% dlmModel$GG)
-  dlmModel$W <- dlmModel$C0 <- var(wt)#with(smoothed, dlmSvd2var(U.S[[length(U.S)]],D.S[NROW(D.S), ]))
-  dlmModel$V <- var(smoothedFits(smoothed, dlmModel) - y, na.rm = TRUE)
+  wt <- smoothed$s[seq_len(NROW(smoothed$s) - 1) + 1, ] - smoothed$s[seq_len(NROW(smoothed$s) - 1), ]%*%t(dlmModel$GG)
+  dlmModel$W <- var(wt)
+
+  dlmModel$V <- var(y - smoothedFits(smoothed, dlmModel), na.rm = TRUE)
   dlmModel
 }

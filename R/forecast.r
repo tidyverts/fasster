@@ -1,4 +1,3 @@
-
 #' @importFrom dlm dlmSvd2var
 #' @importFrom forecast forecast
 #' @export

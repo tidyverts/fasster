@@ -295,7 +295,7 @@ fasster <- function(data, formula, heuristic=c("filterSmooth", "lmSaturated", "l
     U.C[[lastObsIndex]],
     D.C[lastObsIndex, ]
   ))
-  wt <- filtered$a[seq_len(NROW(filtered$a) - 1), ] - (filtered$a[seq_len(NROW(filtered$a) - 1) + 1, ] %*% dlmModel$GG)
+  wt <- filtered$a[seq_len(NROW(filtered$a) - 1) + 1, ] - filtered$a[seq_len(NROW(filtered$a) - 1), ]%*%t(dlmModel$GG)
   modFuture$W <- var(wt)
   if (is.ts(filtered$m))
     modFuture$m0 <- window(filtered$m, start = end(filtered$m))
