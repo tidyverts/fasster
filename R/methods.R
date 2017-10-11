@@ -20,7 +20,7 @@ residuals.fasster <- function(object, ...){
     object$residuals
   }
   else{
-    object$fitted - object$x
+    object$fitted - getResponse(x)
   }
 }
 
@@ -31,7 +31,7 @@ residuals.fasster <- function(object, ...){
 #'
 #' @export
 getResponse.fasster <- function(object, ...){
-  object$x
+  object$x %>% pull(!!object$series)
 }
 
 #' @export
@@ -54,11 +54,6 @@ print.fasster <- function(x, ...){
 #' @export
 summary.fasster <- function(x, ...){
   print(x)
-  if(NROW(x$fitted) < NROW(x$x)){
-    cat("\nApproximate training set error measures:\n")
-  }
-  else{
-    cat("\nTraining set error measures:\n")
-  }
+  cat("\nTraining set error measures (on included data):\n")
   print(accuracy(x))
 }

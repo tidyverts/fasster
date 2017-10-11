@@ -233,6 +233,7 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "reg
 #'
 #' @importFrom forecast BoxCox InvBoxCox
 #' @importFrom dlm dlmFilter dlmSvd2var
+#' @importFrom dplyr bind_cols
 #' @importFrom utils tail
 fasster <- function(data, formula, heuristic=c("filterSmooth", "lmSaturated", "lm"), include=NULL, lambda=NULL, biasadj=FALSE, ...) {
   cl <- match.call()
@@ -240,44 +241,63 @@ fasster <- function(data, formula, heuristic=c("filterSmooth", "lmSaturated", "l
 
   if(inherits(data, "formula")){
     formula <- data
-    data <- get_all_vars(data)
+    formula_vars <- get_all_vars(data)
   }
   else{
     if(missing(formula)){
       stop("Model formula missing")
     }
-    data <- get_all_vars(formula, data)
+    if(is_tsibble(data)){
+      if(length(key(data)) > 0){
+        stop("tsibbles with keys are not supported yet.")
+      }
+      tsibble_index <- data %>% select(!!index(.), !!!key(.))
+    }
+    formula_vars <- get_all_vars(formula, data)
   }
 
   series <- all.vars(formula)[1]
-  y <- data[, series]
+  y <- formula_vars[, series]
   if(!is.null(dim(y))){
     y <- y[[1]]
   }
 
-  if (!is.null(lambda)){
-    y <- BoxCox(y, lambda)
+  if(is.ts(y)){
+    tsibble_index <- y %>% as_tsibble %>% select(!!index(.))
+  }
+  else if(!is_tsibble(data)){
+    warning("Time series information not found, please provide a tsibble or time-series object.")
+    tsibble_index <- y %>% ts %>% as_tsibble %>% select(!!index(.))
   }
 
-  if (is.null(include)){
-    include <- NROW(y)
+  series <- as_quosure(sym(series))
+
+  data <- tsibble_index %>%
+    bind_cols(formula_vars)
+
+  if (!is.null(lambda)){
+    data <- data %>%
+      mutate(!!quo_text(series, 500) := BoxCox(!!series, lambda))
+  }
+
+  if (!is.null(include)){
+    data <- tail(data, include)
   }
 
   # Parse formula into structure
   model_struct <- formula_parse_groups(formula)
-  dlmModel <- build_FASSTER_group(model_struct, tail(data, include)) %>%
+  dlmModel <- build_FASSTER_group(model_struct, data) %>%
     ungroup_struct()
 
   if(heuristic == "lm")
-    dlmModel <- dlm_lmHeuristic(tail(y, include), dlmModel)
+    dlmModel <- dlm_lmHeuristic(data %>% pull(!!series), dlmModel)
   else if(heuristic == "lmSaturated")
-    dlmModel <- dlm_lmHeuristic_saturated(tail(y, include), dlmModel,
-                                          ungroup_struct(build_FASSTER_group(model_struct, tail(data, include), internal = "saturate")))
+    dlmModel <- dlm_lmHeuristic_saturated(data %>% pull(!!series), dlmModel, ungroup_struct(build_FASSTER_group(model_struct, data, internal = "saturate")))
   else if(heuristic == "filterSmooth")
-    dlmModel <- dlm_filterSmoothHeuristic(tail(y, include), dlmModel)
+    dlmModel <- dlm_filterSmoothHeuristic(data %>% pull(!!series), dlmModel)
 
   # Fit model
-  filtered <- dlmFilter(tail(y, include), dlmModel)
+  filtered <- dlmFilter(data %>% pull(!!series), dlmModel)
 
   if(!is.matrix(filtered$a)){
     filtered$a <- matrix(filtered$a)
