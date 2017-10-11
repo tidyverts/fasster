@@ -20,6 +20,16 @@ fortify.fasster <- function(model, data=NULL, ...) {
     bind_cols(Fitted = fitted(model), States = states)
 }
 
+#' @inherit ggplot2::fortify
+#'
+#' @importFrom ggplot2 fortify
+#' @importFrom dplyr as_tibble bind_cols
+#' @export
+fortify.tbl_forecast <- function(model, data=NULL, ...) {
+  model$forecast
+}
+
+
 #' @inherit ggplot2::autoplot
 #'
 #' @importFrom ggplot2 fortify ggplot aes geom_line facet_grid xlab ylab ggtitle
