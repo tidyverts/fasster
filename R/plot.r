@@ -21,11 +21,38 @@ fortify.fasster <- function(model, data=NULL, ...) {
 
 #' @inherit ggplot2::autoplot
 #'
-#' @importFrom ggplot2 autoplot facet_grid
+#' @importFrom ggplot2 fortify ggplot geom_line facet_grid xlab ylab ggtitle
+#' @importFrom tsibble index
+#' @importFrom dplyr gather
 #' @export
-autoplot.fasster <- function(object, ...) {
-  modTrigPlotData <- ts(ggplot2::fortify(object))
-  autoplot(modTrigPlotData, ...) + facet_grid(as.numeric(series %in% c("Data", "Fitted")) ~ .)
+autoplot.fasster <- function(object, range.bars = FALSE, ...) {
+  plot_data <- fortify(object)
+  index <- index(plot_data)
+  suppressWarnings(plot_data <- plot_data %>%
+    gather(".key", ".value", -!!index, factor_key = TRUE))
+  p <- plot_data %>%
+    ggplot(aes_(x = index, y = ~.value)) +
+    geom_line() +
+    facet_grid(.key ~ ., scales="free_y", switch="y") +
+    xlab(NULL) +
+    ylab(NULL) +
+    ggtitle("Decomposition by FASSTER method")
+
+  if(range.bars){
+    error("Currently not supported")
+    xrange <- range(plot_data %>% pull(!!index))
+    rangebar_data <- plot_data %>%
+      group_by(.key) %>%
+      summarise(min = min(.value), max = max(.value)) %>%
+      mutate(middle = mean(c(min, max)), length = max - min,
+             width = (1/64)*diff(xrange),
+             left = xrange[2] + width, right = xrange[2] + width*2,
+             top = middle + length/2, bottom = middle - length/2,
+             .value = left)
+    p <- p + ggplot2::geom_rect(ggplot2::aes_(xmin = ~left, xmax = ~right, ymax = ~top, ymin = ~bottom),
+                                data=rangebar_data, fill="gray75", colour="black", size=1/3)
+  }
+  p
 }
 
 #' Time-series plot of fitted and observed values
