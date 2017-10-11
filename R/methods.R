@@ -1,8 +1,71 @@
 #' @importFrom forecast accuracy
 #' @export
-accuracy.fasster <- function(f, x, test, ...){
-  attr(f, "class") <- "ets" # TODO: Implement fasster specific accuracy function
-  accuracy(f)
+accuracy.fasster <- function(f, x, test=NULL, d=NULL, D=NULL, ...){
+  trainset <- (is.list(f))
+  testset <- (!missing(x))
+  if(testset & !is.null(test))
+    trainset <- FALSE
+  if(!trainset & !testset)
+    stop("Unable to compute forecast accuracy measures")
+
+  # Find d and D
+  if(is.null(D) & is.null(d))
+  {
+    if(testset)
+    {
+      d <- as.numeric(frequency(x) == 1)
+      D <- as.numeric(frequency(x) > 1)
+    }
+    else if(trainset)
+    {
+      if(!is.null(f$mean))
+      {
+        d <- as.numeric(frequency(f$mean) == 1)
+        D <- as.numeric(frequency(f$mean) > 1)
+      }
+      else
+      {
+        d <- as.numeric(frequency(f$x) == 1)
+        D <- as.numeric(frequency(f$x) > 1)
+      }
+    }
+    else
+    {
+      d <- as.numeric(frequency(f)==1)
+      D <- as.numeric(frequency(f) > 1)
+    }
+  }
+
+
+  if(trainset)
+  {
+    trainout <- trainingaccuracy(f,test,d,D)
+    trainnames <- names(trainout)
+  }
+  else
+    trainnames <- NULL
+  if(testset)
+  {
+    testout <- testaccuracy(f,x,test,d,D)
+    testnames <- names(testout)
+  }
+  else
+    testnames <- NULL
+  outnames <- unique(c(trainnames,testnames))
+
+  out <- matrix(NA,nrow=2,ncol=length(outnames))
+  colnames(out) <- outnames
+  rownames(out) <- c("Training set","Test set")
+  if(trainset)
+    out[1,names(trainout)] <- trainout
+  if(testset)
+    out[2,names(testout)] <- testout
+
+  if(!testset)
+    out <- out[1,,drop=FALSE]
+  if(!trainset)
+    out <- out[2,,drop=FALSE]
+  return(out)
 }
 
 #' @inherit stats::fitted
