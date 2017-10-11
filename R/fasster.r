@@ -70,6 +70,7 @@ build_FASSTER_group <- function(model_struct, data, groups=NULL, internal = "reg
       groupX <- groupData %>%
         spread_groups() %>%
         as.data.frame()
+      colnames(groupX) <- paste0(paste(groups, sep="/"), colnames(groupX), sep=":")
     }
     model_struct[[".model"]] <- groupX %>%
       imap(~ build_FASSTER(model_struct[[".model"]], data, X = .x, group = .y, internal=internal))
@@ -312,5 +313,5 @@ fasster <- function(data, formula, heuristic=c("filterSmooth", "lmSaturated", "l
 
   return(structure(list(model = dlmModel, model_future = modFuture, formula = formula, lambda = lambda,
                         x = data[, series], fitted = fitted, residuals = resid, states = filtered$a,
-                        call = cl, series = series, method="FASSTER"), class = "fasster"))
+                        call = cl, heuristic = heuristic, series = series, method="FASSTER"), class = "fasster"))
 }
