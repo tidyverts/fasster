@@ -102,3 +102,52 @@ ggfitted <- function(object, ...){
     error("This model is not supported")
   }
 }
+
+#' @inherit forecast::autoplot.forecast
+#' @export
+#' @importFrom ggplot2 ggplot aes_ xlab ylab ggtitle
+#' @importFrom tsibble index
+autoplot.tbl_forecast <- function(object, ...){
+  object$x %>%
+    ggplot(aes_(x = index(.), y = object$series)) +
+    geom_line() +
+    autolayer(object, ...) +
+    xlab(paste0("Time (Interval: ", format(interval(object$x)), ")")) +
+    ylab(quo_text(object$series)) +
+    ggtitle(paste0("Forecasts from", object$method))
+}
+
+#' @inherit forecast::autolayer.forecast
+#' @export
+#' @importFrom forecast autolayer geom_forecast
+#' @importFrom tidyr gather separate spread
+#' @importFrom dplyr bind_rows mutate
+autolayer.tbl_forecast <- function(object, series = NULL, PI = TRUE, showgap = TRUE, ...){
+  PI <- PI & !is.null(object$level)
+  fc_data <- fortify(object) %>%
+    gather(".key", ".value", -!!index(object$forecast))
+  fc_data <- fc_data %>%
+    dplyr::filter(.key == "PointForecast") %>%
+    bind_rows(fc_data %>%
+                dplyr::filter(.key != "PointForecast") %>%
+                separate(.key, c("Type", "Level")) %>%
+                spread(Type, .value)) %>%
+    mutate(Level = as.numeric(Level))
+
+  mapping <- ggplot2::aes_(x = index(object$forecast), y = ~.value)
+  if(!is.null(object$series)){
+    fc_data <- fc_data %>%
+      mutate(series = quo_text(object$series))
+  }
+  if(!is.null(series)){
+    fc_data <- fc_data %>%
+      mutate(series = series)
+    mapping$colour <- quote(series)
+  }
+  if(PI){
+    mapping$level <- quote(Level)
+    mapping$ymin <- quote(Lower)
+    mapping$ymax <- quote(Upper)
+  }
+  geom_forecast(mapping=mapping, data=fc_data, stat="identity", ...)
+}
