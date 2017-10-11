@@ -1,6 +1,7 @@
 #' @inherit ggplot2::fortify
 #'
 #' @importFrom ggplot2 fortify
+#' @importFrom dplyr as_tibble bind_cols
 #' @export
 fortify.fasster <- function(model, data=NULL, ...) {
   states <- model$model$FF %>%
@@ -21,7 +22,7 @@ fortify.fasster <- function(model, data=NULL, ...) {
 
 #' @inherit ggplot2::autoplot
 #'
-#' @importFrom ggplot2 fortify ggplot geom_line facet_grid xlab ylab ggtitle
+#' @importFrom ggplot2 fortify ggplot aes geom_line facet_grid xlab ylab ggtitle
 #' @importFrom tsibble index
 #' @importFrom dplyr gather
 #' @export
@@ -71,7 +72,7 @@ autoplot.fasster <- function(object, range.bars = FALSE, ...) {
 #'
 #' @export
 #' @importFrom forecast getResponse
-#' @importFrom ggplot2 autoplot ggplot geom_line facet_grid xlab ylab ggtitle
+#' @importFrom ggplot2 autoplot ggplot aes geom_line facet_grid xlab ylab ggtitle
 #' @importFrom dplyr bind_cols
 #' @importFrom tsibble index interval
 ggfitted <- function(object, ...){

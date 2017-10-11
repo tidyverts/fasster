@@ -4,7 +4,7 @@
 \alias{autoplot.fasster}
 \title{Create a complete ggplot appropriate to a particular data type}
 \usage{
-\method{autoplot}{fasster}(object, ...)
+\method{autoplot}{fasster}(object, range.bars = FALSE, ...)
 }
 \arguments{
 \item{object}{an object, whose class will determine the behaviour of autoplot}
