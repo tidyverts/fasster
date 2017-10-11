@@ -265,7 +265,7 @@ fasster <- function(data, formula, heuristic=c("filterSmooth", "lmSaturated", "l
     y <- y[[1]]
   }
 
-  if(is.ts(y)){
+  if(is.ts(y) & !is_tsibble(data)){
     tsibble_index <- y %>% as_tsibble
   }
   else if(!is_tsibble(data)){
