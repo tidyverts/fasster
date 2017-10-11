@@ -119,7 +119,7 @@ autoplot.tbl_forecast <- function(object, ...){
     autolayer(object, ...) +
     xlab(paste0("Time (Interval: ", format(interval(object$x)), ")")) +
     ylab(quo_text(object$series)) +
-    ggtitle(paste0("Forecasts from", object$method))
+    ggtitle(paste0("Forecasts from ", object$method))
 }
 
 #' @inherit forecast::autolayer.forecast
@@ -133,12 +133,13 @@ autolayer.tbl_forecast <- function(object, series = NULL, PI = TRUE, showgap = T
   fc_data <- fortify(object) %>%
     gather(".key", ".value", -!!index(object$forecast))
 
-  fc_data <- fc_data %>%
-    dplyr::filter(UQE(sym(".key")) == "PointForecast") %>%
-    bind_rows(fc_data %>%
+  fc_point <- fc_data %>%
+    dplyr::filter(UQE(sym(".key")) == "PointForecast")
+  fc_interval <- fc_data %>%
                 dplyr::filter(UQE(sym(".key")) != "PointForecast") %>%
                 separate(".key", c("Type", "Level")) %>%
-                spread("Type", ".value")) %>%
+                spread("Type", ".value")
+  fc_data <- bind_rows(fc_point, fc_interval) %>%
     mutate(!!"Level" := as.numeric(!!as_quosure(sym("Level"))))
 
   mapping <- ggplot2::aes_(x = index(object$forecast), y = ~.value)
