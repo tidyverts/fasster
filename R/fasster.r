@@ -19,6 +19,7 @@ NULL
 dplyr::`%>%`
 
 #' @import stats
+#' @importFrom rlang ":="
 NULL
 
 spread_groups <- function(object) {
@@ -253,7 +254,7 @@ fasster <- function(data, formula, heuristic=c("filterSmooth", "lmSaturated", "l
       if(length(key(data)) > 0){
         stop("tsibbles with keys are not supported yet.")
       }
-      tsibble_index <- data %>% select(!!index(.), !!!key(.))
+      tsibble_index <- data %>% select(!!index(data), !!!key(data))
     }
     formula_vars <- get_all_vars(formula, data)
   }
@@ -265,12 +266,13 @@ fasster <- function(data, formula, heuristic=c("filterSmooth", "lmSaturated", "l
   }
 
   if(is.ts(y)){
-    tsibble_index <- y %>% as_tsibble %>% select(!!index(.))
+    tsibble_index <- y %>% as_tsibble
   }
   else if(!is_tsibble(data)){
     warning("Time series information not found, please provide a tsibble or time-series object.")
-    tsibble_index <- y %>% ts %>% as_tsibble %>% select(!!index(.))
+    tsibble_index <- y %>% ts %>% as_tsibble
   }
+  tsibble_index <- tsibble_index %>% select(!!index(tsibble_index))
 
   series <- as_quosure(sym(series))
 

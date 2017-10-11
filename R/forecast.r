@@ -1,5 +1,6 @@
 #' @importFrom dlm dlmSvd2var
 #' @importFrom forecast forecast
+#' @importFrom dplyr tibble
 #' @export
 forecast.fasster <- function(object, newdata=NULL, h=floor(NROW(object$x)/10), level=c(80, 95), lambda = object$lambda, biasadj = NULL) {
   mod <- object$model_future

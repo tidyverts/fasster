@@ -108,9 +108,9 @@ print.fasster <- function(x, ...){
   cat("Estimated variances:\n")
   cat(" State noise variances (W):\n")
   data.frame(term = colnames(x$model$FF), W = diag(x$model$W)) %>%
-    group_by(!!as_quosure(sym(term))) %>%
-    summarise(!!"W" := paste(format(W, digits=5, scientific=TRUE), collapse=" ")) %>%
-    transmute(!!"Val" := paste0("  ", term, "\n   ", W)) %>%
+    group_by(!!as_quosure(sym("term"))) %>%
+    summarise(!!"W" := paste(format(!!as_quosure(sym("W")), digits=5, scientific=TRUE), collapse=" ")) %>%
+    transmute(!!"Val" := paste0("  ", !!as_quosure(sym("term")), "\n   ", !!as_quosure(sym("W")))) %>%
     pull(!!as_quosure(sum("Val"))) %>%
     paste(collapse="\n") %>%
     paste0("\n\n") %>%
