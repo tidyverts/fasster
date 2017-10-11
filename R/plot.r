@@ -36,6 +36,7 @@ fortify.tbl_forecast <- function(model, data=NULL, ...) {
 #' @importFrom ggplot2 fortify ggplot aes_ geom_line facet_grid xlab ylab ggtitle
 #' @importFrom tsibble index
 #' @importFrom tidyr gather
+#' @importFrom rlang as_quosure sym
 #' @export
 autoplot.fasster <- function(object, range.bars = FALSE, ...) {
   plot_data <- fortify(object)
@@ -54,16 +55,16 @@ autoplot.fasster <- function(object, range.bars = FALSE, ...) {
     range.bars <- is.null(object$lambda)
   }
   if(range.bars){
-    error("Currently not supported")
+    stop("Currently not supported")
     xrange <- range(plot_data %>% pull(!!index))
     rangebar_data <- plot_data %>%
-      group_by(.key) %>%
-      summarise(min = min(.value), max = max(.value)) %>%
-      mutate(middle = mean(c(min, max)), length = max - min,
-             width = (1/64)*diff(xrange),
-             left = xrange[2] + width, right = xrange[2] + width*2,
-             top = middle + length/2, bottom = middle - length/2,
-             .value = left)
+      group_by(!!as_quosure(sym(.key))) %>%
+      summarise(!!"min" := min(.value), !!"max" := max(.value)) %>%
+      mutate(!!"middle" := mean(c(min, max)), !!"length" := max - min,
+             !!"width" := (1/64)*diff(xrange),
+             !!"left" := xrange[2] + width, !!"right" := xrange[2] + width*2,
+             !!"top" := middle + length/2, !!"bottom" := middle - length/2,
+             !!".value" := NA)
     p <- p + ggplot2::geom_rect(ggplot2::aes_(xmin = ~left, xmax = ~right, ymax = ~top, ymin = ~bottom),
                                 data=rangebar_data, fill="gray75", colour="black", size=1/3)
   }
