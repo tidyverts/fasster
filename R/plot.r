@@ -96,9 +96,9 @@ ggfitted <- function(object, ...){
     object$x %>%
       mutate(!!"Response" := getResponse(object),
              !!"Fitted" := fitted(object)) %>%
+      gather("Series", ".value", "Response", "Fitted", factor_key = TRUE) %>%
       ggplot(aes_(x = index(object$x))) +
-      geom_line(aes_(y=~Response, colour=~"Response")) +
-      geom_line(aes_(y=~Fitted, colour=~"Fitted")) +
+      geom_line(aes_(y=~.value, colour=~Series)) +
       xlab(paste0("Time (Interval: ", format(interval(object$x)), ")")) +
       ylab(quo_text(object$series)) +
       ggtitle(paste0("Fitted values from ", object$method))
