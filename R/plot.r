@@ -112,8 +112,12 @@ ggfitted <- function(object, ...){
 #' @export
 #' @importFrom ggplot2 ggplot aes_ xlab ylab ggtitle
 #' @importFrom tsibble index
-autoplot.tbl_forecast <- function(object, ...){
+autoplot.tbl_forecast <- function(object, include, ...){
+  if(missing(include)){
+    include <- NROW(object$x)
+  }
   object$x %>%
+    tail(include) %>%
     ggplot(aes_(x = index(object$x), y = object$series)) +
     geom_line() +
     autolayer(object, ...) +

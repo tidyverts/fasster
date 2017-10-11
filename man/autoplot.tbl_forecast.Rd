@@ -4,11 +4,14 @@
 \alias{autoplot.tbl_forecast}
 \title{Forecast plot}
 \usage{
-\method{autoplot}{tbl_forecast}(object, ...)
+\method{autoplot}{tbl_forecast}(object, include, ...)
 }
 \arguments{
 \item{object}{Forecast object produced by \code{\link{forecast}}. Used for
 ggplot graphics (S3 method consistency).}
+
+\item{include}{number of values from time series to include in plot. Default
+is all values.}
 
 \item{...}{Other plotting parameters to affect the plot.}
 }
