@@ -35,19 +35,20 @@ getResponse.fasster <- function(object, ...){
 }
 
 #' @export
+#' @importFrom dplyr group_by summarise transmute
 print.fasster <- function(x, ...){
   cat(paste("Call:\n", deparse(x$call), "\n\n"))
   cat("Estimated variances:\n")
   cat(" State noise variances (W):\n")
   data.frame(term = colnames(x$model$FF), W = diag(x$model$W)) %>%
     group_by(term) %>%
-    summarise(W=paste(round(W,2), collapse=" ")) %>%
+    summarise(W=paste(format(W, digits=5, scientific=TRUE), collapse=" ")) %>%
     transmute(Val = paste0("  ", term, "\n   ", W)) %>%
     .$Val %>%
     paste(collapse="\n") %>%
     paste0("\n\n") %>%
     cat
-  cat(paste(" Observation noise variance (V):\n ", round(x$model$V,2)))
+  cat(paste(" Observation noise variance (V):\n ", format(x$model$V, digits=5, scientific = TRUE)))
 }
 
 #' @export
