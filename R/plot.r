@@ -123,16 +123,18 @@ autoplot.tbl_forecast <- function(object, ...){
 #' @importFrom forecast autolayer geom_forecast
 #' @importFrom tidyr gather separate spread
 #' @importFrom dplyr bind_rows mutate
+#' @importFrom rlang UQE sym
 autolayer.tbl_forecast <- function(object, series = NULL, PI = TRUE, showgap = TRUE, ...){
   PI <- PI & !is.null(object$level)
   fc_data <- fortify(object) %>%
     gather(".key", ".value", -!!index(object$forecast))
+
   fc_data <- fc_data %>%
-    dplyr::filter(.key == "PointForecast") %>%
+    dplyr::filter(UQE(sym(".key")) == "PointForecast") %>%
     bind_rows(fc_data %>%
-                dplyr::filter(.key != "PointForecast") %>%
-                separate(.key, c("Type", "Level")) %>%
-                spread(Type, .value)) %>%
+                dplyr::filter(UQE(sym(".key")) != "PointForecast") %>%
+                separate(".key", c("Type", "Level")) %>%
+                spread("Type", ".value")) %>%
     mutate(Level = as.numeric(Level))
 
   mapping <- ggplot2::aes_(x = index(object$forecast), y = ~.value)
