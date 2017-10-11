@@ -57,20 +57,36 @@ fit %>% ggfitted
 ``` r
 library(forecast)
 fit %>% accuracy
+#>                     ME     RMSE      MAE        MPE     MAPE      MASE
+#> Training set -23.10502 257.6256 190.2418 -0.3173936 2.204005 0.2956716
+#>                   ACF1
+#> Training set 0.1697722
 
 fit %>% 
-  forecast %>%
+  forecast(h=24) %>%
   autoplot
 ```
+
+![](man/figure/forecast-1.png)
 
 The tools made available by *fasster* are designed to integrate seamlessly with the tidyverse of packages, enabling familiar data manipulation and visualisation capabilities.
 
 The interface for creating a FASSTER model introduces a new formula construct, `%S%`, known as the switch operator. This allows modelling of more complex patterns such as multiple seasonality by modelling the components for each group seperately and switching between them.
 
 ``` r
+library(tsibble)
+#> 
+#> Attaching package: 'tsibble'
+#> The following objects are masked from 'package:lubridate':
+#> 
+#>     interval, year
+#> The following object is masked from 'package:stats':
+#> 
+#>     filter
 fit <- tibble(taylor) %>%
   mutate(DateTime = seq(ymd_h("2000-6-5 00"), by="30 mins", length.out=length(taylor)),
          DayType = ifelse(wday(DateTime) %in% 2:6, "Weekday", "Weekend")) %>% 
+  as_tsibble(index = DateTime) %>% 
   fasster(taylor ~ DayType %S% (poly(1) + trig(48, 10))) 
 fit %>%
   ggfitted
@@ -87,3 +103,5 @@ fit %>%
                     mutate(DayType = ifelse(wday(DateTime) %in% 2:6, "Weekday", "Weekend"))) %>% 
   autoplot(include = 48*7*4)
 ```
+
+![](man/figure/complex_fc-1.png)

@@ -69,7 +69,7 @@ library(forecast)
 fit %>% accuracy
 
 fit %>% 
-  forecast %>%
+  forecast(h=24) %>%
   autoplot
 ```
 
@@ -78,9 +78,11 @@ The tools made available by *fasster* are designed to integrate seamlessly with 
 The interface for creating a FASSTER model introduces a new formula construct, `%S%`, known as the switch operator. This allows modelling of more complex patterns such as multiple seasonality by modelling the components for each group seperately and switching between them.
 
 ```{r complex}
+library(tsibble)
 fit <- tibble(taylor) %>%
   mutate(DateTime = seq(ymd_h("2000-6-5 00"), by="30 mins", length.out=length(taylor)),
          DayType = ifelse(wday(DateTime) %in% 2:6, "Weekday", "Weekend")) %>% 
+  as_tsibble(index = DateTime) %>% 
   fasster(taylor ~ DayType %S% (poly(1) + trig(48, 10))) 
 fit %>%
   ggfitted
