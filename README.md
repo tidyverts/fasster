@@ -29,6 +29,7 @@ Usage
 
 ``` r
 fasster(fdeaths ~ mdeaths) %>% ggfitted
+#> Don't know how to automatically pick scale for object of type ts. Defaulting to continuous.
 ```
 
 ![](man/figure/xreg-1.png)
@@ -46,6 +47,7 @@ For example, to create a model with trend and monthly seasonality, you can use:
 ``` r
 fit <- fasster(USAccDeaths ~ poly(1) + trig(12))
 fit %>% ggfitted
+#> Don't know how to automatically pick scale for object of type ts. Defaulting to continuous.
 ```
 
 ![](man/figure/component-1.png)
@@ -55,17 +57,11 @@ fit %>% ggfitted
 ``` r
 library(forecast)
 fit %>% accuracy
-#>                     ME     RMSE      MAE        MPE     MAPE     MASE
-#> Training set -23.10502 257.6256 190.2418 -0.3173936 2.204005 0.435087
-#>                   ACF1
-#> Training set 0.1697722
 
 fit %>% 
   forecast %>%
   autoplot
 ```
-
-![](man/figure/forecast-1.png)
 
 The tools made available by *fasster* are designed to integrate seamlessly with the tidyverse of packages, enabling familiar data manipulation and visualisation capabilities.
 
@@ -78,6 +74,7 @@ fit <- tibble(taylor) %>%
   fasster(taylor ~ DayType %S% (poly(1) + trig(48, 10))) 
 fit %>%
   ggfitted
+#> Don't know how to automatically pick scale for object of type msts/ts. Defaulting to continuous.
 ```
 
 ![](man/figure/complex-1.png)
@@ -90,5 +87,3 @@ fit %>%
                     mutate(DayType = ifelse(wday(DateTime) %in% 2:6, "Weekday", "Weekend"))) %>% 
   autoplot(include = 48*7*4)
 ```
-
-![](man/figure/complex_fc-1.png)
