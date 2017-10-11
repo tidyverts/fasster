@@ -183,3 +183,9 @@ trainingaccuracy <- function(f,test,d, D)
 
   return(out)
 }
+
+#' @importFrom dplyr pull select
+col2rowname <- function(.data, col){
+  rownames(.data) <- .data %>% pull(!!col)
+  .data %>% select(-!!col)
+}

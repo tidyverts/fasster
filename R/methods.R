@@ -120,3 +120,11 @@ summary.fasster <- function(x, ...){
   cat("\nTraining set error measures (on included data):\n")
   print(accuracy(x))
 }
+
+#' @export
+print.tbl_forecast <- function(x, ...){
+  x$forecast %>%
+    as.data.frame %>%
+    col2rowname(index(x$forecast)) %>%
+    print
+}
