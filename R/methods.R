@@ -101,15 +101,17 @@ getResponse.fasster <- function(object, ...){
 
 #' @export
 #' @importFrom dplyr group_by summarise transmute
+#' @importFrom rlang as_quosure sym
+#' @importFrom dplyr pull
 print.fasster <- function(x, ...){
   cat(paste("Call:\n", deparse(x$call), "\n\n"))
   cat("Estimated variances:\n")
   cat(" State noise variances (W):\n")
   data.frame(term = colnames(x$model$FF), W = diag(x$model$W)) %>%
-    group_by(term) %>%
-    summarise(W=paste(format(W, digits=5, scientific=TRUE), collapse=" ")) %>%
-    transmute(Val = paste0("  ", term, "\n   ", W)) %>%
-    .$Val %>%
+    group_by(!!as_quosure(sym(term))) %>%
+    summarise(!!"W" := paste(format(W, digits=5, scientific=TRUE), collapse=" ")) %>%
+    transmute(!!"Val" := paste0("  ", term, "\n   ", W)) %>%
+    pull(!!as_quosure(sum("Val"))) %>%
     paste(collapse="\n") %>%
     paste0("\n\n") %>%
     cat
