@@ -6,8 +6,6 @@ fasster <img src="man/figure/logo.png" align="right" />
 
 An implementation of the FASSTER (Forecasting with Additive Switching of Seasonality, Trend and Exogenous Regressors) model in R. The *fasster* package implements the FASSTER model for forecasting time-series that can handle multiple seasonal patterns using model switching. It prioritizes flexibility, computational speed and accuracy to provide convenient tools for modelling, predicting and understanding high frequency time-series.
 
-*fasster* builds upon the *dlm* package to create a user-friendly interface for creating switching
-
 Installation
 ------------
 
