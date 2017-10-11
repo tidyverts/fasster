@@ -9,6 +9,10 @@
 \arguments{
 \item{object}{an object, whose class will determine the behaviour of autoplot}
 
+\item{range.bars}{Logical indicating if each plot should have a bar at its
+right side representing relative size. If NULL, automatic selection takes
+place.}
+
 \item{...}{other arguments passed to specific methods}
 }
 \value{
