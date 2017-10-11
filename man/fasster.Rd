@@ -72,9 +72,9 @@ The recommended heuristic is "filterSmooth", which estimates the parameters usin
 \enumerate{
    \item Filter the data using the specified model with non-zero state variances
    \item Obtain smoothed states \eqn{(\theta^{(s)}t=\theta_t|D_T)} to approximate correct behaviour
-   \item The initial state parameters taken from the first smoothed state: \eqn{m_0=E(\theta^{(s)}_0)}, \eqn{C_0=\text{Var}(\theta^{(s)}_0)}
-   \item Obtain state noise variances from the smoothed variance of \eqn{w_t}: \eqn{W=\text{Var}(w^{(s)}_t)=\text{Var}(\theta^{(s)}_t−G\theta^{(s)}_{t−1})}
-   Obtain measurement noise variance from smoothed variance of \eqn{v_t}: \eqn{V=\text{Var}(v^{(s)}_t)=\text{Var}(y_t−F_t\theta^{(s)}_t)}
+   \item The initial state parameters taken from the first smoothed state: \eqn{m_0=E(\theta^{(s)}_0)}, \eqn{C_0=Var(\theta^{(s)}_0)}
+   \item Obtain state noise variances from the smoothed variance of \eqn{w_t}: \eqn{W=Var(w^{(s)}_t)=Var(\theta^{(s)}_t−G\theta^{(s)}_{t−1})}
+   Obtain measurement noise variance from smoothed variance of \eqn{v_t}: \eqn{V=Var(v^{(s)}_t)=Var(y_t−F_t\theta^{(s)}_t)}
    \item Repair restricted state variances for seasonal factors and ARMA terms
 }
 
