@@ -3,9 +3,20 @@
 #' @importFrom ggplot2 fortify
 #' @export
 fortify.fasster <- function(model, data=NULL, ...) {
-  modTrigPlotData <- cbind(model$states, model$x, model$fitted)
-  colnames(modTrigPlotData) <- c(colnames(model$model$FF), "Data", "Fitted")
-  return(modTrigPlotData)
+  states <- model$model$FF %>%
+    colnames() %>%
+    factor %>%
+    spread_groups() %>%
+    t
+
+  states <- (states * model$model$FF[rep(1,NROW(states)),]) %*% t(model$states) %>% t %>% as_tibble
+
+  if(!is.null(model$lambda)){
+    warning("State decompositions are BoxCox transformed")
+  }
+
+  model$x %>%
+    bind_cols(Fitted = fitted(model), States = states)
 }
 
 #' @inherit ggplot2::autoplot
@@ -30,16 +41,15 @@ autoplot.fasster <- function(object, ...) {
 #'
 #' @export
 #' @importFrom forecast getResponse
-#' @importFrom ggplot2 autoplot
+#' @importFrom ggplot2 autoplot ggplot geom_line facet_grid xlab ylab ggtitle
 #' @importFrom dplyr bind_cols
-#' @importFrom tsibble interval
+#' @importFrom tsibble index interval
 ggfitted <- function(object, ...){
   if(is.ts(object$x)){
     autoplot(cbind(getResponse(object), fitted(object)), ...)
   }
   else if(is_tsibble(object$x)){
-    object$x %>%
-      bind_cols(Response = getResponse(object), Fitted = fitted(object)) %>%
+    object %>%
       ggplot(aes_(x = index(.))) +
       geom_line(aes(y=Response, colour="Response")) +
       geom_line(aes(y=Fitted, colour="Fitted")) +
