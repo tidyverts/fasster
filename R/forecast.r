@@ -83,8 +83,8 @@ forecast.fasster <- function(object, newdata=NULL, h=floor(NROW(object$x)/10), l
     upper <- InvBoxCox(upper, lambda)
   }
 
-  colnames(upper) <- paste0("Upper", level)
-  colnames(lower) <- paste0("Lower", level)
+  colnames(upper) <- paste("Upper", level, sep="_")
+  colnames(lower) <- paste("Lower", level, sep="_")
 
   seq_by <- unclass(interval(object$x))
   if(names(seq_by) != "unit"){
