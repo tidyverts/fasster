@@ -233,7 +233,7 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "reg
 #'
 #' @importFrom forecast BoxCox InvBoxCox
 #' @importFrom dlm dlmFilter dlmSvd2var
-#' @importFrom dplyr bind_cols
+#' @importFrom dplyr bind_cols pull
 #' @importFrom utils tail
 #' @importFrom tsibble as_tsibble is_tsibble index key
 #' @importFrom rlang sym as_quosure quo_text
