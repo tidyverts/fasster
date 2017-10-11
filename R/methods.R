@@ -115,10 +115,10 @@ print.fasster <- function(x, ...){
 }
 
 #' @export
-summary.fasster <- function(x, ...){
-  print(x)
+summary.fasster <- function(object, ...){
+  print(object)
   cat("\nTraining set error measures (on included data):\n")
-  print(accuracy(x))
+  print(accuracy(object))
 }
 
 #' @export
