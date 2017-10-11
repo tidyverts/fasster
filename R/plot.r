@@ -91,10 +91,12 @@ ggfitted <- function(object, ...){
     autoplot(cbind(getResponse(object), fitted(object)), ...)
   }
   else if(is_tsibble(object$x)){
-    object %>%
+    object$x %>%
+      mutate(!!"Response" := getResponse(object),
+             !!"Fitted" := fitted(object)) %>%
       ggplot(aes_(x = index(.))) +
-      geom_line(aes(y=Response, colour="Response")) +
-      geom_line(aes(y=Fitted, colour="Fitted")) +
+      geom_line(aes_(y=~Response, colour=~"Response")) +
+      geom_line(aes_(y=~Fitted, colour=~"Fitted")) +
       xlab(paste0("Time (Interval: ", format(interval(object$x)), ")")) +
       ylab(quo_text(object$series)) +
       ggtitle(paste0("Fitted values from ", object$method))
