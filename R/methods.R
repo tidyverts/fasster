@@ -93,6 +93,8 @@ residuals.fasster <- function(object, ...){
 #' \code{\link[forecast]{getResponse}}
 #'
 #' @export
+#'
+#' @importFrom dplyr pull
 getResponse.fasster <- function(object, ...){
   object$x %>% pull(!!object$series)
 }
