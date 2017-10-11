@@ -1,7 +1,7 @@
 #' @importFrom dlm dlmSvd2var
 #' @importFrom forecast forecast
 #' @export
-forecast.fasster <- function(object, newdata=NULL, h=NULL, level=c(80, 95), lambda = object$lambda, biasadj = NULL) {
+forecast.fasster <- function(object, newdata=NULL, h=floor(NROW(object$x)/10), level=c(80, 95), lambda = object$lambda, biasadj = NULL) {
   mod <- object$model_future
   ytsp <- tsp(object$x)
 
@@ -38,17 +38,7 @@ forecast.fasster <- function(object, newdata=NULL, h=NULL, level=c(80, 95), lamb
     NROW(X)
   }
   else{
-    if(is.null(h)){
-      if(is.ts(object$x)){
-        frequency(object$x) * 2
-      }
-      else{
-        24
-      }
-    }
-    else{
-      h
-    }
+    h
   }
 
   p <- length(mod$m0)
@@ -77,10 +67,6 @@ forecast.fasster <- function(object, newdata=NULL, h=NULL, level=c(80, 95), lamb
   }
   a <- a[-1,, drop = FALSE]
   R <- R[-1]
-  if (!is.null(ytsp)) {
-    a <- ts(a, start = ytsp[2] + 1 / ytsp[3], frequency = ytsp[3])
-    f <- ts(f, start = ytsp[2] + 1 / ytsp[3], frequency = ytsp[3])
-  }
 
   Q <- unlist(Q)
   lower <- matrix(NA, ncol = length(level), nrow = nAhead)
@@ -91,13 +77,32 @@ forecast.fasster <- function(object, newdata=NULL, h=NULL, level=c(80, 95), lamb
     upper[, i] <- f + qq * sqrt(Q)
   }
 
-  ans <- structure(list(model = object, mean = f, level = level, x = object$x, upper = upper, lower = lower, fitted = fit$f, method = "FASSTER", series = object$series, residuals = residuals(object)), class = c("forecast"))
-
   if (!is.null(lambda)) {
-    ans$mean <- InvBoxCox(ans$mean, lambda, biasadj, ans)
-    ans$lower <- InvBoxCox(ans$lower, lambda)
-    ans$upper <- InvBoxCox(ans$upper, lambda)
+    f <- InvBoxCox(f, lambda, biasadj, ans)
+    lower <- InvBoxCox(lower, lambda)
+    upper <- InvBoxCox(upper, lambda)
   }
+
+  colnames(upper) <- paste0("Upper", level)
+  colnames(lower) <- paste0("Lower", level)
+
+  seq_by <- unclass(interval(object$x))
+  if(names(seq_by) != "unit"){
+    seq_by <- paste0(seq_by, " ", names(seq_by), "s")
+  }
+
+  fcIndex <- seq(max(object$x %>% pull(!!index(object$x))), length.out = nAhead + 1, by = seq_by)
+  class(fcIndex) <- object$x %>% pull(!!index(object$x)) %>% class
+
+  tsibble_index <- tibble(!!quo_text(index(object$x)) := fcIndex) %>%
+    tail(-1) %>%
+    as_tsibble(index = !!index(object$x))
+
+  ans <- structure(list(model = object, x = object$x, fitted = fit$f,
+                        forecast = tsibble_index %>% bind_cols(PointForecast=c(f), as_tibble(upper), as_tibble(lower)),
+                        level = level,
+                        method = "FASSTER", series = object$series, residuals = residuals(object)),
+                   class = c("tbl_forecast", "forecast"))
 
   return(ans)
 }
