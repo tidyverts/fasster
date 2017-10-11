@@ -83,7 +83,7 @@ residuals.fasster <- function(object, ...){
     object$residuals
   }
   else{
-    object$fitted - getResponse(x)
+    object$fitted - getResponse(object)
   }
 }
 
