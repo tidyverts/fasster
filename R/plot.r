@@ -35,7 +35,7 @@ autoplot.fasster <- function(object, range.bars = FALSE, ...) {
     ggplot(aes_(x = index, y = ~.value)) +
     geom_line() +
     facet_grid(.key ~ ., scales="free_y", switch="y") +
-    xlab(NULL) +
+    xlab(paste0("Time (Interval: ", format(interval(object$x)), ")")) +
     ylab(NULL) +
     ggtitle("Decomposition by FASSTER method")
 
