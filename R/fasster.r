@@ -150,7 +150,7 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "reg
       mt <- mt[-specialIdx]
     }
     xreg <- model.matrix(mt, data)
-    specialPathList <- c(specialPathList, paste0(group, ":", colnames(xreg)))
+    specialPathList <- c(specialPathList, paste0(group, colnames(xreg), collapse=":"))
     if (!is.null(X)) {
       xreg <- xreg * X # xreg switching
     }
