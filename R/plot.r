@@ -38,6 +38,9 @@ autoplot.fasster <- function(object, range.bars = FALSE, ...) {
     ylab(NULL) +
     ggtitle("Decomposition by FASSTER method")
 
+  if(is.null(range.bars)){
+    range.bars <- is.null(object$lambda)
+  }
   if(range.bars){
     error("Currently not supported")
     xrange <- range(plot_data %>% pull(!!index))
