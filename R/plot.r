@@ -31,6 +31,7 @@ fortify.tbl_forecast <- function(model, data=NULL, ...) {
 
 
 #' @inherit ggplot2::autoplot
+#' @inheritParams forecast::autoplot.ets
 #'
 #' @importFrom ggplot2 fortify ggplot aes_ geom_line facet_grid xlab ylab ggtitle
 #' @importFrom tsibble index
