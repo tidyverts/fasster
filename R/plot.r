@@ -24,7 +24,7 @@ fortify.fasster <- function(model, data=NULL, ...) {
 #'
 #' @importFrom ggplot2 fortify ggplot aes geom_line facet_grid xlab ylab ggtitle
 #' @importFrom tsibble index
-#' @importFrom dplyr gather
+#' @importFrom tidyr gather
 #' @export
 autoplot.fasster <- function(object, range.bars = FALSE, ...) {
   plot_data <- fortify(object)

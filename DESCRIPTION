@@ -9,6 +9,7 @@ Imports:
     tsibble,
     ggplot2,
     dplyr,
+    tidyr,
     purrr,
     rlang,
     stats,
