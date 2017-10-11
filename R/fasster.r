@@ -235,6 +235,8 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "reg
 #' @importFrom dlm dlmFilter dlmSvd2var
 #' @importFrom dplyr bind_cols
 #' @importFrom utils tail
+#' @importFrom tsibble as_tsibble is_tsibble index key
+#' @importFrom rlang sym as_quosure quo_text
 fasster <- function(data, formula, heuristic=c("filterSmooth", "lmSaturated", "lm"), include=NULL, lambda=NULL, biasadj=FALSE, ...) {
   cl <- match.call()
   heuristic <- match.arg(heuristic)
@@ -327,11 +329,13 @@ fasster <- function(data, formula, heuristic=c("filterSmooth", "lmSaturated", "l
 
   fitted <- filtered$f
   if(!is.null(lambda)){
+    data <- data %>%
+      mutate(!!quo_text(series, 500) := InvBoxCox(!!series, lambda))
     fitted <- InvBoxCox(fitted,lambda, biasadj, filtered$mod$V)
     attr(lambda, "biasadj") <- biasadj
   }
 
   return(structure(list(model = dlmModel, model_future = modFuture, formula = formula, lambda = lambda,
-                        x = data[, series], fitted = fitted, residuals = resid, states = filtered$a,
+                        x = data, fitted = fitted, residuals = resid, states = filtered$a,
                         call = cl, heuristic = heuristic, series = series, method="FASSTER"), class = "fasster"))
 }
