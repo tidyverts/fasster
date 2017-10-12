@@ -94,8 +94,8 @@ ggfitted <- function(object, ...){
   }
   else if(is_tsibble(object$x)){
     object$x %>%
-      mutate(!!"Response" := getResponse(object),
-             !!"Fitted" := fitted(object)) %>%
+      mutate(!!"Response" := c(getResponse(object)),
+             !!"Fitted" := c(fitted(object))) %>%
       gather("Series", ".value", "Response", "Fitted", factor_key = TRUE) %>%
       ggplot(aes_(x = index(object$x))) +
       geom_line(aes_(y=~.value, colour=~Series)) +
