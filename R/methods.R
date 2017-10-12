@@ -111,7 +111,7 @@ print.fasster <- function(x, ...){
     group_by(!!as_quosure(sym("term"))) %>%
     summarise(!!"W" := paste(format(!!as_quosure(sym("W")), digits=5, scientific=TRUE), collapse=" ")) %>%
     transmute(!!"Val" := paste0("  ", !!as_quosure(sym("term")), "\n   ", !!as_quosure(sym("W")))) %>%
-    pull(!!as_quosure(sum("Val"))) %>%
+    pull(!!as_quosure(sym("Val"))) %>%
     paste(collapse="\n") %>%
     paste0("\n\n") %>%
     cat
