@@ -198,7 +198,7 @@ add_tsblNA <- function(obj){
 
   seq_by <- unclass(interval(obj))
   if(length(seq_by) > 1){
-    seq_by <- object$x %>% pull(!!index(object$x)) %>% diff %>% median
+    seq_by <- obj %>% pull(!!index(obj)) %>% diff %>% median
   }
   else if(names(seq_by) != "unit"){
     seq_by <- paste0(seq_by, " ", names(seq_by), "s")
