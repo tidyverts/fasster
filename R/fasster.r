@@ -288,6 +288,9 @@ fasster <- function(data, formula, heuristic=c("filterSmooth", "lmSaturated", "l
     data <- tail(data, include)
   }
 
+  # Add missing values and sort tsibble
+  data <- data %>% add_tsblNA
+
   # Parse formula into structure
   model_struct <- formula_parse_groups(formula)
   dlmModel <- build_FASSTER_group(model_struct, data) %>%
