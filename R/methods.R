@@ -125,6 +125,27 @@ summary.fasster <- function(object, ...){
   print(accuracy(object))
 }
 
+#' @inherit tibble::as_tibble
+#' @importFrom tsibble as.tibble as_tibble
+#' @export
+as.tibble.fasster <- as_tibble.fasster <- function(x, ...){
+  fortify(x, ...) %>% as_tibble()
+}
+
+#' @inherit tsibble::as_tsibble
+#' @importFrom tsibble as.tsibble as_tsibble
+#' @export
+as.tsibble.fasster <- as_tsibble.fasster <- function(x, ...){
+  fortify(x, ...)
+}
+
+#' @inherit base::as.data.frame
+#' @export
+as.data.frame.fasster <- function(x, ...){
+  fortify(x, ...) %>% as.data.frame
+}
+
+#' @inherit base::print
 #' @export
 print.tbl_forecast <- function(x, ...){
   x$forecast %>%
