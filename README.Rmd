@@ -15,6 +15,8 @@ knitr::opts_chunk$set(
 library(fasster)
 library(tidyverse)
 library(lubridate)
+library(tsibble)
+library(forecast)
 ```
 
 # fasster <img src="man/figure/logo.png" align="right" />
@@ -42,6 +44,8 @@ devtools::install_github("mitchelloharawild/fasster")
 
 ## Usage
 
+### Model specification
+
 *fasster* allows flexible model specification by allowing the user to specify the model structure with standard formula conventions.
 ```{r xreg}
 fasster(fdeaths ~ mdeaths) %>% ggfitted
@@ -61,6 +65,30 @@ fit <- fasster(USAccDeaths ~ poly(1) + trig(12))
 fit %>% ggfitted
 ```
 
+The interface for creating a FASSTER model introduces a new formula construct, `%S%`, known as the switch operator. This allows modelling of more complex patterns such as multiple seasonality by modelling the components for each group seperately and switching between them.
+
+```{r complex}
+fit_switch <- as_tsibble(taylor) %>%
+  mutate(index = seq(ymd_h("2000-6-5 00"), by="30 mins", length.out=length(taylor)),
+         DayType = ifelse(wday(index) %in% 2:6, "Weekday", "Weekend")) %>% 
+  fasster(taylor ~ DayType %S% (poly(1) + trig(48, 10))) 
+fit_switch %>%
+  ggfitted
+```
+
+### Decomposing
+
+Fitted FASSTER models can be decomposed to provide a description of how the underlying states function. Decomposing a FASSTER model provides aggregates of its components such as trends and seasonalities.
+
+These components can be plotted using the autoplot function on a fitted model:
+```{r decompose}
+fit %>% autoplot
+```
+
+The tools made available by *fasster* are designed to integrate seamlessly with the tidyverse of packages, enabling familiar data manipulation and visualisation capabilities.
+
+### Forecasting
+
 *fasster* conforms to the object structure from the *forecast* package, allowing common visualisation and analysis tools to be applied on FASSTER models.
 ```{r forecast}
 library(forecast)
@@ -71,25 +99,10 @@ fit %>%
   autoplot
 ```
 
-The tools made available by *fasster* are designed to integrate seamlessly with the tidyverse of packages, enabling familiar data manipulation and visualisation capabilities.
-
-The interface for creating a FASSTER model introduces a new formula construct, `%S%`, known as the switch operator. This allows modelling of more complex patterns such as multiple seasonality by modelling the components for each group seperately and switching between them.
-
-```{r complex}
-library(tsibble)
-fit <- tibble(taylor) %>%
-  mutate(DateTime = seq(ymd_h("2000-6-5 00"), by="30 mins", length.out=length(taylor)),
-         DayType = ifelse(wday(DateTime) %in% 2:6, "Weekday", "Weekend")) %>% 
-  as_tsibble(index = DateTime) %>% 
-  fasster(taylor ~ DayType %S% (poly(1) + trig(48, 10))) 
-fit %>%
-  ggfitted
-```
-
 Like other forecasting functions, if additional information is required (such as future state switching), it can be provided via the `newdata` argument.
 
 ```{r complex_fc}
-fit %>% 
+fit_switch %>% 
   forecast(newdata = tibble(DateTime = seq(ymd_h("2000-8-28 00"), by="30 mins", length.out=48*7*2)) %>%
                     mutate(DayType = ifelse(wday(DateTime) %in% 2:6, "Weekday", "Weekend"))) %>% 
   autoplot(include = 48*7*4)
