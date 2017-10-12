@@ -195,7 +195,16 @@ add_tsblNA <- function(obj){
   index <- index(obj)
   indexVals <- obj %>%
     pull(!!index)
-  na_DateTime <-  tibble(!!quo_text(index) := seq(min(indexVals), max(indexVals), by= indexVals %>% diff %>% median))
+
+  seq_by <- unclass(interval(obj))
+  if(length(seq_by) > 1){
+    seq_by <- object$x %>% pull(!!index(object$x)) %>% diff %>% median
+  }
+  else if(names(seq_by) != "unit"){
+    seq_by <- paste0(seq_by, " ", names(seq_by), "s")
+  }
+
+  na_DateTime <-  tibble(!!quo_text(index) := seq(min(indexVals), max(indexVals), by= seq_by))
 
   return(full_join(as_tibble(obj), as_tibble(na_DateTime), by = quo_text(index)) %>%
            arrange(!!index) %>%
