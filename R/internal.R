@@ -206,7 +206,11 @@ add_tsblNA <- function(obj){
 
   na_DateTime <-  tibble(!!quo_text(index) := seq(min(indexVals), max(indexVals), by= seq_by))
 
-  return(full_join(as_tibble(obj), as_tibble(na_DateTime), by = quo_text(index)) %>%
-           arrange(!!index) %>%
+  out <- full_join(as_tibble(obj), as_tibble(na_DateTime), by = quo_text(index)) %>%
+    arrange(!!index)
+
+  class(out[[quo_text(index)]]) <- obj %>% pull(!!index(obj)) %>% class
+
+  return(out %>%
            as_tsibble(index = !!index))
 }

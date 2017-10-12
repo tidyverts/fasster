@@ -128,16 +128,26 @@ summary.fasster <- function(object, ...){
 #' @inherit tibble::as_tibble
 #' @importFrom tsibble as.tibble as_tibble
 #' @export
-as.tibble.fasster <- as_tibble.fasster <- function(x, ...){
+as_tibble.fasster <- function(x, ...){
   fortify(x, ...) %>% as_tibble()
+}
+
+#' @inherit tibble::as_tibble
+#' @importFrom tsibble as.tibble as_tibble
+#' @export
+as.tibble.fasster <- as_tibble.fasster
+
+#' @inherit tsibble::as_tsibble
+#' @importFrom tsibble as.tsibble as_tsibble
+#' @export
+as_tsibble.fasster <- function(x, ...){
+  fortify(x, ...)
 }
 
 #' @inherit tsibble::as_tsibble
 #' @importFrom tsibble as.tsibble as_tsibble
 #' @export
-as.tsibble.fasster <- as_tsibble.fasster <- function(x, ...){
-  fortify(x, ...)
-}
+as.tsibble.fasster <- as_tsibble.fasster
 
 #' @inherit base::as.data.frame
 #' @export
