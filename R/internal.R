@@ -189,3 +189,14 @@ col2rowname <- function(.data, col){
   rownames(.data) <- .data %>% pull(!!col)
   .data %>% select(-!!col)
 }
+
+add_tsblNA <- function(obj){
+  index <- index(obj)
+  indexVals <- obj %>%
+    pull(!!index)
+  na_DateTime <-  tibble(!!quo_text(index) := seq(min(indexVals), max(indexVals), by= indexVals %>% diff %>% median))
+
+  return(full_join(as_tibble(obj), as_tibble(na_DateTime), by = quo_text(index)) %>%
+           arrange(!!index) %>%
+           as_tsibble(index = !!index))
+}
