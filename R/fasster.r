@@ -297,14 +297,14 @@ fasster <- function(data, formula, heuristic=c("filterSmooth", "lmSaturated", "l
     ungroup_struct()
 
   if(heuristic == "lm")
-    dlmModel <- dlm_lmHeuristic(data %>% pull(!!series), dlmModel)
+    dlmModel <- dlm_lmHeuristic(data %>% pull(!!series) %>% c, dlmModel)
   else if(heuristic == "lmSaturated")
-    dlmModel <- dlm_lmHeuristic_saturated(data %>% pull(!!series), dlmModel, ungroup_struct(build_FASSTER_group(model_struct, data, internal = "saturate")))
+    dlmModel <- dlm_lmHeuristic_saturated(data %>% pull(!!series) %>% c, dlmModel, ungroup_struct(build_FASSTER_group(model_struct, data, internal = "saturate")))
   else if(heuristic == "filterSmooth")
-    dlmModel <- dlm_filterSmoothHeuristic(data %>% pull(!!series), dlmModel)
+    dlmModel <- dlm_filterSmoothHeuristic(data %>% pull(!!series) %>% c, dlmModel)
 
   # Fit model
-  filtered <- dlmFilter(data %>% pull(!!series), dlmModel)
+  filtered <- dlmFilter(data %>% pull(!!series) %>% c, dlmModel)
 
   if(!is.matrix(filtered$a)){
     filtered$a <- matrix(filtered$a)
