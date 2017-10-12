@@ -190,6 +190,7 @@ col2rowname <- function(.data, col){
   .data %>% select(-!!col)
 }
 
+#' @importFrom dplyr full_join arrange
 add_tsblNA <- function(obj){
   index <- index(obj)
   indexVals <- obj %>%
