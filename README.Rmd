@@ -85,6 +85,11 @@ These components can be plotted using the autoplot function on a fitted model:
 fit %>% autoplot
 ```
 
+```{r decompose-complex}
+fit_switch %>% autoplot
+```
+
+
 The tools made available by *fasster* are designed to integrate seamlessly with the tidyverse of packages, enabling familiar data manipulation and visualisation capabilities.
 
 ### Forecasting

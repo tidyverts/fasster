@@ -75,6 +75,22 @@ fit %>% autoplot
 
 ![](man/figure/decompose-1.png)
 
+``` r
+fit_switch %>% autoplot
+#> geom_path: Each group consists of only one observation. Do you need to
+#> adjust the group aesthetic?
+#> geom_path: Each group consists of only one observation. Do you need to
+#> adjust the group aesthetic?
+#> geom_path: Each group consists of only one observation. Do you need to
+#> adjust the group aesthetic?
+#> geom_path: Each group consists of only one observation. Do you need to
+#> adjust the group aesthetic?
+#> geom_path: Each group consists of only one observation. Do you need to
+#> adjust the group aesthetic?
+```
+
+![](man/figure/decompose-complex-1.png)
+
 The tools made available by *fasster* are designed to integrate seamlessly with the tidyverse of packages, enabling familiar data manipulation and visualisation capabilities.
 
 ### Forecasting
