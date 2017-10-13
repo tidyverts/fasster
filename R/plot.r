@@ -17,6 +17,7 @@ fortify.fasster <- function(model, data=NULL, ...) {
   }
 
   model$x %>%
+    select(!!index(model$x), !!model$series) %>%
     bind_cols(Fitted = fitted(model), States = states)
 }
 
