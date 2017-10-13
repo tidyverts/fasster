@@ -77,16 +77,6 @@ fit %>% autoplot
 
 ``` r
 fit_switch %>% autoplot
-#> geom_path: Each group consists of only one observation. Do you need to
-#> adjust the group aesthetic?
-#> geom_path: Each group consists of only one observation. Do you need to
-#> adjust the group aesthetic?
-#> geom_path: Each group consists of only one observation. Do you need to
-#> adjust the group aesthetic?
-#> geom_path: Each group consists of only one observation. Do you need to
-#> adjust the group aesthetic?
-#> geom_path: Each group consists of only one observation. Do you need to
-#> adjust the group aesthetic?
 ```
 
 ![](man/figure/decompose-complex-1.png)
