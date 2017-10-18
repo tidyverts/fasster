@@ -191,26 +191,31 @@ col2rowname <- function(.data, col){
 }
 
 #' @importFrom dplyr full_join arrange
+#' @importFrom tsibble fill_na
 add_tsblNA <- function(obj){
-  index <- index(obj)
-  indexVals <- obj %>%
-    pull(!!index)
+  # index <- index(obj)
+  # indexVals <- obj %>%
+  #   pull(!!index)
+  #
+  # seq_by <- unclass(interval(obj))
+  # if(length(seq_by) > 1){
+  #   seq_by <- obj %>% pull(!!index(obj)) %>% diff %>% median
+  # }
+  # else if(names(seq_by) != "unit"){
+  #   seq_by <- paste0(seq_by, " ", names(seq_by), "s")
+  # }
+  #
+  # if(class(indexVals))
+  #
+  # na_DateTime <-  tibble(!!quo_text(index) := seq(min(indexVals), max(indexVals), by= seq_by))
+  #
+  # out <- full_join(as_tibble(obj), as_tibble(na_DateTime), by = quo_text(index)) %>%
+  #   arrange(!!index)
+  #
+  # class(out[[quo_text(index)]]) <- obj %>% pull(!!index(obj)) %>% class
 
-  seq_by <- unclass(interval(obj))
-  if(length(seq_by) > 1){
-    seq_by <- obj %>% pull(!!index(obj)) %>% diff %>% median
-  }
-  else if(names(seq_by) != "unit"){
-    seq_by <- paste0(seq_by, " ", names(seq_by), "s")
-  }
+  obj %>%
+    fill_na %>%
+    arrange(!!index(obj))
 
-  na_DateTime <-  tibble(!!quo_text(index) := seq(min(indexVals), max(indexVals), by= seq_by))
-
-  out <- full_join(as_tibble(obj), as_tibble(na_DateTime), by = quo_text(index)) %>%
-    arrange(!!index)
-
-  class(out[[quo_text(index)]]) <- obj %>% pull(!!index(obj)) %>% class
-
-  return(out %>%
-           as_tsibble(index = !!index))
 }
