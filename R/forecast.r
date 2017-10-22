@@ -87,12 +87,9 @@ forecast.fasster <- function(object, newdata=NULL, h=floor(NROW(object$x)/10), l
   colnames(upper) <- paste("Upper", level, sep="_")
   colnames(lower) <- paste("Lower", level, sep="_")
 
-  seq_by <- unclass(interval(object$x))
+  seq_by <- object$x %>% interval %>% unclass %>% as.numeric
   if(length(seq_by) > 1){
     seq_by <- object$x %>% pull(!!index(object$x)) %>% diff %>% median
-  }
-  else if(names(seq_by) != "unit"){
-    seq_by <- paste0(seq_by, " ", names(seq_by), "s")
   }
 
   fcIndex <- seq(max(object$x %>% pull(!!index(object$x))), length.out = nAhead + 1, by = seq_by)
