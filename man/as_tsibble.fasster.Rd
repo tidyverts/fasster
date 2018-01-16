@@ -9,10 +9,7 @@
 \arguments{
 \item{x}{Other objects to be coerced to a tsibble (\code{tbl_ts}).}
 
-\item{...}{Unquoted key variable(s) that define unique time indices. Only used
-for data of class \code{tbl_df}, \code{data.frame} and \code{list} (i.e. long data form), if
-a univariate time series (without an explicit key), simply leave it blank.
-Ignored for other types of classes.}
+\item{...}{Other arguments passed on to individual methods.}
 }
 \value{
 A tsibble object.
@@ -20,45 +17,44 @@ A tsibble object.
 \description{
 Coerce to a tsibble object
 }
-\section{Index}{
+\examples{
+# coerce tibble to tsibble w/o a key ----
+tbl1 <- tibble::tibble(
+  date = seq(as.Date("2017-01-01"), as.Date("2017-01-10"), by = 1),
+  value = rnorm(10)
+)
+as_tsibble(tbl1)
+# specify the index var
+as_tsibble(tbl1, index = date)
 
+# coerce tibble to tsibble with one key ----
+# "date" is automatically considered as the index var, and "group" is the key
+tbl2 <- tibble::tibble(
+  mth = rep(yearmonth(seq(2017, 2017 + 9 / 12, by = 1 / 12)), 3),
+  group = rep(c("x", "y", "z"), each = 10),
+  value = rnorm(30)
+)
+as_tsibble(tbl2, key = id(group))
+as_tsibble(tbl2, key = id(group), index = mth)
 
-The time indices are no longer an attribute (for example, the \code{tsp} attribute
-in a \code{ts} object), but preserved as the essential component of the tsibble. A
-few index class, such as \code{Date}, \code{POSIXt}, and \code{difftime}, forms the basis of
-the tsibble, with new additions \link{yearmth}, \link{yearqtr} and \link{year} representing
-year-month, year-quarter and year objects respectively.
+# coerce ts to tsibble
+as_tsibble(AirPassengers)
+as_tsibble(sunspot.year)
+as_tsibble(sunspot.month)
+as_tsibble(austres)
 
+# coerce mts to tsibble
+z <- ts(matrix(rnorm(300), 100, 3), start = c(1961, 1), frequency = 12)
+as_tsibble(z)
+as_tsibble(z, gather = FALSE)
+
+# coerce hts from the "hts" package to tsibble
+if (!requireNamespace("hts", quietly = TRUE)) {
+  stop("Please install the hts package to run these following examples.")
 }
-
-\section{Key}{
-
-
-Key variable(s) together with the index uniquely identifies each record. And
-key(s) also imposes the structure on a tsibble:
-\itemize{
-\item Univariate time series: none.
-\item Multivariate time series: a single variable. For example, \code{data(pedestrian)}
-uses the \code{Sensor} column as the key.
-\item Grouped time series: multiple variables separated by commas (\code{,}). For example,
-sales data over time can be split by product types (\code{product}) and geographical
-locations (\code{geo}), and thus \code{product}, \code{geo} suggests the structure.
-\item Hierarchical time series: nested keys using vertical bars (\code{|}). For example,
-a natural hierarchy is defined on geographical regions: cities (\code{city}) are
-nested in states (\code{state}). The expression of \code{city} | \code{state} is expected.
-The general principle is that lower levels are nested in higher levels
-(\code{lower} | \code{middle} | \code{higher}).
+as_tsibble(hts::htseg1)
+as_tsibble(hts::htseg2)
 }
-
-A combination of nested and grouped variables are also supported.
-
+\seealso{
+tsibble
 }
-
-\section{Print options}{
-
-
-The tsibble package fully utilises the \code{print} method from the tibble. Please
-refer to \link[tibble:tibble-package]{tibble::tibble-package} to change display options.
-
-}
-
