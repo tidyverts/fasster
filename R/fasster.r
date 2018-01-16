@@ -325,12 +325,7 @@ fasster <- function(data, formula, heuristic=c("filterSmooth", "lmSaturated", "l
   ))
   wt <- filtered$a[seq_len(NROW(filtered$a) - 1) + 1, ] - filtered$a[seq_len(NROW(filtered$a) - 1), ]%*%t(dlmModel$GG)
   modFuture$W <- var(wt)
-  if (is.ts(filtered$m))
-    modFuture$m0 <- window(filtered$m, start = end(filtered$m))
-  else {
-    modFuture$m0 <- window(filtered$m, start = lastObsIndex)
-    tsp(modFuture$m0) <- NULL
-  }
+  modFuture$m0 <- filtered$m %>% tail(1) %>% as.numeric()
 
   fitted <- filtered$f
   if(!is.null(lambda)){
