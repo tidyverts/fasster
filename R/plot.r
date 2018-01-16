@@ -132,16 +132,16 @@ autoplot.tbl_forecast <- function(object, include, ...){
 #' @importFrom forecast autolayer geom_forecast
 #' @importFrom tidyr gather separate spread
 #' @importFrom dplyr bind_rows mutate
-#' @importFrom rlang UQE sym
+#' @importFrom rlang get_expr sym
 autolayer.tbl_forecast <- function(object, series = NULL, PI = TRUE, showgap = TRUE, ...){
   PI <- PI & !is.null(object$level)
   fc_data <- fortify(object) %>%
     gather(".key", ".value", -!!index(object$forecast))
 
   fc_point <- fc_data %>%
-    dplyr::filter(UQE(sym(".key")) == "PointForecast")
+    dplyr::filter(!! get_expr(sym(".key")) == "PointForecast")
   fc_interval <- fc_data %>%
-                dplyr::filter(UQE(sym(".key")) != "PointForecast") %>%
+                dplyr::filter(!! get_expr(sym(".key")) != "PointForecast") %>%
                 separate(".key", c("Type", "Level")) %>%
                 spread("Type", ".value")
   fc_data <- bind_rows(fc_point, fc_interval) %>%
