@@ -18,42 +18,10 @@ A tsibble object.
 Coerce to a tsibble object
 }
 \examples{
-# coerce tibble to tsibble w/o a key ----
-tbl1 <- tibble::tibble(
-  date = seq(as.Date("2017-01-01"), as.Date("2017-01-10"), by = 1),
-  value = rnorm(10)
-)
-as_tsibble(tbl1)
-# specify the index var
-as_tsibble(tbl1, index = date)
+library(tsibble)
+fasster(USAccDeaths ~ poly(1) + trig(12)) \%>\%
+  as_tsibble()
 
-# coerce tibble to tsibble with one key ----
-# "date" is automatically considered as the index var, and "group" is the key
-tbl2 <- tibble::tibble(
-  mth = rep(yearmonth(seq(2017, 2017 + 9 / 12, by = 1 / 12)), 3),
-  group = rep(c("x", "y", "z"), each = 10),
-  value = rnorm(30)
-)
-as_tsibble(tbl2, key = id(group))
-as_tsibble(tbl2, key = id(group), index = mth)
-
-# coerce ts to tsibble
-as_tsibble(AirPassengers)
-as_tsibble(sunspot.year)
-as_tsibble(sunspot.month)
-as_tsibble(austres)
-
-# coerce mts to tsibble
-z <- ts(matrix(rnorm(300), 100, 3), start = c(1961, 1), frequency = 12)
-as_tsibble(z)
-as_tsibble(z, gather = FALSE)
-
-# coerce hts from the "hts" package to tsibble
-if (!requireNamespace("hts", quietly = TRUE)) {
-  stop("Please install the hts package to run these following examples.")
-}
-as_tsibble(hts::htseg1)
-as_tsibble(hts::htseg2)
 }
 \seealso{
 tsibble

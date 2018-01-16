@@ -98,6 +98,11 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "reg
   ## Deparse model specification
   specials <- c("poly", "trig", "fourier", "seas", "seasonality",  "seasonal", "ARMA", "custom")
 
+  ## Overwrite pre-existing functions
+  for(fn in specials){
+    assign(fn, function(...) stop("Cannot apply transformations to special functions"))
+  }
+
   mt <- terms(formula, data = data, specials = specials)
   attr(mt, "intercept") <- 0
 

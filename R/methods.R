@@ -126,26 +126,37 @@ summary.fasster <- function(object, ...){
 }
 
 #' @inherit tibble::as_tibble
+#'
+#' @examples
+#' library(tsibble)
+#' fasster(USAccDeaths ~ poly(1) + trig(12)) %>%
+#'   as_tibble()
+#'
 #' @importFrom tsibble as.tibble as_tibble
 #' @export
 as_tibble.fasster <- function(x, ...){
   fortify(x, ...) %>% as_tibble()
 }
 
-#' @inherit tibble::as_tibble
+#' @inherit as_tibble.fasster
 #' @importFrom tsibble as.tibble as_tibble
 #' @export
 as.tibble.fasster <- as_tibble.fasster
 
 #' @inherit tsibble::as_tsibble
+#'
+#' @examples
+#' library(tsibble)
+#' fasster(USAccDeaths ~ poly(1) + trig(12)) %>%
+#'   as_tsibble()
+#'
 #' @importFrom tsibble as.tsibble as_tsibble
 #' @export
 as_tsibble.fasster <- function(x, ...){
   fortify(x, ...)
 }
 
-#' @inherit tsibble::as_tsibble
-#' @importFrom tsibble as.tsibble as_tsibble
+#' @inherit as_tsibble.fasster
 #' @export
 as.tsibble.fasster <- as_tsibble.fasster
 

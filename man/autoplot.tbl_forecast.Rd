@@ -4,7 +4,7 @@
 \alias{autoplot.tbl_forecast}
 \title{Forecast plot}
 \usage{
-\method{autoplot}{tbl_forecast}(object, include, ...)
+\method{autoplot}{tbl_forecast}(object, include = NROW(object$x), ...)
 }
 \arguments{
 \item{object}{Forecast object produced by \code{\link{forecast}}. Used for
@@ -27,19 +27,12 @@ Plots historical data with forecasts and prediction intervals.
 plot.splineforecast autoplot.splineforecast
 }
 \examples{
+library(forecast)
 library(ggplot2)
+fasster(USAccDeaths ~ poly(1) + trig(12)) \%>\%
+  forecast(h=24) \%>\%
+  autoplot
 
-wine.fit <- hw(wineind,h=48)
-plot(wine.fit)
-autoplot(wine.fit)
-
-fit <- tslm(wineind ~ fourier(wineind,4))
-fcast <- forecast(fit, newdata=data.frame(fourier(wineind,4,20)))
-autoplot(fcast)
-
-fcast <- splinef(airmiles,h=5)
-plot(fcast)
-autoplot(fcast)
 }
 \references{
 Hyndman and Athanasopoulos (2014) \emph{Forecasting: principles

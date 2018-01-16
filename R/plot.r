@@ -110,6 +110,14 @@ ggfitted <- function(object, ...){
 }
 
 #' @inherit forecast::autoplot.forecast
+#'
+#' @examples
+#' library(forecast)
+#' library(ggplot2)
+#' fasster(USAccDeaths ~ poly(1) + trig(12)) %>%
+#'   forecast(h=24) %>%
+#'   autoplot
+#'
 #' @export
 #' @importFrom ggplot2 ggplot aes_ xlab ylab ggtitle
 #' @importFrom tsibble index
@@ -125,6 +133,18 @@ autoplot.tbl_forecast <- function(object, include = NROW(object$x), ...){
 }
 
 #' @inherit forecast::autolayer.forecast
+#'
+#' @examples
+#' library(forecast)
+#' fc <- fasster(USAccDeaths ~ poly(1) + trig(12)) %>%
+#'   forecast(h=24)
+#'
+#' library(ggplot2)
+#' library(tsibble)
+#' as_tsibble(USAccDeaths) %>%
+#'   ggplot(aes(x=index, y=value)) +
+#'   autolayer(fc)
+#'
 #' @export
 #' @importFrom forecast autolayer geom_forecast
 #' @importFrom tidyr gather separate spread
