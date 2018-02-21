@@ -256,8 +256,8 @@ fasster <- function(data, formula, heuristic=c("filterSmooth", "lmSaturated", "l
       stop("Model formula missing")
     }
     if(is_tsibble(data)){
-      if(length(key(data)) > 0){
-        stop("tsibbles with keys are not supported yet.")
+      if(length(key(data)) > 1){
+        stop("Only univariate time series are currently supported.")
       }
       tsibble_index <- data %>% select(!!index(data), !!!key(data))
     }
