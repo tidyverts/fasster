@@ -2,7 +2,7 @@
 % Please edit documentation in R/methods.R
 \name{as_tibble.fasster}
 \alias{as_tibble.fasster}
-\title{Coerce lists and matrices to data frames.}
+\title{Coerce lists and matrices to data frames}
 \usage{
 \method{as_tibble}{fasster}(x, ...)
 }

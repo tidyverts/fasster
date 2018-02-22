@@ -190,20 +190,19 @@ col2rowname <- function(.data, col){
   .data %>% select(-!!col)
 }
 
-#' @importFrom dplyr full_join arrange
 #' @importFrom tsibble fill_na
 add_tsblNA <- function(obj){
-  # index <- index(obj)
-  # indexVals <- obj %>%
-  #   pull(!!index)
-  #
-  # seq_by <- unclass(interval(obj))
-  # if(length(seq_by) > 1){
-  #   seq_by <- obj %>% pull(!!index(obj)) %>% diff %>% median
-  # }
-  # else if(names(seq_by) != "unit"){
-  #   seq_by <- paste0(seq_by, " ", names(seq_by), "s")
-  # }
+  index <- index(obj)
+  indexVals <- obj %>%
+    pull(!!index)
+
+  seq_by <- unclass(interval(obj))
+  if(length(seq_by) > 1){
+    seq_by <- obj %>% pull(!!index(obj)) %>% diff %>% median
+  }
+  else if(names(seq_by) != "unit"){
+    seq_by <- paste0(seq_by, " ", names(seq_by), "s")
+  }
   #
   # if(class(indexVals))
   #
@@ -215,7 +214,23 @@ add_tsblNA <- function(obj){
   # class(out[[quo_text(index)]]) <- obj %>% pull(!!index(obj)) %>% class
 
   obj %>%
-    fill_na %>%
-    arrange(!!index(obj))
+    fill_na
 
+}
+
+#' @importFrom tsibble fill_na
+has_implicit_missing <- function(obj){
+  index <- index(obj)
+  indexVals <- obj %>%
+    pull(!!index)
+
+  seq_by <- unclass(interval(obj))
+  if(length(seq_by) > 1){
+    seq_by <- seq_by$hour*60*60 + seq_by$minute*60 + seq_by$second
+  }
+  else if(names(seq_by) != "unit"){
+    seq_by <- paste0(seq_by, " ", names(seq_by), "s")
+  }
+
+  !identical(seq(min(indexVals), max(indexVals), by = seq_by), indexVals)
 }

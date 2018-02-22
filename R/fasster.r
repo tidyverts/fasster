@@ -242,64 +242,60 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "reg
 #' @importFrom dplyr bind_cols pull
 #' @importFrom utils tail
 #' @importFrom tsibble as_tsibble is_tsibble index key
-#' @importFrom rlang sym as_quosure quo_text
+#' @importFrom rlang sym as_quosure quo_text quo
+#' @importFrom purrr map_lgl
 fasster <- function(data, formula, heuristic=c("filterSmooth", "lmSaturated", "lm"), include=NULL, lambda=NULL, biasadj=FALSE, ...) {
   cl <- match.call()
-  heuristic <- match.arg(heuristic)
 
-  if(inherits(data, "formula")){
-    formula <- data
-    formula_vars <- get_all_vars(data)
-  }
-  else{
-    if(missing(formula)){
-      stop("Model formula missing")
-    }
-    if(is_tsibble(data)){
-      if(length(key(data)) > 1){
-        stop("Only univariate time series are currently supported.")
-      }
-      tsibble_index <- data %>% select(!!index(data), !!!key(data))
-    }
-    formula_vars <- get_all_vars(formula, data)
-  }
-
-  series <- all.vars(formula)[1]
-  y <- formula_vars[, series]
-  if(!is.null(dim(y))){
-    y <- y[[1]]
-  }
-
-  if(is.ts(y) & !is_tsibble(data)){
-    tsibble_index <- y %>% as_tsibble
+  if(is.ts(data)){
+    stop("Convert your data into a tsibble with as_tsibble()")
   }
   else if(!is_tsibble(data)){
-    warning("Time series information not found, please provide a tsibble or time-series object.")
-    tsibble_index <- y %>% ts %>% as_tsibble
+    stop("Time series information not found, please provide a tsibble or time-series object.")
   }
-  tsibble_index <- tsibble_index %>% select(!!index(tsibble_index))
 
-  series <- as_quosure(sym(series))
+  if(length(key(data)) > 0){
+    data <- data %>%
+      split(.[, as.character(key(.))])
 
-  data <- tsibble_index %>%
-    bind_cols(formula_vars)
+    # Check for missing values
+    if(data %>% map_lgl(has_implicit_missing) %>% any){
+      stop("The provided data contains implicit missing values, you can complete these using fill_na()")
+    }
+
+    return(data %>%
+      map(function(x){
+        attr(x, "key") <- id()
+        attr(x, "key_indices") <- NULL
+        cl$data <- quo(x)
+        eval_tidy(cl)
+      }))
+  }
+
+  heuristic <- match.arg(heuristic)
+
+  mt <- terms(formula)
+  series <- sym(rownames(attr(mt, "factors"))[attr(mt, "response")])
+
 
   if (!is.null(lambda)){
     data <- data %>%
-      mutate(!!quo_text(series, 500) := BoxCox(!!series, lambda))
+      mutate(!!series := BoxCox(!!series, lambda))
   }
 
   if (!is.null(include)){
     data <- tail(data, include)
   }
 
-  # Add missing values and sort tsibble
-  data <- data %>% add_tsblNA
+  # Arrange the data
 
-  # Parse formula into structure
+  data <- data %>%
+    arrange(!!index(data))
+
+  # Parse formula into structure to produce dlmModel
   model_struct <- formula_parse_groups(formula)
   dlmModel <- build_FASSTER_group(model_struct, data) %>%
-    ungroup_struct()
+    ungroup_struct() ## Check what happens with NA in xreg
 
   if(heuristic == "lm")
     dlmModel <- dlm_lmHeuristic(data %>% pull(!!series) %>% c, dlmModel)
