@@ -14,7 +14,7 @@ Imports:
     rlang,
     stats,
     forecast
-Remotes: earowang/tsibble
+Remotes: tidyverts/tsibble
 Authors@R: person("Mitchell", "O'Hara-Wild", email = "mail@mitchelloharawild.com", role = c("aut", "cre"))
 URL: https://github.com/mitchelloharawild/fasster
 BugReports: https://github.com/mitchelloharawild/fasster/issues

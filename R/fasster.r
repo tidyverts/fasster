@@ -256,7 +256,7 @@ fasster <- function(data, formula, heuristic=c("filterSmooth", "lmSaturated", "l
 
   if(length(key(data)) > 0){
     data <- data %>%
-      split(.[, as.character(rlang::flatten(key(.)))]) # flatten nested keys
+      tsibble::split_key() # faster than calling split() when key sizes are large
 
     # Check for missing values
     if(data %>% map_lgl(has_implicit_missing) %>% any){
