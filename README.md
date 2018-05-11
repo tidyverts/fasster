@@ -6,6 +6,11 @@ fasster <img src="man/figure/logo.png" align="right" />
 
 An implementation of the FASSTER (Forecasting with Additive Switching of Seasonality, Trend and Exogenous Regressors) model in R. This model is designed to capture patterns of multiple seasonality in a state space framework by using state switching. The *fasster* package prioritizes flexibility, computational speed and accuracy to provide convenient tools for modelling, predicting and understanding high frequency time-series.
 
+Development cycle
+-----------------
+
+This package is early in development, and there are plans to make substantial changes in the future. These changes will be make to support a consistent modelling interface with the [tidyforecast](https://github.com/tidyverts/tidyforecast) package. After the modelling and forecasting tools in tidyforecast have been developed, this package will be overhauled to support better heuristic optimisation techniques and sparse matrix algebra (removing the dlm package dependency) to make fasster even faster. Until then, using this package may prove difficult due to limited support and documentation. These improvements are expected to be introduced within a few months.
+
 Installation
 ------------
 
@@ -91,9 +96,7 @@ The tools made available by *fasster* are designed to integrate seamlessly with 
 library(forecast)
 fit %>% accuracy
 #>                     ME     RMSE      MAE        MPE     MAPE      MASE
-#> Training set -23.10502 257.6256 190.2418 -0.3173936 2.204005 0.2956716
-#>                   ACF1
-#> Training set 0.1697722
+#> Training set -23.10502 257.6256 190.2418 -0.3173936 2.204005 0.2482198
 
 fit %>% 
   forecast(h=24) %>%
