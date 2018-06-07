@@ -126,6 +126,18 @@ FASSTER <- function(data, formula, include=NULL, ...){
     enclass("mable")
 }
 
-model_sum.FASSTER <- function(x){
+#' @export
+pillar_shaft.FASSTER <- function(x){
+  rep("FASSTER", length(x))
+}
+
+#' @export
+format.FASSTER <- function(x){
   "FASSTER"
 }
+
+#' @export
+print.FASSTER <- function(x, ...){
+  cat("FASSTER")
+}
+
