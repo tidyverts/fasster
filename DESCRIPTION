@@ -15,6 +15,13 @@ Imports:
     stats,
     forecast
 Remotes: earowang/tsibble
+Suggests:
+    tsibbledata,
+    knitr,
+    rmarkdown,
+    testthat,
+    spelling,
+    covr
 Authors@R: person("Mitchell", "O'Hara-Wild", email = "mail@mitchelloharawild.com", role = c("aut", "cre"))
 URL: https://github.com/mitchelloharawild/fasster
 BugReports: https://github.com/mitchelloharawild/fasster/issues
@@ -23,4 +30,5 @@ Encoding: UTF-8
 LazyData: true
 ByteCompile: true
 RoxygenNote: 6.0.1.9000
-Suggests: testthat
+Roxygen: list(markdown = TRUE, roclets=c('rd', 'collate', 'namespace'))
+Language: en-GB
