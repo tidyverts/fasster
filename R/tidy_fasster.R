@@ -141,3 +141,136 @@ print.FASSTER <- function(x, ...){
   cat("FASSTER")
 }
 
+#' @importFrom dlm dlmSvd2var
+#' @importFrom forecast forecast
+#' @importFrom tsibblestats get_frequencies
+#' @importFrom fable parse_model_rhs model_rhs
+#' @export
+forecast.FASSTER <- function(object, data, newdata = NULL, h = NULL, ...){
+  mod <- object$"dlm_future"
+
+  if(!is.null(newdata)){
+    newdata <- as_tsibble(newdata)
+
+    # Build model on newdata
+    specials <- new_specials_env(
+      `%S%` = function(group, expr){
+        group_expr <- enexpr(group)
+        lhs <- factor(group)
+        groups <- levels(lhs) %>% map(~ as.numeric(lhs == .x)) %>% set_names(levels(lhs))
+
+        rhs <- parse_model_rhs(enexpr(expr), data = data, specials = specials)$args %>%
+          unlist(recursive = FALSE) %>%
+          reduce(`+`)
+
+        groups %>%
+          imap(function(X, groupVal){
+            if(is.null(rhs$JFF)){
+              rhs$JFF <- rhs$FF
+              rhs$X <- matrix(X, ncol = 1)
+            }
+            else{
+              rhs$X <- rhs$X * X
+              if(any(new_X_pos <- rhs$FF!=0 & rhs$JFF==0)){
+                new_X_col <- NCOL(rhs$X) + 1
+                rhs$JFF[new_X_pos] <- new_X_col
+                rhs$X <- cbind(rhs$X, X)
+              }
+            }
+            colnames(rhs$X) <- paste0(expr_text(group_expr), "_", groupVal, "/", colnames(rhs$X))
+            rhs
+          }) %>%
+          reduce(`+`)
+      },
+      `(` = function(expr){
+        parse_model_rhs(enexpr(expr), data = data, specials = specials)$args %>%
+          unlist(recursive = FALSE) %>%
+          reduce(`+`)
+      },
+      poly = function(...){
+        dlmModPoly(...)
+      },
+      seas = function(...){
+        dlmModSeas(...)
+      },
+      seasonal = function(...){
+        dlmModSeas(...)
+      },
+      trig = function(...){
+        dlmModTrig(...)
+      },
+      fourier = function(...){
+        dlmModTrig(...)
+      },
+      ARMA = function(...){
+        dlmModARMA(...)
+      },
+      custom = function(...){
+        dlm(...)
+      },
+      xreg = function(...){
+        dlmModReg(cbind(...), addInt = FALSE)
+      },
+      parent_env = caller_env()
+    )
+
+    X <- parse_model_rhs(object%@%"model", data = newdata, specials = specials)$args %>%
+      unlist(recursive = FALSE) %>%
+      reduce(`+`) %>%
+      .$X
+  }
+  else{
+    X <- NULL
+  }
+
+  fit <- mod
+
+  nAhead <- if(!is.null(mod$X)){
+    if(is.null(X)){
+      stop("X must be given")
+    }
+    NROW(X)
+  }
+  else{
+    if(is.null(h)){
+      h <- get_frequencies("smallest", data)*2
+    }
+    h
+  }
+
+  p <- length(mod$m0)
+  m <- nrow(mod$FF)
+  a <- rbind(mod$m0, matrix(0, nAhead, p))
+  R <- vector("list", nAhead + 1)
+  R[[1]] <- mod$C0
+  f <- matrix(0, nAhead, m)
+  Q <- vector("list", nAhead)
+  for (it in 1:nAhead) {
+    # Time varying components
+    XFF <- mod$FF
+    XFF[mod$JFF != 0] <- X[it, mod$JFF]
+    XV <- mod$V
+    XV[mod$JV != 0] <- X[it, mod$JV]
+    XGG <- mod$GG
+    XGG[mod$JGG != 0] <- X[it, mod$JGG]
+    XW <- mod$W
+    XW[mod$JW != 0] <- X[it, mod$JW]
+
+    # Kalman Filter Forecast
+    a[it + 1, ] <- XGG %*% a[it, ]
+    R[[it + 1]] <- XGG %*% R[[it]] %*% t(XGG) + XW
+    f[it, ] <- XFF %*% a[it + 1, ]
+    Q[[it]] <- XFF %*% R[[it + 1]] %*% t(XFF) + XV
+  }
+  a <- a[-1,, drop = FALSE]
+  R <- R[-1]
+
+  se <- sqrt(unlist(Q))
+  idx <- data %>% pull(!!index(.))
+  future_idx <- seq(tail(idx, 1), length.out = nAhead + 1, by = time_unit(idx)) %>% tail(-1)
+
+  tsibble(!!index(data) := future_idx,
+          mean = biasadj(invert_transformation(object%@%"transformation"), se^2)(c(f)),
+          distribution = new_fcdist(qnorm, c(f), sd = se, transformation = invert_transformation(object%@%"transformation"), abbr = "N"),
+          index = !!index(data))
+}
