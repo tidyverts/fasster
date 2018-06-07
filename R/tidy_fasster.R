@@ -1,7 +1,7 @@
-#' @importFrom fable new_specials_env parse_model parse_model_rhs traverse multi_univariate
+#' @importFrom fable new_specials_env parse_model parse_model_rhs model_lhs traverse multi_univariate invert_transformation
 #' @importFrom dplyr tibble
 #' @importFrom purrr reduce imap
-FASSTER <- function(data, formula, heuristic=c("filterSmooth", "lmSaturated", "lm"), include=NULL, ...){
+FASSTER <- function(data, formula, include=NULL, ...){
   # Capture user call
   cl <- call_standardise(match.call())
 
@@ -75,13 +75,56 @@ FASSTER <- function(data, formula, heuristic=c("filterSmooth", "lmSaturated", "l
     parent_env = caller_env()
   )
 
-  model_inputs <- parse_model(data, formula, specials = specials)
+  model_inputs <- parse_model(data, formula, specials = specials) %>%
+    map(eval_tidy)
 
   dlmModel <- model_inputs$args %>%
-    eval_tidy %>%
     unlist(recursive = FALSE) %>%
     reduce(`+`)
 
-  dlmModel
+  response <- eval_tidy(model_lhs(model_inputs$model), data = data)
 
+  dlmModel <- response %>%
+    dlm_filterSmoothHeuristic(dlmModel)
+
+  # Fit model
+  filtered <- dlmFilter(response, dlmModel)
+
+  if(!is.matrix(filtered$a)){
+    filtered$a <- matrix(filtered$a)
+  }
+
+  # Update model variance
+  resid <- filtered$y - filtered$f
+  filtered$mod$V <- resid %>%
+    as.numeric() %>%
+    var()
+
+  # Model to start forecasting from
+  modFuture <- filtered$mod
+  lastObsIndex <- NROW(filtered$m)
+  modFuture$C0 <- with(filtered, dlmSvd2var(
+    U.C[[lastObsIndex]],
+    D.C[lastObsIndex, ]
+  ))
+  wt <- filtered$a[seq_len(NROW(filtered$a) - 1) + 1, ] - filtered$a[seq_len(NROW(filtered$a) - 1), ]%*%t(dlmModel$GG)
+  modFuture$W <- var(wt)
+  modFuture$m0 <- filtered$m %>% tail(1) %>% as.numeric()
+
+  fitted <- invert_transformation(eval_tidy(model_inputs$transformation))(filtered$f)
+
+  data %>%
+    grouped_df(key_vars(.)) %>%
+    nest %>%
+    mutate(model = list(
+      list(dlm = dlmModel, dlm_future = modFuture,
+           fitted = fitted, residuals = resid,
+           states = filtered$a, heuristic = "filterSmooth") %>%
+        enclass("FASSTER")
+    )) %>%
+    enclass("mable")
+}
+
+model_sum.FASSTER <- function(x){
+  "FASSTER"
 }
