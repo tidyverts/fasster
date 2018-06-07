@@ -1,6 +1,40 @@
+#' Fast Additive Switching of Seasonality, Trend and Exogenous Regressors
+#'
+#' Implements FASSTER
+#'
+#' @param data A \code{ts}/\code{mts}, \code{tsibble} or \code{data.frame} that contains the variables in the model.
+#' @param formula An object of class "formula" (refer to 'Formula' for usage)
+#' @param include How many terms should be included to fit the model
+#' @param ... Not used
+#'
+#' @return Returns a mable containing the fitted FASSTER model.
+#'
+#' @details
+#' The fasster model extends commonly used state space models by introducing a switching component to the measurement equation.
+#' This is implemented using a time-varying DLM with the switching behaviour encoded in the measurement matrix.
+#'
+#' @section Formula:
+#' \code{fasster} inherits the standard formula specification from \code{\link[stats]{lm}} for specifying exogenous regressors, including interactions and \code{\link[base]{I}()} functionality as described in \code{\link[stats]{formula}}.
+#'
+#' Special DLM components can be specified using special functions defined below:
+#' \itemize{
+#'    \item seas(s): Creates seasonal factors with seasonality s
+#'    \item trig(s): Creates seasonal fourier terms with seasonality s
+#'    \item poly(n): Creates a polynomial of order n (poly(1) creates a level, poly(2) creates a trend)
+#'    \item ARMA(ar, ma): Creates ARMA terms with coefficient vectors ar and ma
+#'    \item custom(dlm): Creates a custom dlm structure, using \code{\link[dlm]{dlm}}
+#' }
+#'
+#' The switching operator, \code{\%S\%} requires the switching factor variable on the LHS, and the model to switch over on the RHS (as built using the above components)
+#'
+#' @examples
+#' tsibbledata::UKLungDeaths %>%
+#'   FASSTER(mdeaths ~ fdeaths + poly(1) + trig(12))
+#'
 #' @importFrom fable new_specials_env parse_model parse_model_rhs model_lhs traverse multi_univariate invert_transformation
 #' @importFrom dplyr tibble
 #' @importFrom purrr reduce imap
+#' @export
 FASSTER <- function(data, formula, include=NULL, ...){
   # Capture user call
   cl <- call_standardise(match.call())
@@ -11,6 +45,11 @@ FASSTER <- function(data, formula, include=NULL, ...){
   # Handle multivariate inputs
   if(n_keys(data) > 1){
     return(multi_univariate(data, cl))
+  }
+
+  # Include only the end of the data
+  if (!is.null(include)){
+    data <- tail(data, include)
   }
 
   # Define specials
