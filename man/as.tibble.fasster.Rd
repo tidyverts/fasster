@@ -2,7 +2,7 @@
 % Please edit documentation in R/methods.R
 \name{as.tibble.fasster}
 \alias{as.tibble.fasster}
-\title{Coerce lists and matrices to data frames.}
+\title{Coerce lists and matrices to data frames}
 \usage{
 \method{as.tibble}{fasster}(x, ...)
 }
@@ -24,10 +24,4 @@ Other types are first coerced via \code{as.data.frame()} with
 \code{stringsAsFactors = FALSE}.
 
 \code{as_data_frame} and \code{as.tibble} are aliases.
-}
-\examples{
-library(tsibble)
-fasster(USAccDeaths ~ poly(1) + trig(12)) \%>\%
-  as_tibble()
-
 }

@@ -188,7 +188,7 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "reg
 #'    \item{model_future}{A model with updated variances appropriate for forecasting}
 #'    \item{formula}{The specified model formula}
 #'    \item{fitted}{The fitted values}
-#'    \item{lambda}{The BoxCox paramater, if used}
+#'    \item{lambda}{The BoxCox parameter, if used}
 #'    \item{residuals}{The fitted innovations}
 #'    \item{states}{The underlying filtered states}
 #'    \item{call}{The user call used to create the model}
@@ -202,7 +202,7 @@ build_FASSTER <- function(formula, data, X = NULL, group = NULL, internal = "reg
 #' This is implemented using a time-varying DLM with the switching behaviour encoded in the measurement matrix.
 #'
 #' @section Formula:
-#' \code{fasster} inherits the standard formula specification from \link[stats]{lm} for specifying exogenous regressors, including interactions and \code{\link[base]{I}()} functionality as described in \code{\link[stats]{formula}}.
+#' \code{fasster} inherits the standard formula specification from \code{\link[stats]{lm}} for specifying exogenous regressors, including interactions and \code{\link[base]{I}()} functionality as described in \code{\link[stats]{formula}}.
 #'
 #' Special DLM components can be specified using special functions defined below:
 #' \itemize{

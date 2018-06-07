@@ -17,12 +17,6 @@ A tsibble object.
 \description{
 Coerce to a tsibble object
 }
-\examples{
-library(tsibble)
-fasster(USAccDeaths ~ poly(1) + trig(12)) \%>\%
-  as_tsibble()
-
-}
 \seealso{
 tsibble
 }

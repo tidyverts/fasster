@@ -28,17 +28,17 @@ Returns a fitted FASSTER model, which is consistent with the model structure fro
 
 This object is a list of class "fasster" that contains:
 \describe{
-   \item{model}{The underlying dlm model}
-   \item{model_future}{A model with updated variances appropriate for forecasting}
-   \item{formula}{The specified model formula}
-   \item{fitted}{The fitted values}
-   \item{lambda}{The BoxCox paramater, if used}
-   \item{residuals}{The fitted innovations}
-   \item{states}{The underlying filtered states}
-   \item{call}{The user call used to create the model}
-   \item{x}{The dependent variable}
-   \item{series}{The name of the dependent variable}
-   \item{method}{The name of the model used, "FASSTER"}
+\item{model}{The underlying dlm model}
+\item{model_future}{A model with updated variances appropriate for forecasting}
+\item{formula}{The specified model formula}
+\item{fitted}{The fitted values}
+\item{lambda}{The BoxCox parameter, if used}
+\item{residuals}{The fitted innovations}
+\item{states}{The underlying filtered states}
+\item{call}{The user call used to create the model}
+\item{x}{The dependent variable}
+\item{series}{The name of the dependent variable}
+\item{method}{The name of the model used, "FASSTER"}
 }
 }
 \description{
@@ -50,15 +50,15 @@ This is implemented using a time-varying DLM with the switching behaviour encode
 }
 \section{Formula}{
 
-\code{fasster} inherits the standard formula specification from \link[stats]{lm} for specifying exogenous regressors, including interactions and \code{\link[base]{I}()} functionality as described in \code{\link[stats]{formula}}.
+\code{fasster} inherits the standard formula specification from \code{\link[stats]{lm}} for specifying exogenous regressors, including interactions and \code{\link[base]{I}()} functionality as described in \code{\link[stats]{formula}}.
 
 Special DLM components can be specified using special functions defined below:
 \itemize{
-   \item seas(s): Creates seasonal factors with seasonality s
-   \item trig(s): Creates seasonal fourier terms with seasonality s
-   \item poly(n): Creates a polynomial of order n (poly(1) creates a level, poly(2) creates a trend)
-   \item ARMA(ar, ma): Creates ARMA terms with coefficient vectors ar and ma
-   \item custom(dlm): Creates a custom dlm structure, using \code{\link[dlm]{dlm}}
+\item seas(s): Creates seasonal factors with seasonality s
+\item trig(s): Creates seasonal fourier terms with seasonality s
+\item poly(n): Creates a polynomial of order n (poly(1) creates a level, poly(2) creates a trend)
+\item ARMA(ar, ma): Creates ARMA terms with coefficient vectors ar and ma
+\item custom(dlm): Creates a custom dlm structure, using \code{\link[dlm]{dlm}}
 }
 
 The switching operator, \code{\%S\%} requires the switching factor variable on the LHS, and the model to switch over on the RHS (as built using the above components)
@@ -70,10 +70,10 @@ Currently three heuristics are usable for estimating the model parameters.
 
 The recommended heuristic is "filterSmooth", which estimates the parameters using the following algorithm:
 \enumerate{
-   \item Filter the data using the specified model with non-zero state variances
-   \item Obtain smoothed states \eqn{(\theta^{(s)}t=\theta_t|D_T)} to approximate correct behaviour
-   \item The initial state parameters taken from the first smoothed state: \eqn{m_0=E(\theta^{(s)}_0)}, \eqn{C_0=Var(\theta^{(s)}_0)}
-   \item Obtain state noise variances from the smoothed variance of \eqn{w_t}: \eqn{W=Var(w^{(s)}_t)=Var(\theta^{(s)}_t−G\theta^{(s)}_{t−1})}
+\item Filter the data using the specified model with non-zero state variances
+\item Obtain smoothed states \eqn{(\theta^{(s)}t=\theta_t|D_T)} to approximate correct behaviour
+\item The initial state parameters taken from the first smoothed state: \eqn{m_0=E(\theta^{(s)}_0)}, \eqn{C_0=Var(\theta^{(s)}_0)}
+\item Obtain state noise variances from the smoothed variance of \eqn{w_t}: \eqn{W=Var(w^{(s)}_t)=Var(\theta^{(s)}_t−G\theta^{(s)}_{t−1})}
    Obtain measurement noise variance from smoothed variance of \eqn{v_t}: \eqn{V=Var(v^{(s)}_t)=Var(y_t−F_t\theta^{(s)}_t)}
    \item Repair restricted state variances for seasonal factors and ARMA terms
 }
