@@ -18,8 +18,10 @@ NULL
 #' @export
 dplyr::`%>%`
 
-#' @import stats
-#' @importFrom rlang ":="
+#' @rawNamespace import(stats, except = filter)
+#' @import rlang
+#' @import dlm
+#' @import tsibble
 NULL
 
 spread_groups <- function(object) {

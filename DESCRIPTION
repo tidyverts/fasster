@@ -13,8 +13,8 @@ Imports:
     purrr,
     rlang,
     stats,
+    fable,
     forecast
-Remotes: earowang/tsibble
 Suggests:
     tsibbledata,
     knitr,
@@ -22,6 +22,9 @@ Suggests:
     testthat,
     spelling,
     covr
+Remotes: 
+    tidyverts/tsibble,
+    tidyverts/fable
 Authors@R: person("Mitchell", "O'Hara-Wild", email = "mail@mitchelloharawild.com", role = c("aut", "cre"))
 URL: https://github.com/mitchelloharawild/fasster
 BugReports: https://github.com/mitchelloharawild/fasster/issues
