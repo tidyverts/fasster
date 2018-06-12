@@ -31,7 +31,7 @@
 #' tsibbledata::UKLungDeaths %>%
 #'   FASSTER(mdeaths ~ fdeaths + poly(1) + trig(12))
 #'
-#' @importFrom fable new_specials_env parse_model parse_model_rhs model_lhs traverse multi_univariate invert_transformation
+#' @importFrom fable new_specials_env parse_model parse_model_rhs model_lhs traverse multi_univariate invert_transformation mable
 #' @importFrom dplyr tibble
 #' @importFrom purrr reduce imap
 #' @export
@@ -158,11 +158,13 @@ FASSTER <- function(data, formula, include=NULL, ...){
     enclass("FASSTER",
             !!!model_inputs[c("model", "transformation", "response")])
 
-  data %>%
-    dplyr::grouped_df(key_vars(.)) %>%
-    nest %>%
-    mutate(model = list(fit)) %>%
-    enclass("mable")
+  mable(
+    key_vals = as.list(data)[key_vars(data)],
+    data = (data %>%
+              dplyr::grouped_df(key_vars(.)) %>%
+              nest)$data,
+    model = list(fit)
+  )
 }
 
 #' @importFrom fable model_sum
