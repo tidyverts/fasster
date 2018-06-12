@@ -31,6 +31,7 @@
 #' tsibbledata::UKLungDeaths %>%
 #'   FASSTER(mdeaths ~ fdeaths + poly(1) + trig(12))
 #'
+#' @rdname FASSTER2
 #' @importFrom fable new_specials_env parse_model parse_model_rhs model_lhs traverse multi_univariate invert_transformation mable
 #' @importFrom dplyr tibble
 #' @importFrom purrr reduce imap
