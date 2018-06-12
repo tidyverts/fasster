@@ -7,7 +7,7 @@ Depends:
 Imports: 
     dlm,
     tsibble,
-    ggplot2,
+    ggplot2 (>= 2.2.1.9000),
     dplyr,
     tidyr,
     purrr,
@@ -27,7 +27,8 @@ Suggests:
 Remotes: 
     tidyverts/tsibble,
     tidyverts/tsibblestats,
-    tidyverts/fable
+    tidyverts/fable,
+    tidyverse/ggplot2
 Authors@R: person("Mitchell", "O'Hara-Wild", email = "mail@mitchelloharawild.com", role = c("aut", "cre"))
 URL: https://github.com/mitchelloharawild/fasster
 BugReports: https://github.com/mitchelloharawild/fasster/issues
