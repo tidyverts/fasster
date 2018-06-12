@@ -27,6 +27,7 @@ Suggests:
 Remotes: 
     tidyverts/tsibble,
     tidyverts/tsibblestats,
+    tidyverts/tsibbledata,
     tidyverts/fable,
     tidyverse/ggplot2
 Authors@R: person("Mitchell", "O'Hara-Wild", email = "mail@mitchelloharawild.com", role = c("aut", "cre"))
