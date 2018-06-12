@@ -159,7 +159,7 @@ FASSTER <- function(data, formula, include=NULL, ...){
             !!!model_inputs[c("model", "transformation", "response")])
 
   data %>%
-    grouped_df(key_vars(.)) %>%
+    dplyr::grouped_df(key_vars(.)) %>%
     nest %>%
     mutate(model = list(fit)) %>%
     enclass("mable")
