@@ -165,9 +165,10 @@ FASSTER <- function(data, formula, include=NULL, ...){
     enclass("mable")
 }
 
+#' @importFrom fable model_sum
 #' @export
-pillar_shaft.FASSTER <- function(x){
-  rep("FASSTER", length(x))
+model_sum.FASSTER <- function(x){
+  "FASSTER"
 }
 
 #' @export
