@@ -92,43 +92,43 @@ FASSTER <- function(data, formula, include=NULL, ...){
     poly = function(...){
       cl <- match.call()
       out <- dlmModPoly(...)
-      colnames(out$FF) <- paste0(deparse(cl), ifelse(NCOL(out$FF)==1, "", seq_len(NCOL(out$FF))))
+      colnames(out$FF) <- deparse(cl)
       out
     },
     seas = function(...){
       cl <- match.call()
       out <- dlmModSeas(...)
-      colnames(out$FF) <- paste0(deparse(cl), ifelse(NCOL(out$FF)==1, "", seq_len(NCOL(out$FF))))
+      colnames(out$FF) <- deparse(cl)
       out
     },
     seasonal = function(...){
       cl <- match.call()
       out <- dlmModSeas(...)
-      colnames(out$FF) <- paste0(deparse(cl), ifelse(NCOL(out$FF)==1, "", seq_len(NCOL(out$FF))))
+      colnames(out$FF) <- deparse(cl)
       out
     },
     trig = function(...){
       cl <- match.call()
       out <- dlmModTrig(...)
-      colnames(out$FF) <- paste0(deparse(cl), ifelse(NCOL(out$FF)==1, "", seq_len(NCOL(out$FF))))
+      colnames(out$FF) <- deparse(cl)
       out
     },
     fourier = function(...){
       cl <- match.call()
       out <- dlmModTrig(...)
-      colnames(out$FF) <- paste0(deparse(cl), ifelse(NCOL(out$FF)==1, "", seq_len(NCOL(out$FF))))
+      colnames(out$FF) <- deparse(cl)
       out
     },
     ARMA = function(...){
       cl <- match.call()
       out <- dlmModARMA(...)
-      colnames(out$FF) <- paste0(deparse(cl), ifelse(NCOL(out$FF)==1, "", seq_len(NCOL(out$FF))))
+      colnames(out$FF) <- deparse(cl)
       out
     },
     custom = function(...){
       cl <- match.call()
       out <- dlm(...)
-      colnames(out$FF) <- paste0(deparse(cl), ifelse(NCOL(out$FF)==1, "", seq_len(NCOL(out$FF))))
+      colnames(out$FF) <- deparse(cl)
       out
     },
     xreg = function(...){
