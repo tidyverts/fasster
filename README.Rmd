@@ -29,7 +29,7 @@ An implementation of the FASSTER (Forecasting with Additive Switching of Seasona
 
 ## Development cycle
 
-This package is early in development, and there are plans to make substantial changes in the future. These changes will be make to support a consistent modelling interface with the [tidyforecast](https://github.com/tidyverts/tidyforecast) package. After the modelling and forecasting tools in tidyforecast have been developed, this package will be overhauled to support better heuristic optimisation techniques and sparse matrix algebra (removing the dlm package dependency) to make fasster even faster. Until then, using this package may prove difficult due to limited support and documentation. These improvements are expected to be introduced within a few months.
+This package is early in development, and there are plans to make substantial changes in the future. These changes will be make to support a consistent modelling interface with the [fable](https://github.com/tidyverts/fable) package. After the modelling and forecasting tools in fable have been developed, this package will be overhauled to support better heuristic optimisation techniques and sparse matrix algebra (removing the dlm package dependency) to make fasster even faster. Until then, using this package may prove difficult due to limited support and documentation. These improvements are expected to be introduced within a few months.
 
 ## Installation
 
@@ -43,7 +43,7 @@ The **development** version can be installed from GitHub using:
 
 ```{r, eval = FALSE}
 # install.packages("devtools")
-devtools::install_github("mitchelloharawild/fasster")
+devtools::install_github("tidyverts/fasster")
 ```
 
 ## Usage
@@ -51,8 +51,12 @@ devtools::install_github("mitchelloharawild/fasster")
 ### Model specification
 
 *fasster* allows flexible model specification by allowing the user to specify the model structure with standard formula conventions.
+
 ```{r xreg}
-fasster(fdeaths ~ mdeaths) %>% ggfitted
+fit <- tsibbledata::UKLungDeaths %>%
+  FASSTER(fdeaths ~ mdeaths)
+
+fit %>% summary
 ```
 
 Commonly used state space components can be added using the following convenience functions:
@@ -65,55 +69,71 @@ Commonly used state space components can be added using the following convenienc
 
 For example, to create a model with trend and monthly seasonality, you can use:
 ```{r component}
-fit <- fasster(USAccDeaths ~ poly(1) + trig(12))
-fit %>% ggfitted
+fit <- USAccDeaths %>% 
+  as_tsibble %>% 
+  FASSTER(value ~ poly(1) + trig(12))
+fit %>% summary
 ```
 
 The interface for creating a FASSTER model introduces a new formula construct, `%S%`, known as the switch operator. This allows modelling of more complex patterns such as multiple seasonality by modelling the components for each group seperately and switching between them.
 
 ```{r complex}
-fit_switch <- as_tsibble(taylor) %>%
-  mutate(index = seq(ymd_h("2000-6-5 00"), by="30 mins", length.out=length(taylor)),
-         DayType = ifelse(wday(index) %in% 2:6, "Weekday", "Weekend")) %>% 
-  fasster(taylor ~ DayType %S% (poly(1) + trig(48, 10))) 
+taylor_elec <- tsibble(
+  DateTime = seq(ymd_h("2000-6-5 00"), by="30 mins", length.out=length(taylor)),
+  Demand = as.numeric(taylor),
+  index = DateTime
+)
+
+daytype <- function(date){
+  factor(ifelse(wday(date) %in% 2:6, "Weekday", "Weekend"), levels = c("Weekday", "Weekend"))
+}
+
+taylor_elec
+
+fit_switch <- taylor_elec %>% 
+  FASSTER(Demand ~ daytype(DateTime) %S% (poly(1) + trig(48, 10))) 
+
 fit_switch %>%
-  ggfitted
+  summary
 ```
 
 ### Decomposing
 
 Fitted FASSTER models can be decomposed to provide a description of how the underlying states function. Decomposing a FASSTER model provides aggregates of its components such as trends and seasonalities.
 
-These components can be plotted using the autoplot function on a fitted model:
+These components can accessed from a fitted model using the `components()` function:
 ```{r decompose}
-fit %>% autoplot
+fit %>% 
+  components
 ```
 
 ```{r decompose-complex}
-fit_switch %>% autoplot
+fit_switch %>%
+  components
 ```
 
 
 The tools made available by *fasster* are designed to integrate seamlessly with the tidyverse of packages, enabling familiar data manipulation and visualisation capabilities.
 
 ### Forecasting
-
+  
 *fasster* conforms to the object structure from the *forecast* package, allowing common visualisation and analysis tools to be applied on FASSTER models.
 ```{r forecast}
-library(forecast)
-fit %>% accuracy
+library(fable)
+
+# fit %>% accuracy
+# Currently not implemented
 
 fit %>% 
   forecast(h=24) %>%
   autoplot
 ```
 
-Like other forecasting functions, if additional information is required (such as future state switching), it can be provided via the `newdata` argument.
+Future index values are automatically produced and used where necessary in the model specification.
 
 ```{r complex_fc}
 fit_switch %>% 
-  forecast(newdata = tibble(DateTime = seq(ymd_h("2000-8-28 00"), by="30 mins", length.out=48*7*2)) %>%
-                    mutate(DayType = ifelse(wday(DateTime) %in% 2:6, "Weekday", "Weekend"))) %>% 
-  autoplot(include = 48*7*4)
+  forecast(h = 48*7*2) %>% 
+  autoplot
 ```
 
