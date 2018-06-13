@@ -232,7 +232,7 @@ summary.FASSTER <- function(x, ...){
 #' @importFrom dlm dlmSvd2var
 #' @importFrom forecast forecast
 #' @importFrom tsibblestats get_frequencies
-#' @importFrom fable parse_model_rhs model_rhs
+#' @importFrom fable parse_model_rhs model_rhs new_fcdist biasadj
 #' @export
 forecast.FASSTER <- function(object, data, newdata = NULL, h = NULL, ...){
   mod <- object$"dlm_future"
