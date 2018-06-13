@@ -206,7 +206,7 @@ format.FASSTER <- function(x){
 
 #' @export
 print.FASSTER <- function(x, ...){
-  cat("FASSTER")
+  cat(paste("FASSTER Model:\n", deparse(x%@%"model"), "\n\n"))
 }
 
 #' @export
