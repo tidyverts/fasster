@@ -34,7 +34,7 @@
 #' @rdname FASSTER2
 #' @importFrom fable new_specials_env parse_model parse_model_rhs model_lhs traverse multi_univariate invert_transformation mable
 #' @importFrom dplyr tibble
-#' @importFrom purrr reduce imap
+#' @importFrom purrr reduce imap map_chr
 #' @export
 FASSTER <- function(data, formula, include=NULL, ...){
   # Capture user call
@@ -79,6 +79,7 @@ FASSTER <- function(data, formula, include=NULL, ...){
             }
           }
           colnames(rhs$X) <- paste0(expr_text(group_expr), "_", groupVal, "/", colnames(rhs$X))
+          colnames(rhs$FF) <- paste0(expr_text(group_expr), "_", groupVal, "/", colnames(rhs$FF))
           rhs
         }) %>%
         reduce(`+`)
@@ -89,28 +90,52 @@ FASSTER <- function(data, formula, include=NULL, ...){
         reduce(`+`)
     },
     poly = function(...){
-      dlmModPoly(...)
+      cl <- match.call()
+      out <- dlmModPoly(...)
+      colnames(out$FF) <- paste0(deparse(cl), ifelse(NCOL(out$FF)==1, "", seq_len(NCOL(out$FF))))
+      out
     },
     seas = function(...){
-      dlmModSeas(...)
+      cl <- match.call()
+      out <- dlmModSeas(...)
+      colnames(out$FF) <- paste0(deparse(cl), ifelse(NCOL(out$FF)==1, "", seq_len(NCOL(out$FF))))
+      out
     },
     seasonal = function(...){
-      dlmModSeas(...)
+      cl <- match.call()
+      out <- dlmModSeas(...)
+      colnames(out$FF) <- paste0(deparse(cl), ifelse(NCOL(out$FF)==1, "", seq_len(NCOL(out$FF))))
+      out
     },
     trig = function(...){
-      dlmModTrig(...)
+      cl <- match.call()
+      out <- dlmModTrig(...)
+      colnames(out$FF) <- paste0(deparse(cl), ifelse(NCOL(out$FF)==1, "", seq_len(NCOL(out$FF))))
+      out
     },
     fourier = function(...){
-      dlmModTrig(...)
+      cl <- match.call()
+      out <- dlmModTrig(...)
+      colnames(out$FF) <- paste0(deparse(cl), ifelse(NCOL(out$FF)==1, "", seq_len(NCOL(out$FF))))
+      out
     },
     ARMA = function(...){
-      dlmModARMA(...)
+      cl <- match.call()
+      out <- dlmModARMA(...)
+      colnames(out$FF) <- paste0(deparse(cl), ifelse(NCOL(out$FF)==1, "", seq_len(NCOL(out$FF))))
+      out
     },
     custom = function(...){
-      dlm(...)
+      cl <- match.call()
+      out <- dlm(...)
+      colnames(out$FF) <- paste0(deparse(cl), ifelse(NCOL(out$FF)==1, "", seq_len(NCOL(out$FF))))
+      out
     },
     xreg = function(...){
-      dlmModReg(cbind(...), addInt = FALSE)
+      cn <- enexprs(...) %>% map_chr(expr_text)
+      out <- dlmModReg(cbind(...), addInt = FALSE)
+      colnames(out$FF) <- cn
+      out
     },
     parent_env = caller_env()
   )
