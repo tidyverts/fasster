@@ -1,7 +1,6 @@
 #' @importFrom fable components
 #' @export
 components.FASSTER <- function(object, ...) {
-  browser()
   states <- object$dlm$FF %>%
     colnames() %>%
     factor %>%
