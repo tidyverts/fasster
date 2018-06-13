@@ -205,19 +205,19 @@ format.FASSTER <- function(x, ...){
 }
 
 #' @export
-print.FASSTER <- function(object, ...){
-  cat(paste("FASSTER Model:\n", deparse(object%@%"model"), "\n\n"))
+print.FASSTER <- function(x, ...){
+  cat(paste("FASSTER Model:\n", deparse(x%@%"model"), "\n\n"))
 }
 
 #' @export
 #' @importFrom dplyr group_by summarise transmute
 #' @importFrom rlang as_quosure sym
 #' @importFrom dplyr pull
-summary.FASSTER <- function(x, ...){
-  cat(paste("FASSTER Model:\n", deparse(x%@%"model"), "\n\n"))
+summary.FASSTER <- function(object, ...){
+  cat(paste("FASSTER Model:\n", deparse(object%@%"model"), "\n\n"))
   cat("Estimated variances:\n")
   cat(" State noise variances (W):\n")
-  data.frame(term = colnames(x$dlm$FF), W = diag(x$dlm$W)) %>%
+  data.frame(term = colnames(object$dlm$FF), W = diag(object$dlm$W)) %>%
     group_by(!!sym("term")) %>%
     summarise(!!"W" := paste(format(!!sym("W"), digits=5, scientific=TRUE), collapse=" ")) %>%
     transmute(!!"Val" := paste0("  ", !!sym("term"), "\n   ", !!sym("W"))) %>%
@@ -225,7 +225,7 @@ summary.FASSTER <- function(x, ...){
     paste(collapse="\n") %>%
     paste0("\n\n") %>%
     cat
-  cat(paste(" Observation noise variance (V):\n ", format(x$dlm$V, digits=5, scientific = TRUE)))
+  cat(paste(" Observation noise variance (V):\n ", format(object$dlm$V, digits=5, scientific = TRUE)))
 }
 
 
