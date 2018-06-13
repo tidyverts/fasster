@@ -179,7 +179,7 @@ FASSTER <- function(data, formula, include=NULL, ...){
   fitted <- invert_transformation(eval_tidy(model_inputs$transformation))(filtered$f)
 
   fit <- list(dlm = dlmModel, dlm_future = modFuture,
-              fitted = fitted, residuals = resid,
+              fitted = fitted, residuals = resid, index = data %>% pull(!!index(data)),
               states = filtered$a, heuristic = "filterSmooth") %>%
     enclass("FASSTER",
             !!!model_inputs[c("model", "transformation", "response")])

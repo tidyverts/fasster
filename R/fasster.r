@@ -18,6 +18,10 @@ NULL
 #' @export
 dplyr::`%>%`
 
+#' @importFrom fable components
+#' @export
+fable::components
+
 #' @rawNamespace import(stats, except = filter)
 #' @import rlang
 #' @import dlm
