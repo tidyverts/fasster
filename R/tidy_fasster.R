@@ -209,6 +209,26 @@ print.FASSTER <- function(x, ...){
   cat("FASSTER")
 }
 
+#' @export
+#' @importFrom dplyr group_by summarise transmute
+#' @importFrom rlang as_quosure sym
+#' @importFrom dplyr pull
+summary.FASSTER <- function(x, ...){
+  cat(paste("Model:\n", deparse(x%@%"model"), "\n\n"))
+  cat("Estimated variances:\n")
+  cat(" State noise variances (W):\n")
+  data.frame(term = colnames(x$dlm$FF), W = diag(x$dlm$W)) %>%
+    group_by(!!sym("term")) %>%
+    summarise(!!"W" := paste(format(!!sym("W"), digits=5, scientific=TRUE), collapse=" ")) %>%
+    transmute(!!"Val" := paste0("  ", !!sym("term"), "\n   ", !!sym("W"))) %>%
+    pull(!!sym("Val")) %>%
+    paste(collapse="\n") %>%
+    paste0("\n\n") %>%
+    cat
+  cat(paste(" Observation noise variance (V):\n ", format(x$dlm$V, digits=5, scientific = TRUE)))
+}
+
+
 #' @importFrom dlm dlmSvd2var
 #' @importFrom forecast forecast
 #' @importFrom tsibblestats get_frequencies
