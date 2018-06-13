@@ -200,13 +200,13 @@ model_sum.FASSTER <- function(x){
 }
 
 #' @export
-format.FASSTER <- function(x){
+format.FASSTER <- function(x, ...){
   "FASSTER"
 }
 
 #' @export
-print.FASSTER <- function(x, ...){
-  cat(paste("FASSTER Model:\n", deparse(x%@%"model"), "\n\n"))
+print.FASSTER <- function(object, ...){
+  cat(paste("FASSTER Model:\n", deparse(object%@%"model"), "\n\n"))
 }
 
 #' @export
