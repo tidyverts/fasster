@@ -92,43 +92,43 @@ FASSTER <- function(data, formula, include=NULL, ...){
     poly = function(...){
       cl <- match.call()
       out <- dlmModPoly(...)
-      colnames(out$FF) <- deparse(cl)
+      colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
       out
     },
     seas = function(...){
       cl <- match.call()
       out <- dlmModSeas(...)
-      colnames(out$FF) <- deparse(cl)
+      colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
       out
     },
     seasonal = function(...){
       cl <- match.call()
       out <- dlmModSeas(...)
-      colnames(out$FF) <- deparse(cl)
+      colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
       out
     },
     trig = function(...){
       cl <- match.call()
       out <- dlmModTrig(...)
-      colnames(out$FF) <- deparse(cl)
+      colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
       out
     },
     fourier = function(...){
       cl <- match.call()
       out <- dlmModTrig(...)
-      colnames(out$FF) <- deparse(cl)
+      colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
       out
     },
     ARMA = function(...){
       cl <- match.call()
       out <- dlmModARMA(...)
-      colnames(out$FF) <- deparse(cl)
+      colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
       out
     },
     custom = function(...){
       cl <- match.call()
       out <- dlm(...)
-      colnames(out$FF) <- deparse(cl)
+      colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
       out
     },
     xreg = function(...){
