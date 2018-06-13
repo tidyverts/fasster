@@ -214,7 +214,7 @@ print.FASSTER <- function(x, ...){
 #' @importFrom rlang as_quosure sym
 #' @importFrom dplyr pull
 summary.FASSTER <- function(x, ...){
-  cat(paste("Model:\n", deparse(x%@%"model"), "\n\n"))
+  cat(paste("FASSTER Model:\n", deparse(x%@%"model"), "\n\n"))
   cat("Estimated variances:\n")
   cat(" State noise variances (W):\n")
   data.frame(term = colnames(x$dlm$FF), W = diag(x$dlm$W)) %>%
