@@ -238,102 +238,100 @@ forecast.FASSTER <- function(object, data, newdata = NULL, h = NULL, ...){
   mod <- object$"dlm_future"
 
   if(!is.null(newdata)){
-    newdata <- as_tsibble(newdata)
-
-    # Build model on newdata
-    specials <- new_specials_env(
-      `%S%` = function(group, expr){
-        group_expr <- enexpr(group)
-        lhs <- factor(group)
-        groups <- levels(lhs) %>% map(~ as.numeric(lhs == .x)) %>% set_names(levels(lhs))
-
-        rhs <- parse_model_rhs(enexpr(expr), data = data, specials = specials)$args %>%
-          unlist(recursive = FALSE) %>%
-          reduce(`+`)
-
-        groups %>%
-          imap(function(X, groupVal){
-            if(is.null(rhs$JFF)){
-              rhs$JFF <- rhs$FF
-              rhs$X <- matrix(X, ncol = 1)
-            }
-            else{
-              rhs$X <- rhs$X * X
-              if(any(new_X_pos <- rhs$FF!=0 & rhs$JFF==0)){
-                new_X_col <- NCOL(rhs$X) + 1
-                rhs$JFF[new_X_pos] <- new_X_col
-                rhs$X <- cbind(rhs$X, X)
-              }
-            }
-            colnames(rhs$X) <- paste0(expr_text(group_expr), "_", groupVal, "/", colnames(rhs$X))
-            rhs
-          }) %>%
-          reduce(`+`)
-      },
-      `(` = function(expr){
-        parse_model_rhs(enexpr(expr), data = data, specials = specials)$args %>%
-          unlist(recursive = FALSE) %>%
-          reduce(`+`)
-      },
-      poly = function(...){
-        dlmModPoly(...)
-      },
-      seas = function(...){
-        dlmModSeas(...)
-      },
-      seasonal = function(...){
-        dlmModSeas(...)
-      },
-      trig = function(...){
-        dlmModTrig(...)
-      },
-      fourier = function(...){
-        dlmModTrig(...)
-      },
-      ARMA = function(...){
-        dlmModARMA(...)
-      },
-      custom = function(...){
-        dlm(...)
-      },
-      xreg = function(...){
-        dlmModReg(cbind(...), addInt = FALSE)
-      },
-      parent_env = caller_env()
-    )
-
-    X <- parse_model_rhs(object%@%"model", data = newdata, specials = specials)$args %>%
-      unlist(recursive = FALSE) %>%
-      reduce(`+`) %>%
-      .$X
-  }
-  else{
-    X <- NULL
-  }
-
-  fit <- mod
-
-  nAhead <- if(!is.null(mod$X)){
-    if(is.null(X)){
-      stop("X must be given")
-    }
-    NROW(X)
+    h <- NROW(newdata)
   }
   else{
     if(is.null(h)){
       h <- get_frequencies("smallest", data)*2
     }
-    h
   }
+
+  idx <- data %>% pull(!!index(.))
+  future_idx <- seq(tail(idx, 1), length.out = h + 1, by = time_unit(idx)) %>% tail(-1)
+
+  if(!is_tsibble(newdata)){
+    newdata <- c(list(future_idx), as.list(newdata))
+    names(newdata)[1] <- expr_text(index(data))
+    newdata <- as_tsibble(newdata, index = !!index(data))
+  }
+
+  # Build model on newdata
+  specials <- new_specials_env(
+    `%S%` = function(group, expr){
+      group_expr <- enexpr(group)
+      lhs <- as.factor(group)
+      groups <- levels(lhs) %>% map(~ as.numeric(lhs == .x)) %>% set_names(levels(lhs))
+
+      rhs <- parse_model_rhs(enexpr(expr), data = data, specials = specials)$args %>%
+        unlist(recursive = FALSE) %>%
+        reduce(`+`)
+
+      groups %>%
+        imap(function(X, groupVal){
+          if(is.null(rhs$JFF)){
+            rhs$JFF <- rhs$FF
+            rhs$X <- matrix(X, ncol = 1)
+          }
+          else{
+            rhs$X <- rhs$X * X
+            if(any(new_X_pos <- rhs$FF!=0 & rhs$JFF==0)){
+              new_X_col <- NCOL(rhs$X) + 1
+              rhs$JFF[new_X_pos] <- new_X_col
+              rhs$X <- cbind(rhs$X, X)
+            }
+          }
+          colnames(rhs$X) <- paste0(expr_text(group_expr), "_", groupVal, "/", colnames(rhs$X))
+          rhs
+        }) %>%
+        reduce(`+`)
+    },
+    `(` = function(expr){
+      parse_model_rhs(enexpr(expr), data = data, specials = specials)$args %>%
+        unlist(recursive = FALSE) %>%
+        reduce(`+`)
+    },
+    poly = function(...){
+      dlmModPoly(...)
+    },
+    seas = function(...){
+      dlmModSeas(...)
+    },
+    seasonal = function(...){
+      dlmModSeas(...)
+    },
+    trig = function(...){
+      dlmModTrig(...)
+    },
+    fourier = function(...){
+      dlmModTrig(...)
+    },
+    ARMA = function(...){
+      dlmModARMA(...)
+    },
+    custom = function(...){
+      dlm(...)
+    },
+    xreg = function(...){
+      dlmModReg(cbind(...), addInt = FALSE)
+    },
+    parent_env = caller_env()
+  )
+
+  X <- parse_model_rhs(model_rhs(object%@%"model"), data = newdata, specials = specials)$args %>%
+    unlist(recursive = FALSE) %>%
+    reduce(`+`) %>%
+    .$X
+
+  fit <- mod
 
   p <- length(mod$m0)
   m <- nrow(mod$FF)
-  a <- rbind(mod$m0, matrix(0, nAhead, p))
-  R <- vector("list", nAhead + 1)
+  a <- rbind(mod$m0, matrix(0, h, p))
+  R <- vector("list", h + 1)
   R[[1]] <- mod$C0
-  f <- matrix(0, nAhead, m)
-  Q <- vector("list", nAhead)
-  for (it in 1:nAhead) {
+  f <- matrix(0, h, m)
+  Q <- vector("list", h)
+  for (it in 1:h) {
     # Time varying components
     XFF <- mod$FF
     XFF[mod$JFF != 0] <- X[it, mod$JFF]
@@ -354,8 +352,6 @@ forecast.FASSTER <- function(object, data, newdata = NULL, h = NULL, ...){
   R <- R[-1]
 
   se <- sqrt(unlist(Q))
-  idx <- data %>% pull(!!index(.))
-  future_idx <- seq(tail(idx, 1), length.out = nAhead + 1, by = time_unit(idx)) %>% tail(-1)
 
   tsibble(!!index(data) := future_idx,
           mean = biasadj(invert_transformation(object%@%"transformation"), se^2)(c(f)),
