@@ -28,6 +28,8 @@ fable::components
 #' @import tsibble
 NULL
 
+globalVariables(".")
+
 spread_groups <- function(object) {
   out <- NULL
   for (group in levels(object)) {
