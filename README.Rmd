@@ -16,7 +16,7 @@ library(fasster)
 library(tidyverse)
 library(lubridate)
 library(tsibble)
-library(forecast)
+library(fable)
 ```
 
 # fasster <img src="man/figure/logo.png" align="right" />
