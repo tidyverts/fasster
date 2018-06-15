@@ -14,9 +14,9 @@
 #' @keywords package
 NULL
 
-#' @importFrom dplyr %>%
+#' @importFrom fable %>%
 #' @export
-dplyr::`%>%`
+fable::`%>%`
 
 #' @importFrom fable components
 #' @export

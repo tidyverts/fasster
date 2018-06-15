@@ -13,8 +13,6 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{dplyr}{\code{\link[dplyr]{\%>\%}}}
-
-  \item{fable}{\code{\link[fable]{components}}}
+  \item{fable}{\code{\link[fable]{\%>\%}}, \code{\link[fable]{components}}}
 }}
 

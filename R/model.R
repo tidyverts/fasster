@@ -27,7 +27,7 @@
 #'
 #' The switching operator, \code{\%S\%} requires the switching factor variable on the LHS, and the model to switch over on the RHS (as built using the above components)
 #'
-#' @section Heuristic
+#' @section Heuristic:
 #' The model parameters are estimated using the following heuristic:
 #' \enumerate{
 #'    \item Filter the data using the specified model with non-zero state variances
@@ -42,9 +42,8 @@
 #' tsibbledata::UKLungDeaths %>%
 #'   FASSTER(mdeaths ~ fdeaths + poly(1) + trig(12))
 #'
-#' @rdname FASSTER2
+#' @rdname fasster-model
 #' @importFrom fable new_specials_env parse_model parse_model_rhs model_lhs traverse multi_univariate invert_transformation mable
-#' @importFrom dplyr tibble
 #' @importFrom purrr reduce imap map_chr
 #' @export
 FASSTER <- function(data, formula, include=NULL, ...){
@@ -221,9 +220,8 @@ print.FASSTER <- function(x, ...){
 }
 
 #' @export
-#' @importFrom dplyr group_by summarise transmute
+#' @importFrom tsibble group_by summarise transmute
 #' @importFrom rlang as_quosure sym
-#' @importFrom dplyr pull
 summary.FASSTER <- function(object, ...){
   cat(paste("FASSTER Model:\n", deparse(object%@%"model"), "\n\n"))
   cat("Estimated variances:\n")

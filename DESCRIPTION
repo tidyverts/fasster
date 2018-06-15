@@ -8,14 +8,11 @@ Imports:
     dlm,
     tsibble,
     ggplot2 (>= 2.2.1.9000),
-    dplyr,
-    tidyr,
     purrr,
     rlang,
     stats,
     fable,
     forecast,
-    pillar,
     tsibblestats
 Suggests:
     tsibbledata,
