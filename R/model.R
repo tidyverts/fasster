@@ -44,7 +44,7 @@
 #'
 #' @rdname fasster-model
 #' @importFrom fable new_specials_env parse_model parse_model_rhs model_lhs traverse multi_univariate invert_transformation mable
-#' @importFrom purrr reduce imap map_chr
+#' @importFrom purrr reduce imap map_chr map
 #' @export
 FASSTER <- function(data, formula, include=NULL, ...){
   # Capture user call
@@ -189,7 +189,7 @@ FASSTER <- function(data, formula, include=NULL, ...){
   fitted <- invert_transformation(eval_tidy(model_inputs$transformation))(filtered$f)
 
   fit <- list(dlm = dlmModel, dlm_future = modFuture,
-              fitted = fitted, residuals = resid, index = data %>% pull(!!index(data)),
+              fitted = fitted, residuals = resid, index = data %>% .[[expr_text(index(data))]],
               states = filtered$a, heuristic = "filterSmooth") %>%
     enclass("FASSTER",
             !!!model_inputs[c("model", "transformation", "response")])
@@ -197,7 +197,7 @@ FASSTER <- function(data, formula, include=NULL, ...){
   mable(
     key_vals = as.list(data)[key_vars(data)],
     data = (data %>%
-              dplyr::grouped_df(key_vars(.)) %>%
+              group_by(!!!syms(key_vars(.))) %>%
               nest)$data,
     model = list(fit)
   )
@@ -230,7 +230,7 @@ summary.FASSTER <- function(object, ...){
     group_by(!!sym("term")) %>%
     summarise(!!"W" := paste(format(!!sym("W"), digits=5, scientific=TRUE), collapse=" ")) %>%
     transmute(!!"Val" := paste0("  ", !!sym("term"), "\n   ", !!sym("W"))) %>%
-    pull(!!sym("Val")) %>%
+    .[["Val"]] %>%
     paste(collapse="\n") %>%
     paste0("\n\n") %>%
     cat
