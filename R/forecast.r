@@ -1,5 +1,5 @@
 #' @importFrom dlm dlmSvd2var
-#' @importFrom forecast forecast
+#' @importFrom fable forecast
 #' @importFrom tsibblestats get_frequencies
 #' @importFrom fable parse_model_rhs model_rhs new_fcdist biasadj
 #' @export
