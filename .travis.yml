@@ -3,4 +3,7 @@
 language: R
 sudo: false
 cache: packages
-r_github_packages: earowang/tsibble
+
+after_failure:
+  - cat $TRAVIS_BUILD_DIR/fable.Rcheck/00install.out
+  - cat $TRAVIS_BUILD_DIR/fable.Rcheck/00check.log
