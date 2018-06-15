@@ -1,55 +1,106 @@
 #' @importFrom dlm dlmSvd2var
 #' @importFrom forecast forecast
-#' @importFrom dplyr tibble
+#' @importFrom tsibblestats get_frequencies
+#' @importFrom fable parse_model_rhs model_rhs new_fcdist biasadj
 #' @export
-forecast.fasster <- function(object, newdata=NULL, h=floor(NROW(object$x)/10), level=c(80, 95), lambda = object$lambda, biasadj = NULL) {
-  mod <- object$model_future
-  ytsp <- tsp(object$x)
-
-  if (is.null(lambda)) {
-    biasadj <- FALSE
-  }
-  else {
-    if (is.null(biasadj)) {
-      biasadj <- attr(lambda, "biasadj")
-    }
-    if (!is.logical(biasadj)) {
-      warning("biasadj information not found, defaulting to FALSE.")
-      biasadj <- FALSE
-    }
-  }
+forecast.FASSTER <- function(object, data, newdata = NULL, h = NULL, ...){
+  mod <- object$"dlm_future"
 
   if(!is.null(newdata)){
-    # Build model on newdata
-    model_struct <- formula_parse_groups(object$formula)
-    dlmModel <- build_FASSTER_group(model_struct, newdata) %>%
-      ungroup_struct()
-    X <- dlmModel$X
+    h <- NROW(newdata)
   }
   else{
-    X <- NULL
+    if(is.null(h)){
+      h <- get_frequencies("smallest", data)*2
+    }
   }
+
+  idx <- data %>% pull(!!index(.))
+  future_idx <- seq(tail(idx, 1), length.out = h + 1, by = time_unit(idx)) %>% tail(-1)
+
+  if(!is_tsibble(newdata)){
+    newdata <- c(list(future_idx), as.list(newdata))
+    names(newdata)[1] <- expr_text(index(data))
+    newdata <- as_tsibble(newdata, index = !!index(data))
+  }
+
+  # Build model on newdata
+  specials <- new_specials_env(
+    `%S%` = function(group, expr){
+      group_expr <- enexpr(group)
+      lhs <- as.factor(group)
+      groups <- levels(lhs) %>% map(~ as.numeric(lhs == .x)) %>% set_names(levels(lhs))
+
+      rhs <- parse_model_rhs(enexpr(expr), data = data, specials = specials)$args %>%
+        unlist(recursive = FALSE) %>%
+        reduce(`+`)
+
+      groups %>%
+        imap(function(X, groupVal){
+          if(is.null(rhs$JFF)){
+            rhs$JFF <- rhs$FF
+            rhs$X <- matrix(X, ncol = 1)
+          }
+          else{
+            rhs$X <- rhs$X * X
+            if(any(new_X_pos <- rhs$FF!=0 & rhs$JFF==0)){
+              new_X_col <- NCOL(rhs$X) + 1
+              rhs$JFF[new_X_pos] <- new_X_col
+              rhs$X <- cbind(rhs$X, X)
+            }
+          }
+          colnames(rhs$X) <- paste0(expr_text(group_expr), "_", groupVal, "/", colnames(rhs$X))
+          rhs
+        }) %>%
+        reduce(`+`)
+    },
+    `(` = function(expr){
+      parse_model_rhs(enexpr(expr), data = data, specials = specials)$args %>%
+        unlist(recursive = FALSE) %>%
+        reduce(`+`)
+    },
+    poly = function(...){
+      dlmModPoly(...)
+    },
+    seas = function(...){
+      dlmModSeas(...)
+    },
+    seasonal = function(...){
+      dlmModSeas(...)
+    },
+    trig = function(...){
+      dlmModTrig(...)
+    },
+    fourier = function(...){
+      dlmModTrig(...)
+    },
+    ARMA = function(...){
+      dlmModARMA(...)
+    },
+    custom = function(...){
+      dlm(...)
+    },
+    xreg = function(...){
+      dlmModReg(cbind(...), addInt = FALSE)
+    },
+    parent_env = caller_env()
+  )
+
+  X <- parse_model_rhs(model_rhs(object%@%"model"), data = newdata, specials = specials)$args %>%
+    unlist(recursive = FALSE) %>%
+    reduce(`+`) %>%
+    .$X
 
   fit <- mod
 
-  nAhead <- if(!is.null(mod$X)){
-    if(is.null(X)){
-      stop("X must be given")
-    }
-    NROW(X)
-  }
-  else{
-    h
-  }
-
   p <- length(mod$m0)
   m <- nrow(mod$FF)
-  a <- rbind(mod$m0, matrix(0, nAhead, p))
-  R <- vector("list", nAhead + 1)
+  a <- rbind(mod$m0, matrix(0, h, p))
+  R <- vector("list", h + 1)
   R[[1]] <- mod$C0
-  f <- matrix(0, nAhead, m)
-  Q <- vector("list", nAhead)
-  for (it in 1:nAhead) {
+  f <- matrix(0, h, m)
+  Q <- vector("list", h)
+  for (it in 1:h) {
     # Time varying components
     XFF <- mod$FF
     XFF[mod$JFF != 0] <- X[it, mod$JFF]
@@ -69,41 +120,10 @@ forecast.fasster <- function(object, newdata=NULL, h=floor(NROW(object$x)/10), l
   a <- a[-1,, drop = FALSE]
   R <- R[-1]
 
-  Q <- unlist(Q)
-  lower <- matrix(NA, ncol = length(level), nrow = nAhead)
-  upper <- lower
-  for (i in seq_along(level)){
-    qq <- qnorm(0.5 * (1 + level[i] / 100))
-    lower[, i] <- f - qq * sqrt(Q)
-    upper[, i] <- f + qq * sqrt(Q)
-  }
+  se <- sqrt(unlist(Q))
 
-  if (!is.null(lambda)) {
-    f <- InvBoxCox(f, lambda, biasadj, ans)
-    lower <- InvBoxCox(lower, lambda)
-    upper <- InvBoxCox(upper, lambda)
-  }
-
-  colnames(upper) <- paste("Upper", level, sep="_")
-  colnames(lower) <- paste("Lower", level, sep="_")
-
-  seq_by <- object$x %>% interval %>% unclass %>% as.numeric
-  if(length(seq_by) > 1){
-    seq_by <- object$x %>% pull(!!index(object$x)) %>% diff %>% median
-  }
-
-  fcIndex <- seq(max(object$x %>% pull(!!index(object$x))), length.out = nAhead + 1, by = seq_by)
-  class(fcIndex) <- object$x %>% pull(!!index(object$x)) %>% class
-
-  tsibble_index <- tibble(!!quo_text(index(object$x)) := fcIndex) %>%
-    tail(-1) %>%
-    as_tsibble(index = !!index(object$x))
-
-  ans <- structure(list(model = object, x = object$x, fitted = fit$f,
-                        forecast = tsibble_index %>% bind_cols(PointForecast=c(f), as_tibble(upper), as_tibble(lower)),
-                        level = level,
-                        method = "FASSTER", series = object$series, residuals = residuals(object)),
-                   class = c("tbl_forecast", "forecast"))
-
-  return(ans)
+  tsibble(!!index(data) := future_idx,
+          mean = biasadj(invert_transformation(object%@%"transformation"), se^2)(c(f)),
+          distribution = new_fcdist(qnorm, c(f), sd = se, transformation = invert_transformation(object%@%"transformation"), abbr = "N"),
+          index = !!index(data))
 }

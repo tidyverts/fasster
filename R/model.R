@@ -27,6 +27,17 @@
 #'
 #' The switching operator, \code{\%S\%} requires the switching factor variable on the LHS, and the model to switch over on the RHS (as built using the above components)
 #'
+#' @section Heuristic
+#' The model parameters are estimated using the following heuristic:
+#' \enumerate{
+#'    \item Filter the data using the specified model with non-zero state variances
+#'    \item Obtain smoothed states \eqn{(\theta^{(s)}t=\theta_t|D_T)} to approximate correct behaviour
+#'    \item The initial state parameters taken from the first smoothed state: \eqn{m_0=E(\theta^{(s)}_0)}, \eqn{C_0=Var(\theta^{(s)}_0)}
+#'    \item Obtain state noise variances from the smoothed variance of \eqn{w_t}: \eqn{W=Var(w^{(s)}_t)=Var(\theta^{(s)}_t−G\theta^{(s)}_{t−1})}
+#'    Obtain measurement noise variance from smoothed variance of \eqn{v_t}: \eqn{V=Var(v^{(s)}_t)=Var(y_t−F_t\theta^{(s)}_t)}
+#'    \item Repair restricted state variances for seasonal factors and ARMA terms
+#' }
+#'
 #' @examples
 #' tsibbledata::UKLungDeaths %>%
 #'   FASSTER(mdeaths ~ fdeaths + poly(1) + trig(12))
@@ -226,135 +237,4 @@ summary.FASSTER <- function(object, ...){
     paste0("\n\n") %>%
     cat
   cat(paste(" Observation noise variance (V):\n ", format(object$dlm$V, digits=5, scientific = TRUE)))
-}
-
-
-#' @importFrom dlm dlmSvd2var
-#' @importFrom forecast forecast
-#' @importFrom tsibblestats get_frequencies
-#' @importFrom fable parse_model_rhs model_rhs new_fcdist biasadj
-#' @export
-forecast.FASSTER <- function(object, data, newdata = NULL, h = NULL, ...){
-  mod <- object$"dlm_future"
-
-  if(!is.null(newdata)){
-    h <- NROW(newdata)
-  }
-  else{
-    if(is.null(h)){
-      h <- get_frequencies("smallest", data)*2
-    }
-  }
-
-  idx <- data %>% pull(!!index(.))
-  future_idx <- seq(tail(idx, 1), length.out = h + 1, by = time_unit(idx)) %>% tail(-1)
-
-  if(!is_tsibble(newdata)){
-    newdata <- c(list(future_idx), as.list(newdata))
-    names(newdata)[1] <- expr_text(index(data))
-    newdata <- as_tsibble(newdata, index = !!index(data))
-  }
-
-  # Build model on newdata
-  specials <- new_specials_env(
-    `%S%` = function(group, expr){
-      group_expr <- enexpr(group)
-      lhs <- as.factor(group)
-      groups <- levels(lhs) %>% map(~ as.numeric(lhs == .x)) %>% set_names(levels(lhs))
-
-      rhs <- parse_model_rhs(enexpr(expr), data = data, specials = specials)$args %>%
-        unlist(recursive = FALSE) %>%
-        reduce(`+`)
-
-      groups %>%
-        imap(function(X, groupVal){
-          if(is.null(rhs$JFF)){
-            rhs$JFF <- rhs$FF
-            rhs$X <- matrix(X, ncol = 1)
-          }
-          else{
-            rhs$X <- rhs$X * X
-            if(any(new_X_pos <- rhs$FF!=0 & rhs$JFF==0)){
-              new_X_col <- NCOL(rhs$X) + 1
-              rhs$JFF[new_X_pos] <- new_X_col
-              rhs$X <- cbind(rhs$X, X)
-            }
-          }
-          colnames(rhs$X) <- paste0(expr_text(group_expr), "_", groupVal, "/", colnames(rhs$X))
-          rhs
-        }) %>%
-        reduce(`+`)
-    },
-    `(` = function(expr){
-      parse_model_rhs(enexpr(expr), data = data, specials = specials)$args %>%
-        unlist(recursive = FALSE) %>%
-        reduce(`+`)
-    },
-    poly = function(...){
-      dlmModPoly(...)
-    },
-    seas = function(...){
-      dlmModSeas(...)
-    },
-    seasonal = function(...){
-      dlmModSeas(...)
-    },
-    trig = function(...){
-      dlmModTrig(...)
-    },
-    fourier = function(...){
-      dlmModTrig(...)
-    },
-    ARMA = function(...){
-      dlmModARMA(...)
-    },
-    custom = function(...){
-      dlm(...)
-    },
-    xreg = function(...){
-      dlmModReg(cbind(...), addInt = FALSE)
-    },
-    parent_env = caller_env()
-  )
-
-  X <- parse_model_rhs(model_rhs(object%@%"model"), data = newdata, specials = specials)$args %>%
-    unlist(recursive = FALSE) %>%
-    reduce(`+`) %>%
-    .$X
-
-  fit <- mod
-
-  p <- length(mod$m0)
-  m <- nrow(mod$FF)
-  a <- rbind(mod$m0, matrix(0, h, p))
-  R <- vector("list", h + 1)
-  R[[1]] <- mod$C0
-  f <- matrix(0, h, m)
-  Q <- vector("list", h)
-  for (it in 1:h) {
-    # Time varying components
-    XFF <- mod$FF
-    XFF[mod$JFF != 0] <- X[it, mod$JFF]
-    XV <- mod$V
-    XV[mod$JV != 0] <- X[it, mod$JV]
-    XGG <- mod$GG
-    XGG[mod$JGG != 0] <- X[it, mod$JGG]
-    XW <- mod$W
-    XW[mod$JW != 0] <- X[it, mod$JW]
-
-    # Kalman Filter Forecast
-    a[it + 1, ] <- XGG %*% a[it, ]
-    R[[it + 1]] <- XGG %*% R[[it]] %*% t(XGG) + XW
-    f[it, ] <- XFF %*% a[it + 1, ]
-    Q[[it]] <- XFF %*% R[[it + 1]] %*% t(XFF) + XV
-  }
-  a <- a[-1,, drop = FALSE]
-  R <- R[-1]
-
-  se <- sqrt(unlist(Q))
-
-  tsibble(!!index(data) := future_idx,
-          mean = biasadj(invert_transformation(object%@%"transformation"), se^2)(c(f)),
-          distribution = new_fcdist(qnorm, c(f), sd = se, transformation = invert_transformation(object%@%"transformation"), abbr = "N"),
-          index = !!index(data))
 }
