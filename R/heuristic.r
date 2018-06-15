@@ -34,45 +34,45 @@
 #  #   invoke(rbind, .) %>%
 #  #   var_stl_decomp()
 # }
-
-
-dlm_lmHeuristic <- function(y, dlmModel){
-  ## Generate optimisation Z
-  ZF <- as.matrix(dlmModel$FF[rep(1, length(y)), ])
-  ZF[, dlmModel$JFF != 0] <- dlmModel$X[, dlmModel$JFF]
-  G_i <- dlmModel$GG
-  Z <- ZF
-  for (i in seq_along(y)) {
-    Z[i, ] <- ZF[i, ] %*% G_i
-    G_i <- G_i %*% dlmModel$GG
-  }
-
-  ## Fit heuristic models
-  step_len <- NCOL(Z) * 4 ## TODO: Improve block selection as a fn of NROW with s
-  dlmModel$vt <- numeric(length(y) - step_len)
-  dlmModel$xt <- matrix(nrow = length(y) - step_len, ncol = NCOL(Z))
-  for (i in seq_len(length(y) - step_len)) {
-    idx <- seq_len(step_len) + i - 1
-    optimFit <- .lm.fit(Z[idx, ], y[idx], tol = 1e-6)
-    dlmModel$xt[i, ] <- optimFit$coefficients
-    dlmModel$vt[i] <- optimFit$residuals[1]
-  }
-  wt <- dlmModel$xt[seq_len(NROW(dlmModel$xt) - 1), ] - (dlmModel$xt[seq_len(NROW(dlmModel$xt) - 1) + 1, ] %*% dlmModel$GG)
-
-  dlmModel$m0 <- dlmModel$xt[1, ]
-  dlmModel$V <- var(dlmModel$vt)
-  dlmModel$W <- dlmModel$C0 <- var(wt)
-
-  return(dlmModel)
-}
-
-dlm_lmHeuristic_saturated <- function(y, dlmModel, dlmModelSaturated){
-  dlmModel <- dlm_lmHeuristic(y, dlmModel)
-  dlmModelSaturated <- dlm_lmHeuristic(y, dlmModelSaturated)
-  dlmModel$V <- dlmModelSaturated$V
-  dlmModel$W <- dlmModel$W * mean(dlmModelSaturated$W)/mean(dlmModel$W)
-  return(dlmModel)
-}
+#
+#
+# dlm_lmHeuristic <- function(y, dlmModel){
+#   ## Generate optimisation Z
+#   ZF <- as.matrix(dlmModel$FF[rep(1, length(y)), ])
+#   ZF[, dlmModel$JFF != 0] <- dlmModel$X[, dlmModel$JFF]
+#   G_i <- dlmModel$GG
+#   Z <- ZF
+#   for (i in seq_along(y)) {
+#     Z[i, ] <- ZF[i, ] %*% G_i
+#     G_i <- G_i %*% dlmModel$GG
+#   }
+#
+#   ## Fit heuristic models
+#   step_len <- NCOL(Z) * 4 ## TODO: Improve block selection as a fn of NROW with s
+#   dlmModel$vt <- numeric(length(y) - step_len)
+#   dlmModel$xt <- matrix(nrow = length(y) - step_len, ncol = NCOL(Z))
+#   for (i in seq_len(length(y) - step_len)) {
+#     idx <- seq_len(step_len) + i - 1
+#     optimFit <- .lm.fit(Z[idx, ], y[idx], tol = 1e-6)
+#     dlmModel$xt[i, ] <- optimFit$coefficients
+#     dlmModel$vt[i] <- optimFit$residuals[1]
+#   }
+#   wt <- dlmModel$xt[seq_len(NROW(dlmModel$xt) - 1), ] - (dlmModel$xt[seq_len(NROW(dlmModel$xt) - 1) + 1, ] %*% dlmModel$GG)
+#
+#   dlmModel$m0 <- dlmModel$xt[1, ]
+#   dlmModel$V <- var(dlmModel$vt)
+#   dlmModel$W <- dlmModel$C0 <- var(wt)
+#
+#   return(dlmModel)
+# }
+#
+# dlm_lmHeuristic_saturated <- function(y, dlmModel, dlmModelSaturated){
+#   dlmModel <- dlm_lmHeuristic(y, dlmModel)
+#   dlmModelSaturated <- dlm_lmHeuristic(y, dlmModelSaturated)
+#   dlmModel$V <- dlmModelSaturated$V
+#   dlmModel$W <- dlmModel$W * mean(dlmModelSaturated$W)/mean(dlmModel$W)
+#   return(dlmModel)
+# }
 
 smoothedFits <- function(smooth, mod){
   fitted <- numeric(NROW(smooth$s) - 1)
