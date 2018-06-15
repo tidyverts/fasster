@@ -1,13 +1,17 @@
 #' @importFrom fable components
+#' @importFrom purrr map_dfc
 #' @export
 components.FASSTER <- function(object, ...) {
-  states <- object$dlm$FF %>%
+  groups <- object$dlm$FF %>%
     colnames() %>%
-    factor %>%
-    spread_groups() %>%
+    factor
+  states <- levels(groups) %>%
+    map_dfc(~ as.numeric(groups == .x)) %>%
+    set_names(levels(groups)) %>%
+    as.matrix %>%
     t
 
-  tibble(index = object$index) %>%
-    bind_cols((states * object$dlm$FF[rep(1,NROW(states)),]) %*% t(object$states) %>% t %>% as_tibble) %>%
+  data.frame(index = object$index) %>%
+    cbind((states * object$dlm$FF[rep(1,NROW(states)),]) %*% t(object$states) %>% t %>% as_tibble) %>%
     as_tsibble(index=index)
 }
