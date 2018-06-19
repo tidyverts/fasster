@@ -5,6 +5,8 @@
 \alias{reexports}
 \alias{\%>\%}
 \alias{reexports}
+\alias{autoplot}
+\alias{reexports}
 \alias{components}
 \title{Objects exported from other packages}
 \keyword{internal}
@@ -13,6 +15,6 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{fable}{\code{\link[fable]{\%>\%}}, \code{\link[fable]{components}}}
+  \item{fable}{\code{\link[fable]{\%>\%}}, \code{\link[fable]{autoplot}}, \code{\link[fable]{components}}}
 }}
 

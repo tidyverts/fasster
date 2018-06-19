@@ -12,7 +12,8 @@ Imports:
     rlang,
     stats,
     fable,
-    tsibblestats
+    tsibblestats,
+    tidyselect
 Suggests:
     tsibbledata,
     knitr,
