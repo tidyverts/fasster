@@ -1,6 +1,7 @@
 #' @importFrom dlm dlmSvd2var
 #' @importFrom fable forecast
 #' @importFrom tsibblestats get_frequencies
+#' @importFrom utils tail
 #' @importFrom fable parse_model_rhs model_rhs new_fcdist biasadj
 #' @export
 forecast.FASSTER <- function(object, data, newdata = NULL, h = NULL, ...){
@@ -15,7 +16,7 @@ forecast.FASSTER <- function(object, data, newdata = NULL, h = NULL, ...){
     }
   }
 
-  idx <- data %>% pull(!!index(.))
+  idx <- data[[expr_text(index(.))]]
   future_idx <- seq(tail(idx, 1), length.out = h + 1, by = time_unit(idx)) %>% tail(-1)
 
   if(!is_tsibble(newdata)){
