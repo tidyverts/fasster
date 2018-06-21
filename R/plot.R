@@ -39,3 +39,30 @@ autoplot.FASSTER <- function(object, range.bars = FALSE, ...) {
   }
   p
 }
+
+
+
+#' Time-series plot of fitted and observed values
+#'
+#' Plots fitted and observed values with autoplot methods for \code{tbl_ts} using ggplot2.
+#'
+#' @param object A mable
+#' @param ... Additional arguments to be passed to \code{\link[fable]{autoplot.mable}}
+#'
+#' @seealso
+#'
+#' @export
+#' @importFrom ggplot2 autoplot ggplot aes geom_line facet_grid xlab ylab ggtitle
+ggfitted <- function(object, ...){
+  .Deprecated()
+  if(inherits(object, "mable")){
+    fable::getResponse(object) %>%
+      left_join(fitted(object), by = expr_text(index(.))) %>%
+      gather("type", "value") %>%
+      autoplot(var=value) +
+      ggtitle(paste0("Fitted values from ", pillar_shaft(object$model)[[1]]))
+  }
+  else{
+    stop("This object is not supported")
+  }
+}
