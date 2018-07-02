@@ -2,6 +2,7 @@
 % Please edit documentation in R/model.R
 \name{FASSTER}
 \alias{FASSTER}
+\alias{fasster}
 \title{Fast Additive Switching of Seasonality, Trend and Exogenous Regressors}
 \usage{
 FASSTER(data, formula, include = NULL, ...)

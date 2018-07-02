@@ -203,6 +203,12 @@ FASSTER <- function(data, formula, include=NULL, ...){
   )
 }
 
+#' @export
+#' @rdname fasster-model
+#' @usage NULL
+fasster <- FASSTER
+
+
 #' @importFrom fable model_sum
 #' @export
 model_sum.FASSTER <- function(x){
