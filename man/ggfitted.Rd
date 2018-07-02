@@ -9,7 +9,7 @@ ggfitted(object, ...)
 \arguments{
 \item{object}{A mable}
 
-\item{...}{Additional arguments to be passed to \code{\link[fable]{autoplot.tbl_ts}}}
+\item{...}{Additional arguments to be passed to \code{fable::autoplot.tbl_ts}}
 }
 \description{
 Plots fitted and observed values with autoplot methods for \code{tbl_ts} using ggplot2.
