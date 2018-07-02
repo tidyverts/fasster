@@ -1,0 +1,139 @@
+---
+title: "Case study: modelling pedestrian traffic with fasster"
+author: "Mitchell O'Hara-Wild"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  message = FALSE,
+  comment = "#>"
+)
+library(fasster)
+```
+
+## Pedestrian traffic data
+
+The City of Melbourne in Australia provides hourly pedestrian count data from a variety of sensors throughout the city (http://www.pedestrian.melbourne.vic.gov.au/). This data can be obtained from the [Melbourne's Open Data Portal](https://data.melbourne.vic.gov.au/Transport-Movement/Pedestrian-volume-updated-monthly-/b2ak-trbp), or by using the R package [rwalkr](https://cran.r-project.org/web/packages/rwalkr/index.html). To simplify this vignette, we will focus on counts from 2016 to 2017 from the Southern Cross Station sensor.
+
+```{r data, cache = TRUE}
+library(rwalkr)
+library(lubridate)
+ped_count <- run_melb(year = 2016:2017, sensor = "Southern Cross Station")
+ped_count
+```
+
+To inform the fasster about the structure of the data, we must next convert this tibble into a [tsibble](https://pkg.earo.me/tsibble/).
+While we're here, let's remove the columns containing redundant or unnecessary information.
+```{r tsibble}
+library(tsibble)
+ped_count <- ped_count %>%
+  select(Date_Time, Count) %>%
+  as_tsibble(index = Date_Time)
+ped_count
+```
+
+The print output above only gives us a very brief look at the dataset, and is not very informative about the time-series structures that exist in the data. A time-series plot will provide more relevant information about these structures.
+
+```{r tsplot_full}
+library(ggplot2)
+ped_count %>%
+  ggplot(aes(x=Date_Time, y=Count)) + 
+  geom_line() + 
+  xlab("Time (hourly)")
+```
+
+Although difficult to see fine-details in the plot, we can see many features of the time-series here. The most obvious is perhaps the large gap in observations before July 2017. We can also see substantial decreases in pedestrian counts during the Christmas & New Year period in every year. While the daily minimum counts remain low (but non-negative), the peaks appear to be growing over time, which suggests that pedestrian traffic at the station is growing.
+
+The features of this data set which make it not only complex modelling problem, but also a complex visualisation problem! With hourly data, a representative period of time (say 2 years) contains a lot (at least in a time-series context) of data. Improvements in visualisation and modelling tools are needed to display and capture this rich information.
+
+For simplicity, let's see some fine-details of the time-series by focusing on a two week period of the data.
+```{r tsplot_zoom}
+ped_count %>%
+  filter(Date_Time >= ymd("2016-04-18", tz="Australia/Melbourne"), 
+         Date_Time <  ymd("2016-05-02", tz="Australia/Melbourne")) %>%
+  ggplot(aes(x=Date_Time, y=Count)) + 
+  geom_line() + 
+  xlab("Time (hourly)")
+```
+
+As you might expect from your experiences walking throughout a city, the pattern of weekdays and weekends is drastically different. On working days (Monday - Friday), we observe peaks in pedestrian traffic before and after work, and a smaller increase around lunch time. Non-working days have a simpler pattern that is less influenced by common work schedules. This pattern is one example of multiple seasonality, as there is a within day seasonal pattern, and a weekly seasonal pattern. We can also observe that on the second Monday is similar to the weekend pattern, which is caused by a public holiday effect (Anzac Day).
+
+As the shape of the seasonal pattern during typical weekdays is substantially different from typical weekends, we refer to this type of multiple seasonality as 'switching seasonality'. This is because the seasonal pattern switches over time (in this case, switching between working days and non-working days).
+
+## Model specification
+To recap, we have identified many time-series patterns in the pedestrian count data that we would like to model:
+
+* Implicit missing values (large gap before July 2017)
+* Non-negativity (you can't have negative counts)
+* Multiple seasonality (Working day / Non-working day)
+* Holiday effects (such as Christmas and Anzac day)
+* Lots of data! (Hourly observations add up quick)
+
+### Implicit missing values
+While FASSTER is able to handle missing values, the model requires a regular time-series. To regularlise the time-series, we must make the implicit missing values explicit. The tsibble package provides a `fill_na()` function to do this.
+```{r}
+ped_count <- ped_count %>%
+  fill_na()
+```
+
+### Non-negativity
+There are a variety of ways to ensure non-negativity in a model. A common and simple approach is to model the log transformed data, and then back-transform onto the original scale. This can be problematic with count data or low-volume observations, because to do this transformation, all observations must be greater than zero. Unfortunately for us, there are `r ped_count %>% filter(Count == 0) %>% NROW` cases of zero counts, and so a log transformation cannot be used. Fortunately, we can instead use a "log plus one" transformation instead, so our model's response variable can be written using `log(Count + 1)`.
+
+### Switching seasonality
+As the pedestrian data contains hourly observations, we would use a seasonal frequency of 24 to capture the daily seasonal pattern.
+FASSTER provides two methods for modelling seasonality:
+
+* factor/dummy seasonality
+* fourier/trig seasonality
+
+In most cases, using fourier seasonality is recommended as it provides greater control over the shape/flexibility of the seasonality. In addition to the seasonal frequency (24), fourier seasonality also requires the number of harmonics to be specified. A harmonic consists of a sine and cosine function, and so the maximum harmonics allows is half of the seasonal frequency (in this case, 12). The appropriate choice of harmonics depends on the seasonal pattern: a complex seasonal pattern (such as our daily pedestrian counts) requires a large number of harmonics, and a smoother seasonal pattern would require less harmonics.
+
+Fourier terms can be added to your model using the `fourier` function, and so to add our daily seasonality with 10 harmonics we would use: `fourier(24,10)`.
+
+Factor seasonality is a simpler approach to including seasonality in the model, which is analogous to dummy variable seasonality in regression models. Factor seasonality does not provide control over the seasonal flexibility, and so a second parameter is not required. Seasonal factors are added using the `seas` function, so `seas(24)` would include the seasonal dummies for the daily pattern.
+
+As the multiple seasonal pattern in this data is switching between two single seasonal patterns, it is preferab
+The multiple seasonal pattern in this data switches between two single seasonal patterns. To switch between seasonalities in our model, we would use the switching operator (`%S%`) on an variable that categorises days into weekdays and weekends.
+```{r}
+ped_count <- ped_count %>%
+  mutate(DayType = ifelse(wday(Date_Time, week_start = 1) > 5, "Weekend", "Weekday"))
+```
+
+Using this variable, we can switch between our fourier seasonality using `DayType %S% fourier(24,10)`.
+
+### Holiday effects
+Public holidays appear to affect pedestrian counts in a similar way to weekends. As a result, the holiday effects can also be modelled using the switching operator. For holidays to be captured by the model, we must create another variable that indicates which days are public holidays. A table of relevant public holidays can usually be found readily [online](http://www.business.vic.gov.au/victorian-public-holidays-and-daylight-saving/victorian-public-holidays-2016-2017). Fortunately, the tsibble package provides a data for holidays in Australia:
+```{r}
+holiday_aus(2016:2017, state = "VIC")
+```
+
+
+```{r}
+ped_count <- ped_count %>%
+  mutate(holiday = date(Date_Time) %in% holiday_aus(2016:2017, state = "VIC")$date)
+```
+
+To reduce the complexity (and increase the speed) or our model, we can create a workday variable that combines the DayType and holiday variables (as the switched pattern for weekends and holidays are the same).
+```{r}
+ped_count <- ped_count %>%
+  mutate(workday = DayType == "Weekday" & !holiday)
+```
+
+### Lots of data!
+By reducing the complexity of the model we are making the estimation speed as fast as possible. Compared to similar state space models of this complexity, it shouldn't take long to fit the model. Please be patient :)
+
+## Estimating the model
+
+```{r}
+library(fasster)
+ped_count %>%
+  fasster(log(Count + 1) ~ poly(1) + trig(24))
+```
+
