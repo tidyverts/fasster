@@ -29,8 +29,6 @@ autoplot.FASSTER <- function(object, range.bars = FALSE, ...) {
 #' @param object A mable
 #' @param ... Additional arguments to be passed to \code{\link[fable]{autoplot.tbl_ts}}
 #'
-#' @seealso
-#'
 #' @export
 #' @importFrom ggplot2 autoplot ggplot aes geom_line facet_grid xlab ylab ggtitle
 ggfitted <- function(object, ...){
