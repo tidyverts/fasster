@@ -16,7 +16,7 @@ forecast.FASSTER <- function(object, data, newdata = NULL, h = NULL, ...){
     }
   }
 
-  idx <- data[[expr_text(index(.))]]
+  idx <- data[[expr_text(index(data))]]
   future_idx <- seq(tail(idx, 1), length.out = h + 1, by = time_unit(idx)) %>% tail(-1)
 
   if(!is_tsibble(newdata)){
