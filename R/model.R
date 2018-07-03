@@ -173,7 +173,7 @@ FASSTER <- function(data, formula, include=NULL, ...){
   resid <- filtered$y - filtered$f
   filtered$mod$V <- resid %>%
     as.numeric() %>%
-    var()
+    var(na.rm = TRUE)
 
   # Model to start forecasting from
   modFuture <- filtered$mod
