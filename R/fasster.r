@@ -14,18 +14,6 @@
 #' @keywords package
 NULL
 
-#' @importFrom fable %>%
-#' @export
-fable::`%>%`
-
-#' @importFrom fable autoplot
-#' @export
-fable::autoplot
-
-#' @importFrom fable components
-#' @export
-fable::components
-
 #' @rawNamespace import(stats, except = filter)
 #' @import rlang
 #' @import dlm
