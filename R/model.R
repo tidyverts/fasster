@@ -65,89 +65,8 @@ FASSTER <- function(data, formula, include=NULL, ...){
 
   # Define specials
   specials <- new_specials_env(
-    `%S%` = function(group, expr){
-      group_expr <- enexpr(group)
-      lhs <- factor(group)
-      groups <- levels(lhs) %>% map(~ as.numeric(lhs == .x)) %>% set_names(levels(lhs))
-
-      rhs <- parse_model_rhs(enexpr(expr), data = data, specials = specials)$args %>%
-        unlist(recursive = FALSE) %>%
-        reduce(`+`)
-
-      groups %>%
-        imap(function(X, groupVal){
-          if(is.null(rhs$JFF)){
-            rhs$JFF <- rhs$FF
-            rhs$X <- matrix(X, ncol = 1)
-          }
-          else{
-            rhs$X <- rhs$X * X
-            if(any(new_X_pos <- rhs$FF!=0 & rhs$JFF==0)){
-              new_X_col <- NCOL(rhs$X) + 1
-              rhs$JFF[new_X_pos] <- new_X_col
-              rhs$X <- cbind(rhs$X, X)
-            }
-          }
-          colnames(rhs$X) <- paste0(expr_text(group_expr), "_", groupVal, "/", colnames(rhs$X))
-          colnames(rhs$FF) <- paste0(expr_text(group_expr), "_", groupVal, "/", colnames(rhs$FF))
-          rhs
-        }) %>%
-        reduce(`+`)
-    },
-    `(` = function(expr){
-      parse_model_rhs(enexpr(expr), data = data, specials = specials)$args %>%
-        unlist(recursive = FALSE) %>%
-        reduce(`+`)
-    },
-    poly = function(...){
-      cl <- match.call()
-      out <- dlmModPoly(...)
-      colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
-      out
-    },
-    seas = function(...){
-      cl <- match.call()
-      out <- dlmModSeas(...)
-      colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
-      out
-    },
-    seasonal = function(...){
-      cl <- match.call()
-      out <- dlmModSeas(...)
-      colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
-      out
-    },
-    trig = function(...){
-      cl <- match.call()
-      out <- dlmModTrig(...)
-      colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
-      out
-    },
-    fourier = function(...){
-      cl <- match.call()
-      out <- dlmModTrig(...)
-      colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
-      out
-    },
-    ARMA = function(...){
-      cl <- match.call()
-      out <- dlmModARMA(...)
-      colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
-      out
-    },
-    custom = function(...){
-      cl <- match.call()
-      out <- dlm(...)
-      colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
-      out
-    },
-    xreg = function(...){
-      cn <- enexprs(...) %>% map_chr(expr_text)
-      out <- dlmModReg(cbind(...), addInt = FALSE)
-      colnames(out$FF) <- cn
-      out
-    },
-    parent_env = caller_env()
+    !!!fasster_specials,
+    parent_env = child_env(caller_env(), .data = data)
   )
 
   model_inputs <- parse_model(data, formula, specials = specials) %>%
@@ -208,6 +127,91 @@ FASSTER <- function(data, formula, include=NULL, ...){
 #' @usage NULL
 fasster <- FASSTER
 
+
+fasster_specials <- list(
+  `%S%` = function(group, expr){
+    group_expr <- enexpr(group)
+    lhs <- factor(group)
+    groups <- levels(lhs) %>% map(~ as.numeric(lhs == .x)) %>% set_names(levels(lhs))
+
+    rhs <- parse_model_rhs(enexpr(expr), data = .data, specials = specials)$args %>%
+      unlist(recursive = FALSE) %>%
+      reduce(`+`)
+
+    groups %>%
+      imap(function(X, groupVal){
+        if(is.null(rhs$JFF)){
+          rhs$JFF <- rhs$FF
+          rhs$X <- matrix(X, ncol = 1)
+        }
+        else{
+          rhs$X <- rhs$X * X
+          if(any(new_X_pos <- rhs$FF!=0 & rhs$JFF==0)){
+            new_X_col <- NCOL(rhs$X) + 1
+            rhs$JFF[new_X_pos] <- new_X_col
+            rhs$X <- cbind(rhs$X, X)
+          }
+        }
+        colnames(rhs$X) <- paste0(expr_text(group_expr), "_", groupVal, "/", colnames(rhs$X))
+        colnames(rhs$FF) <- paste0(expr_text(group_expr), "_", groupVal, "/", colnames(rhs$FF))
+        rhs
+      }) %>%
+      reduce(`+`)
+  },
+  `(` = function(expr){
+    parse_model_rhs(enexpr(expr), data = .data, specials = specials)$args %>%
+      unlist(recursive = FALSE) %>%
+      reduce(`+`)
+  },
+  poly = function(...){
+    cl <- match.call()
+    out <- dlmModPoly(...)
+    colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
+    out
+  },
+  seas = function(...){
+    cl <- match.call()
+    out <- dlmModSeas(...)
+    colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
+    out
+  },
+  seasonal = function(...){
+    cl <- match.call()
+    out <- dlmModSeas(...)
+    colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
+    out
+  },
+  trig = function(...){
+    cl <- match.call()
+    out <- dlmModTrig(...)
+    colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
+    out
+  },
+  fourier = function(...){
+    cl <- match.call()
+    out <- dlmModTrig(...)
+    colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
+    out
+  },
+  ARMA = function(...){
+    cl <- match.call()
+    out <- dlmModARMA(...)
+    colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
+    out
+  },
+  custom = function(...){
+    cl <- match.call()
+    out <- dlm(...)
+    colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
+    out
+  },
+  xreg = function(...){
+    cn <- enexprs(...) %>% map_chr(expr_text)
+    out <- dlmModReg(cbind(...), addInt = FALSE)
+    colnames(out$FF) <- cn
+    out
+  }
+)
 
 #' @importFrom fable model_sum
 #' @export
