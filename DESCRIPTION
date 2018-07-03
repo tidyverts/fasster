@@ -37,3 +37,4 @@ ByteCompile: true
 RoxygenNote: 6.0.1.9000
 Roxygen: list(markdown = TRUE, roclets=c('rd', 'collate', 'namespace'))
 Language: en-GB
+VignetteBuilder: knitr
