@@ -101,14 +101,15 @@ Fourier terms can be added to your model using the `fourier` function, and so to
 
 Factor seasonality is a simpler approach to including seasonality in the model, which is analogous to dummy variable seasonality in regression models. Factor seasonality does not provide control over the seasonal flexibility, and so a second parameter is not required. Seasonal factors are added using the `seas` function, so `seas(24)` would include the seasonal dummies for the daily pattern.
 
-As the multiple seasonal pattern in this data is switching between two single seasonal patterns, it is preferab
+Seasonal terms on their own are centered around zero, which is inconsistent with the center of the seasonal pattern in the pedestrian data. To shift the seasonal term to be correctly centered, we should also include an level using `poly(1)`. So correctly include our fourier seasonality, we would use `poly(1) + fourier(24,10)`.
+
 The multiple seasonal pattern in this data switches between two single seasonal patterns. To switch between seasonalities in our model, we would use the switching operator (`%S%`) on an variable that categorises days into weekdays and weekends.
 ```{r}
 ped_count <- ped_count %>%
   mutate(DayType = ifelse(wday(Date_Time, week_start = 1) > 5, "Weekend", "Weekday"))
 ```
 
-Using this variable, we can switch between our fourier seasonality using `DayType %S% fourier(24,10)`.
+Using this variable, we can switch between our fourier seasonality using `DayType %S% (poly(1) + fourier(24,10))`.
 
 ### Holiday effects
 Public holidays appear to affect pedestrian counts in a similar way to weekends. As a result, the holiday effects can also be modelled using the switching operator. For holidays to be captured by the model, we must create another variable that indicates which days are public holidays. A table of relevant public holidays can usually be found readily [online](http://www.business.vic.gov.au/victorian-public-holidays-and-daylight-saving/victorian-public-holidays-2016-2017). Fortunately, the tsibble package provides a data for holidays in Australia:
