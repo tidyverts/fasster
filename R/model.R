@@ -68,6 +68,13 @@ FASSTER <- function(data, formula, include=NULL, ...){
     !!!fasster_specials,
     parent_env = child_env(caller_env(), .data = data)
   )
+  specials <- specials %>%
+    as.list %>%
+    map(~ {
+      assign(".specials", specials, envir = get_env(.x))
+      .x
+      }) %>%
+    as.environment()
 
   model_inputs <- parse_model(data, formula, specials = specials) %>%
     map(eval_tidy)
@@ -134,7 +141,7 @@ fasster_specials <- list(
     lhs <- factor(group)
     groups <- levels(lhs) %>% map(~ as.numeric(lhs == .x)) %>% set_names(levels(lhs))
 
-    rhs <- parse_model_rhs(enexpr(expr), data = .data, specials = specials)$args %>%
+    rhs <- parse_model_rhs(enexpr(expr), data = .data, specials = .specials)$args %>%
       unlist(recursive = FALSE) %>%
       reduce(`+`)
 
@@ -159,7 +166,7 @@ fasster_specials <- list(
       reduce(`+`)
   },
   `(` = function(expr){
-    parse_model_rhs(enexpr(expr), data = .data, specials = specials)$args %>%
+    parse_model_rhs(enexpr(expr), data = .data, specials = .specials)$args %>%
       unlist(recursive = FALSE) %>%
       reduce(`+`)
   },

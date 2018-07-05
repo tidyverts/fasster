@@ -30,6 +30,13 @@ forecast.FASSTER <- function(object, data, newdata = NULL, h = NULL, ...){
     !!!fasster_specials,
     parent_env = child_env(caller_env(), .data = data)
   )
+  specials <- specials %>%
+    as.list %>%
+    map(~ {
+      assign(".specials", specials, envir = get_env(.x))
+      .x
+    }) %>%
+    as.environment()
 
   X <- parse_model_rhs(model_rhs(object%@%"model"), data = newdata, specials = specials)$args %>%
     unlist(recursive = FALSE) %>%
