@@ -83,6 +83,8 @@ ped_count <- ped_count %>%
   fill_na()
 ```
 
+(Note that the rwalkr package automatically makes these missing values explicit, but the original data contains implicit missing values)
+
 ### Non-negativity
 There are a variety of ways to ensure non-negativity in a model. A common and simple approach is to model the log transformed data, and then back-transform onto the original scale. This can be problematic with count data or low-volume observations, because to do this transformation, all observations must be greater than zero. Unfortunately for us, there are `r ped_count %>% filter(Count == 0) %>% NROW` cases of zero counts, and so a log transformation cannot be used. Fortunately, we can instead use a "log plus one" transformation instead, so our model's response variable can be written using `log(Count + 1)`.
 
