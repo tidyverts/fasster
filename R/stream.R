@@ -2,17 +2,16 @@
 #' @export
 stream.FASSTER <- function(object, data, ...){
   # Define specials
+  specials <- child_env(caller_env())
   specials <- new_specials_env(
     !!!fasster_specials,
-    parent_env = child_env(caller_env(), .data = data)
+    .env = specials,
+    .bury = FALSE,
+    .vals = list(
+      .data = data,
+      .specials = specials
+    )
   )
-  specials <- specials %>%
-    as.list %>%
-    map(~ {
-      assign(".specials", specials, envir = get_env(.x))
-      .x
-    }) %>%
-    as.environment()
 
   # Extend model
   X <- parse_model_rhs(model_rhs(object%@%"model"), data = data, specials = specials)$args %>%
