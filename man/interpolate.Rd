@@ -9,7 +9,7 @@ interpolate(object, ...)
 \arguments{
 \item{object}{a mable}
 
-\item{...}{}
+\item{...}{Not used}
 }
 \value{
 A tsibble with missing values interpolated

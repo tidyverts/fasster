@@ -3,7 +3,7 @@
 #' Fills in the missing values from a model's response variable using the fitted values from the model.
 #'
 #' @param object a mable
-#' @param ...
+#' @param ... Not used
 #'
 #' @return
 #' A tsibble with missing values interpolated
