@@ -76,8 +76,14 @@ fasster_specials <- list(
     out
   },
   xreg = function(...){
-    cn <- enexprs(...) %>% map_chr(expr_text)
-    out <- dlmModReg(cbind(...), addInt = FALSE)
+    xexpr <- enexprs(...)
+    cn <- xexpr %>% map_chr(expr_text)
+
+    model_formula <- new_formula(
+      lhs = NULL,
+      rhs = reduce(c(0, xexpr), ~ call2("+", .x, .y))
+    )
+    out <- dlmModReg(model.matrix(model_formula, data = .data), addInt = FALSE)
     colnames(out$FF) <- cn
     out
   }
