@@ -34,7 +34,7 @@ forecast.FASSTER <- function(object, data, newdata = NULL, h = NULL, ...){
     .env = specials,
     .bury = FALSE,
     .vals = list(
-      .data = data,
+      .data = newdata,
       .specials = specials
     )
   )
