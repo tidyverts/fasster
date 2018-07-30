@@ -30,7 +30,11 @@ An implementation of the FASSTER (Forecasting with Additive Switching of Seasona
 
 ## Development cycle
 
-This package is early in development, and there are plans to make substantial changes in the future. These changes will be make to support a consistent modelling interface with the [fable](https://github.com/tidyverts/fable) package. After the modelling and forecasting tools in fable have been developed, this package will be overhauled to support better heuristic optimisation techniques and sparse matrix algebra (removing the dlm package dependency) to make fasster even faster. Until then, using this package may prove difficult due to limited support and documentation. These improvements are expected to be introduced within a few months.
+This package is early in development, and there are plans to make substantial changes in the future. Recently the package has been rewritten to support [fable](https://github.com/tidyverts/fable) style modelling. This resulted in a slight interface change, which may have broken previous code (now fasster recommends [tsibble](https://github.com/tidyverts/tsibble) datasets, and discourages `ts` data).
+
+The latest usage examples can be found in my useR! 2018 talk: [slides](https://www.mitchelloharawild.com/user2018/#1), [video](https://www.youtube.com/watch?v=6YlboftSalY), [source](https://github.com/mitchelloharawild/fasster_user2018).
+
+There are further plans to improve the heuristic optimisation techniques and better use sparse matrix algebra (removing the dlm package dependency) to make fasster even faster. Until then, using this package may prove difficult due to limited support and documentation. These improvements are expected to be introduced within a few months.
 
 ## Installation
 
@@ -79,23 +83,15 @@ fit %>% summary
 The interface for creating a FASSTER model introduces a new formula construct, `%S%`, known as the switch operator. This allows modelling of more complex patterns such as multiple seasonality by modelling the components for each group seperately and switching between them.
 
 ```{r complex}
-taylor_elec <- tsibble(
-  DateTime = seq(ymd_h("2000-6-5 00"), by="30 mins", length.out=length(taylor)),
-  Demand = as.numeric(taylor),
-  index = DateTime
-)
+elec_tr <- tsibbledata::elecdemand %>%
+  filter(index < ymd("2014-03-01"))
 
-daytype <- function(date){
-  factor(ifelse(wday(date) %in% 2:6, "Weekday", "Weekend"), levels = c("Weekday", "Weekend"))
-}
-
-taylor_elec
-
-fit_switch <- taylor_elec %>% 
-  FASSTER(Demand ~ daytype(DateTime) %S% (poly(1) + trig(48, 10))) 
-
-fit_switch %>%
-  summary
+elec_fit <- elec_tr %>%
+  fasster(
+    log(Demand) ~ 
+      WorkDay %S% (trig(48, 16) + poly(1)) + 
+      Temperature + I(Temperature^2)
+  )
 ```
 
 ### Decomposing
@@ -109,7 +105,7 @@ fit %>%
 ```
 
 ```{r decompose-complex}
-fit_switch %>%
+elec_fit %>%
   components
 ```
 
@@ -122,19 +118,20 @@ The tools made available by *fasster* are designed to integrate seamlessly with 
 ```{r forecast}
 library(fable)
 
-# fit %>% accuracy
-# Currently not implemented
-
 fit %>% 
   forecast(h=24) %>%
   autoplot
 ```
 
-Future index values are automatically produced and used where necessary in the model specification.
+Future index values are automatically produced and used where necessary in the model specification. If additional information is required by the model (such as `WorkDay` and `Temperature`)
 
 ```{r complex_fc}
-fit_switch %>% 
-  forecast(h = 48*7*2) %>% 
+elec_ts <- tsibbledata::elecdemand %>%
+  filter(index >= ymd("2014-03-01"),
+         index < ymd("2014-04-01")) %>% 
+  select(-Demand)
+elec_fit %>% 
+  forecast(newdata = elec_ts) %>% 
   autoplot
 ```
 
