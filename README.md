@@ -117,7 +117,7 @@ components for each group seperately and switching between them.
 
 ``` r
 elec_tr <- tsibbledata::elecdemand %>%
-  filter(index < ymd("2014-03-01"))
+  filter(index < lubridate::ymd("2014-03-01"))
 
 elec_fit <- elec_tr %>%
   fasster(
@@ -201,8 +201,8 @@ model (such as `WorkDay` and `Temperature`)
 
 ``` r
 elec_ts <- tsibbledata::elecdemand %>%
-  filter(index >= ymd("2014-03-01"),
-         index < ymd("2014-04-01")) %>% 
+  filter(index >= lubridate::ymd("2014-03-01"),
+         index < lubridate::ymd("2014-04-01")) %>% 
   select(-Demand)
 elec_fit %>% 
   forecast(newdata = elec_ts) %>% 
