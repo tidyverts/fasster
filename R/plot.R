@@ -36,9 +36,9 @@ ggfitted <- function(object, ...){
   if(inherits(object, "mable")){
     fablelite::getResponse(object) %>%
       left_join(fitted(object), by = expr_text(index(.))) %>%
-      gather("type", "value") %>%
+      gather(!!sym("type"), !!sym("value")) %>%
       autoplot(var=!!sym("value")) +
-      ggtitle(paste0("Fitted values from ", pillar_shaft(object$model)[[1]]))
+      ggtitle(paste0("Fitted values from ", model_sum(object$model[[1]])))
   }
   else{
     stop("This object is not supported")
