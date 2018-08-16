@@ -1,4 +1,3 @@
-#' @importFrom fable components
 #' @importFrom purrr map_dfc
 #' @export
 components.FASSTER <- function(object, ...) {

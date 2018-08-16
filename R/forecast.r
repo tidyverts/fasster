@@ -1,8 +1,5 @@
 #' @importFrom dlm dlmSvd2var
-#' @importFrom fable forecast
-#' @importFrom tsibblestats get_frequencies
 #' @importFrom utils tail
-#' @importFrom fable parse_model_rhs model_rhs new_fcdist biasadj
 #' @export
 forecast.FASSTER <- function(object, data, newdata = NULL, h = NULL, ...){
   mod <- object$"dlm_future"

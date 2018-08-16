@@ -17,6 +17,7 @@ NULL
 #' @rawNamespace import(stats, except = filter)
 #' @import rlang
 #' @import dlm
+#' @import fablelite
 #' @import tsibble
 NULL
 

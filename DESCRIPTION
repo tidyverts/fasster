@@ -4,7 +4,7 @@ Title: Fast Additive Switching of Seasonality, Trend and Exogenous Regressors
 Description: Implementation of the FASSTER model for forecasting time series with multiple seasonalities using switching states.
 Depends:
     R (>= 3.2.0),
-    fable
+    fablelite
 Imports:
     dlm,
     tsibble,
@@ -12,7 +12,6 @@ Imports:
     purrr,
     rlang,
     stats,
-    tsibblestats,
     tidyselect
 Suggests:
     tsibbledata,
@@ -25,9 +24,8 @@ Suggests:
     covr
 Remotes:
     tidyverts/tsibble,
-    tidyverts/tsibblestats,
     tidyverts/tsibbledata,
-    tidyverts/fable,
+    tidyverts/fablelite,
     tidyverse/ggplot2
 Authors@R: person("Mitchell", "O'Hara-Wild", email = "mail@mitchelloharawild.com", role = c("aut", "cre"))
 URL: https://github.com/mitchelloharawild/fasster

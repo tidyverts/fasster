@@ -43,7 +43,6 @@
 #'   FASSTER(mdeaths ~ fdeaths + poly(1) + trig(12))
 #'
 #' @rdname fasster-model
-#' @importFrom fable new_specials_env parse_model parse_model_rhs model_lhs traverse multi_univariate invert_transformation mable
 #' @importFrom purrr reduce imap map_chr map
 #' @export
 FASSTER <- function(data, formula, include=NULL, ...){
@@ -131,7 +130,6 @@ FASSTER <- function(data, formula, include=NULL, ...){
 #' @usage NULL
 fasster <- FASSTER
 
-#' @importFrom fable model_sum
 #' @export
 model_sum.FASSTER <- function(x){
   "FASSTER"

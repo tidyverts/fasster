@@ -27,14 +27,14 @@ autoplot.FASSTER <- function(object, range.bars = FALSE, ...) {
 #' Plots fitted and observed values with autoplot methods for \code{tbl_ts} using ggplot2.
 #'
 #' @param object A mable
-#' @param ... Additional arguments to be passed to \code{fable::autoplot.tbl_ts}
+#' @param ... Additional arguments to be passed to \code{fablelite::autoplot.tbl_ts}
 #'
 #' @export
 #' @importFrom ggplot2 autoplot ggplot aes geom_line facet_grid xlab ylab ggtitle
 ggfitted <- function(object, ...){
   .Deprecated()
   if(inherits(object, "mable")){
-    fable::getResponse(object) %>%
+    fablelite::getResponse(object) %>%
       left_join(fitted(object), by = expr_text(index(.))) %>%
       gather("type", "value") %>%
       autoplot(var=!!sym("value")) +

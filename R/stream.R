@@ -1,4 +1,3 @@
-#' @importFrom fable stream
 #' @export
 stream.FASSTER <- function(object, data, ...){
   # Define specials
