@@ -53,6 +53,8 @@ FASSTER <- function(data, formula, include=NULL, ...){
   # Coerce data
   data <- as_tsibble(data)
 
+  formula <- validate_model(formula, data)
+
   # Handle multivariate inputs
   if(n_keys(data) > 1){
     return(multi_univariate(data, cl))
@@ -75,14 +77,13 @@ FASSTER <- function(data, formula, include=NULL, ...){
     )
   )
 
-  model_inputs <- parse_model(data, formula, specials = specials) %>%
-    map(eval_tidy)
+  model_inputs <- parse_model(data, formula, specials = specials)
 
   dlmModel <- model_inputs$args %>%
     unlist(recursive = FALSE) %>%
     reduce(`+`)
 
-  response <- eval_tidy(model_lhs(model_inputs$model), data = data)
+  response <- eval_tidy(model_lhs(model_inputs$model), data=data)
 
   dlmModel <- response %>%
     dlm_filterSmoothHeuristic(dlmModel)
@@ -111,20 +112,17 @@ FASSTER <- function(data, formula, include=NULL, ...){
   modFuture$W <- var(wt)
   modFuture$m0 <- filtered$m %>% tail(1) %>% as.numeric()
 
-  fitted <- invert_transformation(eval_tidy(model_inputs$transformation))(filtered$f)
+  fitted <- invert_transformation(model_inputs$transformation)(filtered$f)
 
   fit <- list(dlm = dlmModel, dlm_future = modFuture,
               fitted = fitted, residuals = resid, index = data %>% .[[expr_text(index(data))]],
               states = filtered$a, heuristic = "filterSmooth") %>%
-    enclass("FASSTER",
-            !!!model_inputs[c("model", "transformation", "response")])
+    add_class("FASSTER")
 
   mable(
-    key_vals = as.list(data)[key_vars(data)],
-    data = (data %>%
-              group_by(!!!syms(key_vars(.))) %>%
-              nest)$data,
-    model = list(fit)
+    data,
+    model = fit,
+    model_inputs
   )
 }
 
