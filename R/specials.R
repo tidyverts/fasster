@@ -4,7 +4,7 @@ fasster_specials <- list(
     lhs <- factor(group)
     groups <- levels(lhs) %>% map(~ as.numeric(lhs == .x)) %>% set_names(levels(lhs))
 
-    rhs <- parse_model_rhs(enexpr(expr), data = .data, specials = .specials)$args %>%
+    rhs <- parse_model_rhs(enexpr(expr), data = .data, specials = .specials)$specials %>%
       unlist(recursive = FALSE) %>%
       reduce(`+`)
 
@@ -29,7 +29,7 @@ fasster_specials <- list(
       reduce(`+`)
   },
   `(` = function(expr){
-    parse_model_rhs(enexpr(expr), data = .data, specials = .specials)$args %>%
+    parse_model_rhs(enexpr(expr), data = .data, specials = .specials)$specials %>%
       unlist(recursive = FALSE) %>%
       reduce(`+`)
   },

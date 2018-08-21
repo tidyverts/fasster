@@ -13,7 +13,7 @@ stream.FASSTER <- function(object, data, ...){
   )
 
   # Extend model
-  X <- parse_model_rhs(model_rhs(object%@%"model"), data = data, specials = specials)$args %>%
+  X <- parse_model_rhs(model_rhs(object%@%"model"), data = data, specials = specials)$specials %>%
     unlist(recursive = FALSE) %>%
     reduce(`+`) %>%
     .$X

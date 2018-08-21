@@ -78,7 +78,7 @@ FASSTER <- function(data, formula, include=NULL, ...){
 
   model_inputs <- parse_model(data, formula, specials = specials)
 
-  dlmModel <- model_inputs$args %>%
+  dlmModel <- model_inputs$specials %>%
     unlist(recursive = FALSE) %>%
     reduce(`+`)
 
