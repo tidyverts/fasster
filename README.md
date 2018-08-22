@@ -3,7 +3,7 @@ fasster <img src="man/figure/logo.png" align="right" />
 =======================================================
 
 [![Travis-CI Build
-Status](https://travis-ci.org/mitchelloharawild/fasster.svg?branch=master)](https://travis-ci.org/mitchelloharawild/fasster)
+Status](https://travis-ci.org/tidyverts/fasster.svg?branch=master)](https://travis-ci.org/tidyverts/fasster)
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 <!-- [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/fasster)](https://cran.r-project.org/package=fasster) -->
 <!-- [![Downloads](http://cranlogs.r-pkg.org/badges/fasster?color=brightgreen)](https://cran.r-project.org/package=fasster) -->
@@ -141,7 +141,7 @@ fit %>%
   components
 #> # A tsibble: 72 x 3 [1M]
 #>       index `poly(1)` `trig(12)`
-#>  *    <mth>     <dbl>      <dbl>
+#>       <mth>     <dbl>      <dbl>
 #>  1 1973 Jan     9740.     -795. 
 #>  2 1973 Feb     9754.    -1546. 
 #>  3 1973 Mar     9719.     -758. 
@@ -160,7 +160,7 @@ elec_fit %>%
   components
 #> # A tsibble: 2,832 x 7 [30m]
 #>    index               `I(Temperature^… Temperature `WorkDay_0/poly…
-#>  * <dttm>                         <dbl>       <dbl>            <dbl>
+#>    <dttm>                         <dbl>       <dbl>            <dbl>
 #>  1 2014-01-01 00:00:00         0.000512     -0.0189             1.55
 #>  2 2014-01-01 00:30:00         0.000512     -0.0189             1.55
 #>  3 2014-01-01 01:00:00         0.000512     -0.0189             1.55
