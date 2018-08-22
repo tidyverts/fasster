@@ -20,23 +20,18 @@ Development cycle
 -----------------
 
 This package is early in development, and there are plans to make
-substantial changes in the future. Recently the package has been
-rewritten to support [fable](https://github.com/tidyverts/fable) style
-modelling. This resulted in a slight interface change, which may have
-broken previous code (now fasster recommends
-[tsibble](https://github.com/tidyverts/tsibble) datasets, and
-discourages `ts` data).
+substantial changes in the future.
 
-The latest usage examples can be found in my useR! 2018 talk:
-[slides](https://www.mitchelloharawild.com/user2018/#1),
+The latest usage examples of using fasster can be found in my useR! 2018
+talk: [slides](https://www.mitchelloharawild.com/user2018/#1),
 [video](https://www.youtube.com/watch?v=6YlboftSalY),
 [source](https://github.com/mitchelloharawild/fasster_user2018).
 
 There are further plans to improve the heuristic optimisation techniques
 and better use sparse matrix algebra (removing the dlm package
-dependency) to make fasster even faster. Until then, using this package
-may prove difficult due to limited support and documentation. These
-improvements are expected to be introduced within a few months.
+dependency) to make fasster even faster. Implementing this will likely
+result in a revision of the model object structure, but user directed
+functionality should remain the same.
 
 Installation
 ------------
