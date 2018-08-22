@@ -23,6 +23,7 @@ library(fable)
 
 [![Travis-CI Build Status](https://travis-ci.org/tidyverts/fasster.svg?branch=master)](https://travis-ci.org/tidyverts/fasster)
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![Coverage status](https://codecov.io/gh/tidyverts/fasster/branch/master/graph/badge.svg)](https://codecov.io/github/tidyverts/fasster?branch=master)
 <!-- [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/fasster)](https://cran.r-project.org/package=fasster) -->
 <!-- [![Downloads](http://cranlogs.r-pkg.org/badges/fasster?color=brightgreen)](https://cran.r-project.org/package=fasster) -->
 
