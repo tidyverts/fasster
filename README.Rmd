@@ -84,7 +84,7 @@ The interface for creating a FASSTER model introduces a new formula construct, `
 
 ```{r complex}
 elec_tr <- tsibbledata::elecdemand %>%
-  filter(index < ymd("2014-03-01"))
+  filter(index < lubridate::ymd("2014-03-01"))
 
 elec_fit <- elec_tr %>%
   fasster(
@@ -127,8 +127,8 @@ Future index values are automatically produced and used where necessary in the m
 
 ```{r complex_fc}
 elec_ts <- tsibbledata::elecdemand %>%
-  filter(index >= ymd("2014-03-01"),
-         index < ymd("2014-04-01")) %>% 
+  filter(index >= lubridate::ymd("2014-03-01"),
+         index < lubridate::ymd("2014-04-01")) %>% 
   select(-Demand)
 elec_fit %>% 
   forecast(newdata = elec_ts) %>% 
