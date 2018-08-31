@@ -32,7 +32,7 @@ stream.FASSTER <- function(object, data, ...){
   dlmModel$X <- rbind(object$dlm$X, X)
   resid <- c(object$residuals, filtered$y - filtered$f)
   states <- rbind(object$states, filtered$a)
-  fitted <- c(object$fitted, invert_transformation(object%@%"transformation")(filtered$f))
+  fitted <- c(object$fitted, filtered$f)
 
   # Update model variance
   filtered$mod$V <- resid %>%
