@@ -5,8 +5,8 @@ sudo: false
 cache: packages
 
 after_failure:
-  - cat $TRAVIS_BUILD_DIR/fable.Rcheck/00install.out
-  - cat $TRAVIS_BUILD_DIR/fable.Rcheck/00check.log
+  - cat $TRAVIS_BUILD_DIR/fasster.Rcheck/00install.out
+  - cat $TRAVIS_BUILD_DIR/fasster.Rcheck/00check.log
 
 after_success:
   - Rscript -e 'covr::codecov()'
