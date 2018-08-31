@@ -1,28 +1,13 @@
 #' @importFrom dlm dlmSvd2var
 #' @importFrom utils tail
 #' @export
-forecast.FASSTER <- function(object, data, newdata = NULL, h = NULL, ...){
+forecast.FASSTER <- function(object, data, newdata = NULL, ...){
+  if(!is_regular(newdata)){
+    abort("Forecasts must be regularly spaced")
+  }
+  h <- NROW(newdata)
+
   mod <- object$"dlm_future"
-
-  if(!is.null(newdata)){
-    h <- NROW(newdata)
-  }
-  else{
-    if(is.null(h)){
-      h <- get_frequencies("smallest", data)*2
-    }
-  }
-
-  if(!is_tsibble(newdata)){
-    idx <- data[[expr_text(index(data))]]
-    future_idx <- seq(tail(idx, 1), length.out = h + 1, by = time_unit(idx)) %>% tail(-1)
-    newdata <- c(list(future_idx), as.list(newdata))
-    names(newdata)[1] <- expr_text(index(data))
-    newdata <- as_tsibble(newdata, index = !!index(data))
-  }
-  else{
-    future_idx <- newdata %>% .[[expr_text(index(.))]]
-  }
 
   # Build model on newdata
   specials <- child_env(caller_env())
@@ -36,7 +21,7 @@ forecast.FASSTER <- function(object, data, newdata = NULL, h = NULL, ...){
     )
   )
 
-  X <- parse_model_rhs(model_rhs(object%@%"model"), data = newdata, specials = specials)$specials %>%
+  X <- parse_model_rhs(model_rhs((object%@%"fable")$model), data = newdata, specials = specials)$specials %>%
     unlist(recursive = FALSE) %>%
     reduce(`+`) %>%
     .$X
@@ -72,8 +57,5 @@ forecast.FASSTER <- function(object, data, newdata = NULL, h = NULL, ...){
 
   se <- sqrt(unlist(Q))
 
-  tsibble(!!index(data) := future_idx,
-          mean = biasadj(invert_transformation(object%@%"transformation"), se^2)(c(f)),
-          distribution = new_fcdist(qnorm, c(f), sd = se, transformation = invert_transformation(object%@%"transformation"), abbr = "N"),
-          index = !!index(data))
+  construct_fc(newdata, f, se, new_fcdist(qnorm, c(f), sd = se, abbr = "N"))
 }

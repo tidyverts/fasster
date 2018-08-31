@@ -12,13 +12,14 @@ stream.FASSTER <- function(object, data, ...){
     )
   )
 
+  model <- (object%@%"fable")$model
   # Extend model
-  X <- parse_model_rhs(model_rhs(object%@%"model"), data = data, specials = specials)$specials %>%
+  X <- parse_model_rhs(model_rhs(model), data = data, specials = specials)$specials %>%
     unlist(recursive = FALSE) %>%
     reduce(`+`) %>%
     .$X
 
-  response <- eval_tidy(model_lhs(object%@%"model"), data = data)
+  response <- eval_tidy(model_lhs(model), data = data)
 
   dlmModel <- object$dlm_future
   dlmModel$X <- X
