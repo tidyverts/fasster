@@ -1,7 +1,7 @@
 #' @importFrom dlm dlmSvd2var
 #' @importFrom utils tail
 #' @export
-forecast.FASSTER <- function(object, data, newdata = NULL, ...){
+forecast.FASSTER <- function(object, newdata = NULL, ...){
   if(!is_regular(newdata)){
     abort("Forecasts must be regularly spaced")
   }
