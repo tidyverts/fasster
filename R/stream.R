@@ -12,7 +12,7 @@ stream.FASSTER <- function(object, data, ...){
     )
   )
 
-  model <- (object%@%"fable")$model
+  model <- formula(object)
   # Extend model
   X <- parse_model_rhs(model_rhs(model), data = data, specials = specials)$specials %>%
     unlist(recursive = FALSE) %>%

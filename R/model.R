@@ -137,7 +137,7 @@ model_sum.FASSTER <- function(x){
 
 #' @export
 format.FASSTER <- function(x, ...){
-  cat(paste("FASSTER Model:\n", deparse((x%@%"fable")$model), "\n\n"))
+  cat(paste("FASSTER Model:\n", deparse(formula(x)), "\n\n"))
 }
 
 #' @export
@@ -149,7 +149,7 @@ print.FASSTER <- function(x, ...){
 #' @importFrom tsibble group_by summarise transmute
 #' @importFrom rlang as_quosure sym
 summary.FASSTER <- function(object, ...){
-  cat(paste("FASSTER Model:\n", deparse((object%@%"fable")$model), "\n\n"))
+  cat(paste("FASSTER Model:\n", deparse(formula(object)), "\n\n"))
   cat("Estimated variances:\n")
   cat(" State noise variances (W):\n")
   data.frame(term = colnames(object$dlm$FF), W = diag(object$dlm$W)) %>%

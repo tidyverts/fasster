@@ -21,7 +21,7 @@ forecast.FASSTER <- function(object, newdata = NULL, ...){
     )
   )
 
-  X <- parse_model_rhs(model_rhs((object%@%"fable")$model), data = newdata, specials = specials)$specials %>%
+  X <- parse_model_rhs(model_rhs(formula(object)), data = newdata, specials = specials)$specials %>%
     unlist(recursive = FALSE) %>%
     reduce(`+`) %>%
     .$X
