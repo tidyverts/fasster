@@ -114,7 +114,7 @@ components for each group seperately and switching between them.
 
 ``` r
 elec_tr <- tsibbledata::elecdemand %>%
-  filter(index < lubridate::ymd("2014-03-01"))
+  dplyr::filter(index < lubridate::ymd("2014-03-01"))
 
 elec_fit <- elec_tr %>%
   fasster(
@@ -207,3 +207,9 @@ elec_fit %>%
 ```
 
 ![](man/figure/complex_fc-1.png)
+
+------------------------------------------------------------------------
+
+Please note that this project is released with a [Contributor Code of
+Conduct](.github/CODE_OF_CONDUCT.md). By participating in this project
+you agree to abide by its terms.
