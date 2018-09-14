@@ -85,7 +85,7 @@ The interface for creating a FASSTER model introduces a new formula construct, `
 
 ```{r complex}
 elec_tr <- tsibbledata::elecdemand %>%
-  filter(index < lubridate::ymd("2014-03-01"))
+  dplyr::filter(index < lubridate::ymd("2014-03-01"))
 
 elec_fit <- elec_tr %>%
   fasster(
