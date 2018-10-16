@@ -130,6 +130,16 @@ FASSTER <- function(data, formula, include=NULL, ...){
 fasster <- FASSTER
 
 #' @export
+fitted.FASSTER <- function(object, ...){
+  object$est[[".fitted"]]
+}
+
+#' @export
+residuals.FASSTER <- function(object, ...){
+  object$est[[".resid"]]
+}
+
+#' @export
 model_sum.FASSTER <- function(x){
   "FASSTER"
 }
