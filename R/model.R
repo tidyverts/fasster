@@ -82,7 +82,8 @@ FASSTER <- function(data, formula, include=NULL, ...){
     unlist(recursive = FALSE) %>%
     reduce(`+`)
 
-  response <- eval_tidy(model_lhs(model_inputs$model), data=data)
+  est <- transmute(data, !!model_lhs(model_inputs$model))
+  response <- est[[measured_vars(est)]]
 
   dlmModel <- response %>%
     dlm_filterSmoothHeuristic(dlmModel)
@@ -111,11 +112,9 @@ FASSTER <- function(data, formula, include=NULL, ...){
   modFuture$W <- var(wt)
   modFuture$m0 <- filtered$m %>% tail(1) %>% as.numeric()
 
-  fitted <- invert_transformation(model_inputs$transformation)(filtered$f)
-
   fit <- list(dlm = dlmModel, dlm_future = modFuture,
-              fitted = fitted, residuals = resid, index = data %>% .[[expr_text(index(data))]],
-              states = filtered$a, heuristic = "filterSmooth") %>%
+              est = est %>% mutate(.fitted = filtered$f, .resid = resid),
+              states = est[expr_text(index(est))] %>% cbind(`colnames<-`(filtered$a, colnames(dlmModel$FF)))) %>%
     add_class("FASSTER")
 
   mable(
