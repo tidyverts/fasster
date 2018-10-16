@@ -8,11 +8,9 @@ Depends:
 Imports:
     dlm,
     tsibble,
-    ggplot2 (>= 2.2.1.9000),
     purrr,
     rlang,
-    stats,
-    tidyselect
+    stats
 Suggests:
     tsibbledata,
     lubridate,
