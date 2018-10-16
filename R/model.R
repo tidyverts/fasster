@@ -114,7 +114,7 @@ FASSTER <- function(data, formula, include=NULL, ...){
 
   fit <- list(dlm = dlmModel, dlm_future = modFuture,
               est = est %>% mutate(.fitted = filtered$f, .resid = resid),
-              states = est[expr_text(index(est))] %>% cbind(`colnames<-`(filtered$a, colnames(dlmModel$FF)))) %>%
+              states = filtered$a) %>%
     add_class("FASSTER")
 
   mable(
