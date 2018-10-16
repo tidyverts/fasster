@@ -19,12 +19,12 @@ Suggests:
     rmarkdown,
     testthat,
     spelling,
-    covr
+    covr,
+    ggplot2
 Remotes:
     tidyverts/tsibble,
     tidyverts/tsibbledata,
-    tidyverts/fablelite,
-    tidyverse/ggplot2
+    tidyverts/fablelite
 Authors@R: person("Mitchell", "O'Hara-Wild", email = "mail@mitchelloharawild.com", role = c("aut", "cre"))
 URL: https://github.com/mitchelloharawild/fasster
 BugReports: https://github.com/mitchelloharawild/fasster/issues
