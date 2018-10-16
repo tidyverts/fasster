@@ -131,12 +131,12 @@ fasster <- FASSTER
 
 #' @export
 fitted.FASSTER <- function(object, ...){
-  object$est[[".fitted"]]
+  select(object$est, ".fitted")
 }
 
 #' @export
 residuals.FASSTER <- function(object, ...){
-  object$est[[".resid"]]
+  select(object$est, ".resid")
 }
 
 #' @export
