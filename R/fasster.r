@@ -14,7 +14,7 @@
 #' @keywords package
 NULL
 
-#' @rawNamespace import(stats, except = filter)
+#' @rawNamespace import(stats, except = c(simulate, filter))
 #' @import rlang
 #' @import dlm
 #' @import fablelite
