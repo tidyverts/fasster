@@ -19,7 +19,8 @@ stream.FASSTER <- function(object, new_data, ...){
     reduce(`+`) %>%
     .$X
 
-  response <- eval_tidy(model_lhs(model), data = data)
+  est <- transmute(new_data, !!model_lhs(model))
+  response <- est[[measured_vars(est)]]
 
   dlmModel <- object$dlm_future
   dlmModel$X <- X
@@ -33,7 +34,6 @@ stream.FASSTER <- function(object, new_data, ...){
   dlmModel$X <- rbind(object$dlm$X, X)
   resid <- c(object$residuals, filtered$y - filtered$f)
   states <- rbind(object$states, filtered$a)
-  fitted <- c(object$fitted, filtered$f)
 
   # Update model variance
   filtered$mod$V <- resid %>%
@@ -51,13 +51,10 @@ stream.FASSTER <- function(object, new_data, ...){
   modFuture$W <- var(wt)
   modFuture$m0 <- filtered$m %>% tail(1) %>% as.numeric()
 
-
   object$dlmModel <- dlmModel
   object$dlm_future <- modFuture
-  object$resid <- resid
   object$states <- states
-  object$fitted <- fitted
-  object$index <- c(object$index, data %>% .[[expr_text(index(data))]])
+  object$est <- rbind(object$est, est %>% mutate(.fitted = filtered$f, .resid = filtered$y - filtered$f))
 
   object
 }
