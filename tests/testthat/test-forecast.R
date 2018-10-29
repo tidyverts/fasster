@@ -4,7 +4,7 @@ test_that("Test fasster forecasting", {
   fc1 <- forecast(USAccDeaths_fit)
   expect_equal(NROW(fc1), 24)
 
-  fc2 <- forecast(USAccDeaths_fit, 3)
+  fc2 <- forecast(USAccDeaths_fit, h = 3)
   expect_equal(NROW(fc2), 3)
 
   future_idx <- tsibble::yearmonth(as.Date(USAccDeaths$index) + months(NROW(USAccDeaths)))
