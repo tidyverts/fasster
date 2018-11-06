@@ -11,6 +11,6 @@ test_that("Test fasster forecasting", {
   fc3 <- forecast(USAccDeaths_fit, newdata = tsibble::as_tsibble(list(index = future_idx), index = index))
   expect_equal(NROW(fc3), NROW(USAccDeaths))
 
-  expect_equal(fc1$mean[1:3], fc2$mean[1:3])
-  expect_equal(fc1$mean[1:3], fc3$mean[1:3])
+  expect_equal(fc1$value[1:3], fc2$value[1:3])
+  expect_equal(fc1$value[1:3], fc3$value[1:3])
 })
