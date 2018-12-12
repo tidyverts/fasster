@@ -45,7 +45,7 @@
 #' @rdname fasster-model
 #' @importFrom purrr reduce imap map_chr map
 #' @export
-FASSTER <- fablelite::new_model_definition(
+FASSTER <- fablelite::define_model(
   train = function(.data, formula, specials, include = NULL){
     if(length(measured_vars(.data)) > 1){
       abort("Only univariate responses are supported by FASSTER.")
