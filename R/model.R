@@ -45,84 +45,57 @@
 #' @rdname fasster-model
 #' @importFrom purrr reduce imap map_chr map
 #' @export
-FASSTER <- function(data, formula, include=NULL, ...){
-  # Capture user call
-  cl <- call_standardise(match.call())
+FASSTER <- fablelite::new_model_definition(
+  train = function(.data, formula, specials, include = NULL){
+    if(length(measured_vars(.data)) > 1){
+      abort("Only univariate responses are supported by FASSTER.")
+    }
 
-  # Coerce data
-  data <- as_tsibble(data)
+    # Include only the end of the data
+    if (!is.null(include)){
+      .data <- tail(.data, include)
+    }
 
-  formula <- validate_model(formula, data)
+    dlmModel <- specials %>%
+      unlist(recursive = FALSE) %>%
+      reduce(`+`)
 
-  # Handle multivariate inputs
-  if(n_keys(data) > 1){
-    return(multi_univariate(data, cl))
-  }
+    response <- .data[[measured_vars(.data)]]
 
-  # Include only the end of the data
-  if (!is.null(include)){
-    data <- tail(data, include)
-  }
+    dlmModel <- response %>%
+      dlm_filterSmoothHeuristic(dlmModel)
 
-  # Define specials
-  specials <- child_env(caller_env())
-  specials <- new_specials_env(
-    !!!fasster_specials,
-    .env = specials,
-    .bury = FALSE,
-    .vals = list(
-      .data = data,
-      .specials = specials
-    )
-  )
+    # Fit model
+    filtered <- dlmFilter(response, dlmModel)
 
-  model_inputs <- parse_model(data, formula, specials = specials)
+    if(!is.matrix(filtered$a)){
+      filtered$a <- matrix(filtered$a)
+    }
 
-  dlmModel <- model_inputs$specials %>%
-    unlist(recursive = FALSE) %>%
-    reduce(`+`)
+    # Update model variance
+    resid <- filtered$y - filtered$f
+    filtered$mod$V <- resid %>%
+      as.numeric() %>%
+      var(na.rm = TRUE)
 
-  est <- transmute(data, !!model_lhs(model_inputs$model))
-  response <- est[[measured_vars(est)]]
+    # Model to start forecasting from
+    modFuture <- filtered$mod
+    lastObsIndex <- NROW(filtered$m)
+    modFuture$C0 <- with(filtered, dlmSvd2var(
+      U.C[[lastObsIndex]],
+      D.C[lastObsIndex, ]
+    ))
+    wt <- filtered$a[seq_len(NROW(filtered$a) - 1) + 1, ] - filtered$a[seq_len(NROW(filtered$a) - 1), ]%*%t(dlmModel$GG)
+    modFuture$W <- var(wt)
+    modFuture$m0 <- filtered$m %>% tail(1) %>% as.numeric()
 
-  dlmModel <- response %>%
-    dlm_filterSmoothHeuristic(dlmModel)
-
-  # Fit model
-  filtered <- dlmFilter(response, dlmModel)
-
-  if(!is.matrix(filtered$a)){
-    filtered$a <- matrix(filtered$a)
-  }
-
-  # Update model variance
-  resid <- filtered$y - filtered$f
-  filtered$mod$V <- resid %>%
-    as.numeric() %>%
-    var(na.rm = TRUE)
-
-  # Model to start forecasting from
-  modFuture <- filtered$mod
-  lastObsIndex <- NROW(filtered$m)
-  modFuture$C0 <- with(filtered, dlmSvd2var(
-    U.C[[lastObsIndex]],
-    D.C[lastObsIndex, ]
-  ))
-  wt <- filtered$a[seq_len(NROW(filtered$a) - 1) + 1, ] - filtered$a[seq_len(NROW(filtered$a) - 1), ]%*%t(dlmModel$GG)
-  modFuture$W <- var(wt)
-  modFuture$m0 <- filtered$m %>% tail(1) %>% as.numeric()
-
-  fit <- list(dlm = dlmModel, dlm_future = modFuture,
-              est = est %>% mutate(.fitted = filtered$f, .resid = resid),
-              states = filtered$a) %>%
-    add_class("FASSTER")
-
-  mable(
-    data,
-    model = fit,
-    model_inputs
-  )
-}
+    list(dlm = dlmModel, dlm_future = modFuture,
+         est = .data %>% mutate(.fitted = filtered$f, .resid = resid),
+         states = filtered$a) %>%
+      add_class("FASSTER")
+  },
+  specials = .specials
+)
 
 #' @export
 #' @rdname fasster-model
@@ -151,19 +124,19 @@ model_sum.FASSTER <- function(x){
 
 #' @export
 format.FASSTER <- function(x, ...){
-  cat(paste("FASSTER Model:\n", deparse(formula(x)), "\n\n"))
+  "FASSTER Model"
 }
 
 #' @export
 print.FASSTER <- function(x, ...){
-  print(format(x))
+  cat(format(x))
 }
 
 #' @export
 #' @importFrom tsibble group_by summarise transmute
 #' @importFrom rlang as_quosure sym
 summary.FASSTER <- function(object, ...){
-  cat(paste("FASSTER Model:\n", deparse(formula(object)), "\n\n"))
+  print(object)
   cat("Estimated variances:\n")
   cat(" State noise variances (W):\n")
   data.frame(term = colnames(object$dlm$FF), W = diag(object$dlm$W)) %>%

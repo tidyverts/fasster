@@ -80,9 +80,13 @@ fasster_specials <- list(
       lhs = NULL,
       rhs = reduce(c(0, enexprs(...)), ~ call2("+", .x, .y))
     )
-    mm <- model.matrix(model_formula, data = .data)
+    mm <- eval_tidy(model.matrix(model_formula), data = .data)
     out <- dlmModReg(mm, addInt = FALSE)
     colnames(out$FF) <- colnames(mm)
     out
   }
+)
+
+.specials <- new_specials_env(
+  !!!fasster_specials
 )
