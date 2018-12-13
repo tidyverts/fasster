@@ -45,5 +45,5 @@ forecast.FASSTER <- function(object, newdata = NULL, ...){
 
   se <- sqrt(unlist(Q))
 
-  fablelite::construct_fc(f, se, new_fcdist(qnorm, c(f), sd = se, abbr = "N"))
+  fablelite::construct_fc(c(f), se, dist_normal(c(f), sd = se))
 }
