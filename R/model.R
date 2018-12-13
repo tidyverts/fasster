@@ -1,3 +1,54 @@
+train_fasster <- function(.data, formula, specials, include = NULL){
+  if(length(measured_vars(.data)) > 1){
+    abort("Only univariate responses are supported by FASSTER.")
+  }
+
+  # Include only the end of the data
+  if (!is.null(include)){
+    .data <- tail(.data, include)
+  }
+
+  dlmModel <- specials %>%
+    unlist(recursive = FALSE) %>%
+    reduce(`+`)
+
+  response <- .data[[measured_vars(.data)]]
+
+  dlmModel <- response %>%
+    dlm_filterSmoothHeuristic(dlmModel)
+
+  # Fit model
+  filtered <- dlmFilter(response, dlmModel)
+
+  if(!is.matrix(filtered$a)){
+    filtered$a <- matrix(filtered$a)
+  }
+
+  # Update model variance
+  resid <- filtered$y - filtered$f
+  filtered$mod$V <- resid %>%
+    as.numeric() %>%
+    var(na.rm = TRUE)
+
+  # Model to start forecasting from
+  modFuture <- filtered$mod
+  lastObsIndex <- NROW(filtered$m)
+  modFuture$C0 <- with(filtered, dlmSvd2var(
+    U.C[[lastObsIndex]],
+    D.C[lastObsIndex, ]
+  ))
+  wt <- filtered$a[seq_len(NROW(filtered$a) - 1) + 1, ] - filtered$a[seq_len(NROW(filtered$a) - 1), ]%*%t(dlmModel$GG)
+  modFuture$W <- var(wt)
+  modFuture$m0 <- filtered$m %>% tail(1) %>% as.numeric()
+
+  structure(
+    list(dlm = dlmModel, dlm_future = modFuture,
+         est = .data %>% mutate(.fitted = filtered$f, .resid = resid),
+         states = filtered$a, formula = set_env(formula, new_environment())),
+    class = "FASSTER")
+
+}
+
 #' Fast Additive Switching of Seasonality, Trend and Exogenous Regressors
 #'
 #' Implements FASSTER
@@ -46,54 +97,7 @@
 #' @importFrom purrr reduce imap map_chr map
 #' @export
 FASSTER <- fablelite::define_model(
-  train = function(.data, formula, specials, include = NULL){
-    if(length(measured_vars(.data)) > 1){
-      abort("Only univariate responses are supported by FASSTER.")
-    }
-
-    # Include only the end of the data
-    if (!is.null(include)){
-      .data <- tail(.data, include)
-    }
-
-    dlmModel <- specials %>%
-      unlist(recursive = FALSE) %>%
-      reduce(`+`)
-
-    response <- .data[[measured_vars(.data)]]
-
-    dlmModel <- response %>%
-      dlm_filterSmoothHeuristic(dlmModel)
-
-    # Fit model
-    filtered <- dlmFilter(response, dlmModel)
-
-    if(!is.matrix(filtered$a)){
-      filtered$a <- matrix(filtered$a)
-    }
-
-    # Update model variance
-    resid <- filtered$y - filtered$f
-    filtered$mod$V <- resid %>%
-      as.numeric() %>%
-      var(na.rm = TRUE)
-
-    # Model to start forecasting from
-    modFuture <- filtered$mod
-    lastObsIndex <- NROW(filtered$m)
-    modFuture$C0 <- with(filtered, dlmSvd2var(
-      U.C[[lastObsIndex]],
-      D.C[lastObsIndex, ]
-    ))
-    wt <- filtered$a[seq_len(NROW(filtered$a) - 1) + 1, ] - filtered$a[seq_len(NROW(filtered$a) - 1), ]%*%t(dlmModel$GG)
-    modFuture$W <- var(wt)
-    modFuture$m0 <- filtered$m %>% tail(1) %>% as.numeric()
-
-    list(dlm = dlmModel, dlm_future = modFuture,
-         est = .data %>% mutate(.fitted = filtered$f, .resid = resid),
-         states = filtered$a) %>%
-      add_class("FASSTER")
-  },
+  train = train_fasster,
   specials = .specials
 )
 
