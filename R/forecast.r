@@ -9,19 +9,7 @@ forecast.FASSTER <- function(object, newdata = NULL, ...){
 
   mod <- object$"dlm_future"
 
-  # Build model on newdata
-  specials <- child_env(caller_env())
-  specials <- new_specials_env(
-    !!!fasster_specials,
-    .env = specials,
-    .bury = FALSE,
-    .vals = list(
-      .data = newdata,
-      .specials = specials
-    )
-  )
-
-  X <- parse_model_rhs(model_rhs(object$formula), data = newdata, specials = specials)$specials %>%
+  X <- parse_model_rhs(model_rhs(object$formula), data = newdata, specials = .specials)$specials %>%
     unlist(recursive = FALSE) %>%
     reduce(`+`) %>%
     .$X
@@ -57,7 +45,5 @@ forecast.FASSTER <- function(object, newdata = NULL, ...){
 
   se <- sqrt(unlist(Q))
 
-  fablelite::construct_fc(newdata, f, se,
-                          new_fcdist(qnorm, c(f), sd = se, abbr = "N"),
-                          expr_text(response(object)))
+  fablelite::construct_fc(f, se, new_fcdist(qnorm, c(f), sd = se, abbr = "N"))
 }
