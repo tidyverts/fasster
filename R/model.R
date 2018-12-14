@@ -44,7 +44,7 @@ train_fasster <- function(.data, formula, specials, include = NULL){
   structure(
     list(dlm = dlmModel, dlm_future = modFuture,
          est = .data %>% mutate(.fitted = filtered$f, .resid = resid),
-         states = filtered$a, formula = set_env(formula, new_environment())),
+         states = filtered$a, formula = formula),
     class = "FASSTER")
 }
 
