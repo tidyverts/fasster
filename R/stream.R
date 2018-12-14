@@ -1,20 +1,8 @@
 #' @export
 stream.FASSTER <- function(object, new_data, ...){
-  # Define specials
-  specials <- child_env(caller_env())
-  specials <- new_specials_env(
-    !!!fasster_specials,
-    .env = specials,
-    .bury = FALSE,
-    .vals = list(
-      .data = new_data,
-      .specials = specials
-    )
-  )
-
-  model <- formula(object)
+  model <- object$formula
   # Extend model
-  X <- parse_model_rhs(model_rhs(model), data = new_data, specials = specials)$specials %>%
+  X <- parse_model_rhs(model_rhs(model), data = new_data, specials = .specials)$specials %>%
     unlist(recursive = FALSE) %>%
     reduce(`+`) %>%
     .$X
