@@ -5,16 +5,16 @@
 \alias{fasster}
 \title{Fast Additive Switching of Seasonality, Trend and Exogenous Regressors}
 \usage{
-FASSTER(data, formula, include = NULL, ...)
+FASSTER(formula, ...)
 }
 \arguments{
-\item{data}{A \code{ts}/\code{mts}, \code{tsibble} or \code{data.frame} that contains the variables in the model.}
-
 \item{formula}{An object of class "formula" (refer to 'Formula' for usage)}
 
-\item{include}{How many terms should be included to fit the model}
-
 \item{...}{Not used}
+
+\item{data}{A \code{ts}/\code{mts}, \code{tsibble} or \code{data.frame} that contains the variables in the model.}
+
+\item{include}{How many terms should be included to fit the model}
 }
 \value{
 Returns a mable containing the fitted FASSTER model.
@@ -57,6 +57,6 @@ The model parameters are estimated using the following heuristic:
 
 \examples{
 tsibbledata::UKLungDeaths \%>\%
-  FASSTER(mdeaths ~ fdeaths + poly(1) + trig(12))
+  model(FASSTER(mdeaths ~ fdeaths + poly(1) + trig(12)))
 
 }

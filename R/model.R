@@ -179,7 +179,7 @@ train_fasster <- function(.data, formula, specials, include = NULL){
 #'
 #' @examples
 #' tsibbledata::UKLungDeaths %>%
-#'   FASSTER(mdeaths ~ fdeaths + poly(1) + trig(12))
+#'   model(FASSTER(mdeaths ~ fdeaths + poly(1) + trig(12)))
 #'
 #' @rdname fasster-model
 #' @importFrom purrr reduce imap map_chr map
