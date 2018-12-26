@@ -48,13 +48,13 @@ train_fasster <- function(.data, formula, specials, include = NULL){
     class = "FASSTER")
 }
 
-.specials <- new_specials_env(
+.specials <- new_specials(
   `%S%` = function(group, expr){
     group_expr <- enexpr(group)
     lhs <- factor(group)
     groups <- levels(lhs) %>% map(~ as.numeric(lhs == .x)) %>% set_names(levels(lhs))
 
-    rhs <- parse_model_rhs(enexpr(expr), data = .data, specials = .specials)$specials %>%
+    rhs <- parse_model_rhs(self, data = self$data)$specials %>%
       unlist(recursive = FALSE) %>%
       reduce(`+`)
 
@@ -79,7 +79,7 @@ train_fasster <- function(.data, formula, specials, include = NULL){
       reduce(`+`)
   },
   `(` = function(expr){
-    parse_model_rhs(enexpr(expr), data = .data, specials = .specials)$specials %>%
+    parse_model_rhs(self, data = self$data)$specials %>%
       unlist(recursive = FALSE) %>%
       reduce(`+`)
   },
@@ -130,12 +130,22 @@ train_fasster <- function(.data, formula, specials, include = NULL){
       lhs = NULL,
       rhs = reduce(c(0, enexprs(...)), ~ call2("+", .x, .y))
     )
-    mm <- eval_tidy(model.matrix(model_formula), data = .data)
+    mm <- model.matrix(model_formula, self$data)
     out <- dlmModReg(mm, addInt = FALSE)
     colnames(out$FF) <- colnames(mm)
     out
   }
 )
+
+fasster_model <- R6::R6Class("fasster",
+                             inherit = fablelite::model_definition,
+                             public = list(
+                               model = "FASSTER",
+                               train = train_fasster,
+                               specials = .specials
+                             )
+)
+
 
 #' Fast Additive Switching of Seasonality, Trend and Exogenous Regressors
 #'
@@ -178,16 +188,16 @@ train_fasster <- function(.data, formula, specials, include = NULL){
 #' }
 #'
 #' @examples
-#' tsibbledata::UKLungDeaths %>%
-#'   model(FASSTER(mdeaths ~ fdeaths + poly(1) + trig(12)))
+#' tsibbledata::UKLungDeaths %>% model(FASSTER(mdeaths ~ fdeaths + poly(1) + trig(12)))
 #'
 #' @rdname fasster-model
 #' @importFrom purrr reduce imap map_chr map
 #' @export
-FASSTER <- fablelite::define_model(
-  train = train_fasster,
-  specials = .specials
-)
+FASSTER <- fasster_model$new
+# FASSTER <- fablelite::define_model(
+#   train = train_fasster,
+#   specials = .specials
+# )
 
 #' @export
 #' @rdname fasster-model
