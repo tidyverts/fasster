@@ -60,7 +60,7 @@ devtools::install_github("tidyverts/fasster")
 
 ```{r xreg}
 fit <- tsibbledata::UKLungDeaths %>%
-  FASSTER(fdeaths ~ mdeaths)
+  model(fasster = FASSTER(fdeaths ~ mdeaths))
 
 fit %>% summary
 ```
@@ -77,21 +77,21 @@ For example, to create a model with trend and monthly seasonality, you can use:
 ```{r component}
 fit <- USAccDeaths %>% 
   as_tsibble %>% 
-  FASSTER(value ~ poly(1) + trig(12))
+  model(fasster = FASSTER(value ~ poly(1) + trig(12)))
 fit %>% summary
 ```
 
-The interface for creating a FASSTER model introduces a new formula construct, `%S%`, known as the switch operator. This allows modelling of more complex patterns such as multiple seasonality by modelling the components for each group seperately and switching between them.
+The interface for creating a FASSTER model introduces a new formula construct, `%S%`, known as the switch operator. This allows modelling of more complex patterns such as multiple seasonality by modelling the components for each group separately and switching between them.
 
 ```{r complex}
 elec_tr <- tsibbledata::elecdemand %>%
   dplyr::filter(index < lubridate::ymd("2014-03-01"))
 
 elec_fit <- elec_tr %>%
-  fasster(
-    log(Demand) ~ 
-      WorkDay %S% (trig(48, 16) + poly(1)) + 
-      Temperature + I(Temperature^2)
+  model(
+    fasster = fasster(log(Demand) ~ 
+      WorkDay %S% (trig(48, 16) + poly(1)) + Temperature + I(Temperature^2)
+    )
   )
 ```
 
@@ -121,7 +121,7 @@ library(fable)
 
 fit %>% 
   forecast(h=24) %>%
-  autoplot
+  autoplot(as_tsibble(USAccDeaths))
 ```
 
 Future index values are automatically produced and used where necessary in the model specification. If additional information is required by the model (such as `WorkDay` and `Temperature`)
@@ -132,8 +132,8 @@ elec_ts <- tsibbledata::elecdemand %>%
          index < lubridate::ymd("2014-04-01")) %>% 
   select(-Demand)
 elec_fit %>% 
-  forecast(newdata = elec_ts) %>% 
-  autoplot
+  forecast(new_data = elec_ts) %>% 
+  autoplot(elec_tr)
 ```
 
 ---

@@ -59,13 +59,10 @@ specify the model structure with standard formula conventions.
 
 ``` r
 fit <- tsibbledata::UKLungDeaths %>%
-  FASSTER(fdeaths ~ mdeaths)
+  model(fasster = FASSTER(fdeaths ~ mdeaths))
 
 fit %>% summary
-#> FASSTER Model:
-#>  fdeaths ~ mdeaths 
-#> 
-#> Estimated variances:
+#> FASSTER ModelEstimated variances:
 #>  State noise variances (W):
 #>   mdeaths
 #>    1.7119e-34
@@ -91,12 +88,9 @@ can use:
 ``` r
 fit <- USAccDeaths %>% 
   as_tsibble %>% 
-  FASSTER(value ~ poly(1) + trig(12))
+  model(fasster = FASSTER(value ~ poly(1) + trig(12)))
 fit %>% summary
-#> FASSTER Model:
-#>  value ~ poly(1) + trig(12) 
-#> 
-#> Estimated variances:
+#> FASSTER ModelEstimated variances:
 #>  State noise variances (W):
 #>   poly(1)
 #>    5.9382e+03
@@ -110,17 +104,17 @@ fit %>% summary
 The interface for creating a FASSTER model introduces a new formula
 construct, `%S%`, known as the switch operator. This allows modelling of
 more complex patterns such as multiple seasonality by modelling the
-components for each group seperately and switching between them.
+components for each group separately and switching between them.
 
 ``` r
 elec_tr <- tsibbledata::elecdemand %>%
   dplyr::filter(index < lubridate::ymd("2014-03-01"))
 
 elec_fit <- elec_tr %>%
-  fasster(
-    log(Demand) ~ 
-      WorkDay %S% (trig(48, 16) + poly(1)) + 
-      Temperature + I(Temperature^2)
+  model(
+    fasster = fasster(log(Demand) ~ 
+      WorkDay %S% (trig(48, 16) + poly(1)) + Temperature + I(Temperature^2)
+    )
   )
 ```
 
@@ -136,38 +130,40 @@ These components can accessed from a fitted model using the
 ``` r
 fit %>% 
   components
-#> # A tsibble: 72 x 3 [1M]
-#>       index `poly(1)` `trig(12)`
-#>       <mth>     <dbl>      <dbl>
-#>  1 1973 Jan     9740.     -795. 
-#>  2 1973 Feb     9754.    -1546. 
-#>  3 1973 Mar     9719.     -758. 
-#>  4 1973 Apr     9706.     -536. 
-#>  5 1973 May     9693.      322. 
-#>  6 1973 Jun     9694.      802. 
-#>  7 1973 Jul     9830.     1669. 
-#>  8 1973 Aug     9755.      974. 
-#>  9 1973 Sep     9761.      -65.7
-#> 10 1973 Oct     9768.      233. 
+#> # A tsibble: 72 x 4 [1M]
+#> # Key:       .model [1]
+#>    .model     index `poly(1)` `trig(12)`
+#>    <chr>      <mth>     <dbl>      <dbl>
+#>  1 fasster 1973 Jan     9740.     -795. 
+#>  2 fasster 1973 Feb     9754.    -1546. 
+#>  3 fasster 1973 Mar     9719.     -758. 
+#>  4 fasster 1973 Apr     9706.     -536. 
+#>  5 fasster 1973 May     9693.      322. 
+#>  6 fasster 1973 Jun     9694.      802. 
+#>  7 fasster 1973 Jul     9830.     1669. 
+#>  8 fasster 1973 Aug     9755.      974. 
+#>  9 fasster 1973 Sep     9761.      -65.7
+#> 10 fasster 1973 Oct     9768.      233. 
 #> # ... with 62 more rows
 ```
 
 ``` r
 elec_fit %>%
   components
-#> # A tsibble: 2,832 x 7 [30m]
-#>    index               `I(Temperature^… Temperature `WorkDay_0/poly…
-#>    <dttm>                         <dbl>       <dbl>            <dbl>
-#>  1 2014-01-01 00:00:00         0.000512     -0.0189             1.55
-#>  2 2014-01-01 00:30:00         0.000512     -0.0189             1.55
-#>  3 2014-01-01 01:00:00         0.000512     -0.0189             1.55
-#>  4 2014-01-01 01:30:00         0.000512     -0.0189             1.55
-#>  5 2014-01-01 02:00:00         0.000510     -0.0188             1.55
-#>  6 2014-01-01 02:30:00         0.000509     -0.0186             1.54
-#>  7 2014-01-01 03:00:00         0.000510     -0.0187             1.54
-#>  8 2014-01-01 03:30:00         0.000509     -0.0187             1.53
-#>  9 2014-01-01 04:00:00         0.000521     -0.0195             1.54
-#> 10 2014-01-01 04:30:00         0.000505     -0.0184             1.52
+#> # A tsibble: 2,832 x 8 [30m] <UTC>
+#> # Key:       .model [1]
+#>    .model index               `I(Temperature^… Temperature `WorkDay_0/poly…
+#>    <chr>  <dttm>                         <dbl>       <dbl>            <dbl>
+#>  1 fasst… 2014-01-01 00:00:00         0.000512     -0.0189             1.55
+#>  2 fasst… 2014-01-01 00:30:00         0.000512     -0.0189             1.55
+#>  3 fasst… 2014-01-01 01:00:00         0.000512     -0.0189             1.55
+#>  4 fasst… 2014-01-01 01:30:00         0.000512     -0.0189             1.55
+#>  5 fasst… 2014-01-01 02:00:00         0.000510     -0.0188             1.55
+#>  6 fasst… 2014-01-01 02:30:00         0.000509     -0.0186             1.54
+#>  7 fasst… 2014-01-01 03:00:00         0.000510     -0.0187             1.54
+#>  8 fasst… 2014-01-01 03:30:00         0.000509     -0.0187             1.53
+#>  9 fasst… 2014-01-01 04:00:00         0.000521     -0.0195             1.54
+#> 10 fasst… 2014-01-01 04:30:00         0.000505     -0.0184             1.52
 #> # ... with 2,822 more rows, and 3 more variables: `WorkDay_0/trig(48,
 #> #   16)` <dbl>, `WorkDay_1/poly(1)` <dbl>, `WorkDay_1/trig(48, 16)` <dbl>
 ```
@@ -187,7 +183,8 @@ library(fable)
 
 fit %>% 
   forecast(h=24) %>%
-  autoplot
+  autoplot(as_tsibble(USAccDeaths))
+#> Selecting index: "index"
 ```
 
 ![](man/figure/forecast-1.png)
@@ -202,8 +199,8 @@ elec_ts <- tsibbledata::elecdemand %>%
          index < lubridate::ymd("2014-04-01")) %>% 
   select(-Demand)
 elec_fit %>% 
-  forecast(newdata = elec_ts) %>% 
-  autoplot
+  forecast(new_data = elec_ts) %>% 
+  autoplot(elec_tr)
 ```
 
 ![](man/figure/complex_fc-1.png)
