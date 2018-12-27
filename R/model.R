@@ -54,7 +54,7 @@ train_fasster <- function(.data, formula, specials, include = NULL){
     lhs <- factor(group)
     groups <- levels(lhs) %>% map(~ as.numeric(lhs == .x)) %>% set_names(levels(lhs))
 
-    rhs <- parse_model_rhs(self, data = self$data)$specials %>%
+    rhs <- parse_model_rhs(self)$specials %>%
       unlist(recursive = FALSE) %>%
       reduce(`+`)
 
@@ -79,7 +79,7 @@ train_fasster <- function(.data, formula, specials, include = NULL){
       reduce(`+`)
   },
   `(` = function(expr){
-    parse_model_rhs(self, data = self$data)$specials %>%
+    parse_model_rhs(self)$specials %>%
       unlist(recursive = FALSE) %>%
       reduce(`+`)
   },
