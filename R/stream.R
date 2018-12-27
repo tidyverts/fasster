@@ -1,13 +1,14 @@
 #' @export
 stream.FASSTER <- function(object, new_data, ...){
-  model <- object$formula
   # Extend model
-  X <- parse_model_rhs(model_rhs(model), data = new_data, specials = .specials)$specials %>%
+  mdl <- object$definition
+  mdl$data <- new_data
+  X <- parse_model_rhs(mdl)$specials %>%
     unlist(recursive = FALSE) %>%
     reduce(`+`) %>%
     .$X
 
-  est <- transmute(new_data, !!model_lhs(model))
+  est <- transmute(new_data, !!model_lhs(mdl))
   response <- est[[measured_vars(est)]]
 
   dlmModel <- object$dlm_future
