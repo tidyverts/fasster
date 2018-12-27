@@ -160,7 +160,6 @@ fasster_model <- R6::R6Class("fasster",
 #'
 #' Implements FASSTER
 #'
-#' @param data A \code{ts}/\code{mts}, \code{tsibble} or \code{data.frame} that contains the variables in the model.
 #' @param formula An object of class "formula" (refer to 'Formula' for usage)
 #' @param include How many terms should be included to fit the model
 #' @param ... Not used

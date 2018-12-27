@@ -13,8 +13,6 @@ FASSTER(formula, include = NULL, ...)
 \item{include}{How many terms should be included to fit the model}
 
 \item{...}{Not used}
-
-\item{data}{A \code{ts}/\code{mts}, \code{tsibble} or \code{data.frame} that contains the variables in the model.}
 }
 \value{
 Returns a mable containing the fitted FASSTER model.
