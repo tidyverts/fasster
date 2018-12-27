@@ -1,15 +1,17 @@
 #' @importFrom dlm dlmSvd2var
 #' @importFrom utils tail
 #' @export
-forecast.FASSTER <- function(object, newdata = NULL, ...){
-  if(!is_regular(newdata)){
+forecast.FASSTER <- function(object, new_data = NULL, ...){
+  if(!is_regular(new_data)){
     abort("Forecasts must be regularly spaced")
   }
-  h <- NROW(newdata)
+  h <- NROW(new_data)
 
   mod <- object$"dlm_future"
 
-  X <- parse_model_rhs(model_rhs(object$formula), data = newdata, specials = .specials)$specials %>%
+  mdl <- object$definition
+  mdl$data <- new_data
+  X <- parse_model_rhs(mdl)$specials %>%
     unlist(recursive = FALSE) %>%
     reduce(`+`) %>%
     .$X
