@@ -1,3 +1,4 @@
+globalVariables("self")
 train_fasster <- function(.data, formula, specials, include = NULL){
   if(length(measured_vars(.data)) > 1){
     abort("Only univariate responses are supported by FASSTER.")
@@ -201,11 +202,9 @@ fasster_model <- R6::R6Class("fasster",
 #' @rdname fasster-model
 #' @importFrom purrr reduce imap map_chr map
 #' @export
-FASSTER <- fasster_model$new
-# FASSTER <- fablelite::define_model(
-#   train = train_fasster,
-#   specials = .specials
-# )
+FASSTER <- function(formula, include = NULL, ...){
+  fasster_model$new(formula, include = include, ...)
+}
 
 #' @export
 #' @rdname fasster-model
