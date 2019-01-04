@@ -202,7 +202,7 @@ fasster_model <- R6::R6Class("fasster",
 #' @importFrom purrr reduce imap map_chr map
 #' @export
 FASSTER <- function(formula, include = NULL, ...){
-  fasster_model$new(formula, include = include, ...)
+  fasster_model$new(!!enquo(formula), include = include, ...)
 }
 
 #' @export
