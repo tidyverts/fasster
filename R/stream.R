@@ -1,9 +1,7 @@
 #' @export
-stream.FASSTER <- function(object, new_data, ...){
+stream.FASSTER <- function(object, new_data, specials = NULL, ...){
   # Extend model
-  mdl <- object$definition
-  mdl$data <- new_data
-  X <- parse_model_rhs(mdl)$specials %>%
+  X <- specials %>%
     unlist(recursive = FALSE) %>%
     reduce(`+`) %>%
     .$X
