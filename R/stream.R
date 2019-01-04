@@ -6,7 +6,7 @@ stream.FASSTER <- function(object, new_data, specials = NULL, ...){
     reduce(`+`) %>%
     .$X
 
-  est <- transmute(new_data, !!model_lhs(mdl))
+  est <- transmute(new_data, !!parse_expr(measured_vars(object$est)[1]))
   response <- est[[measured_vars(est)]]
 
   dlmModel <- object$dlm_future
