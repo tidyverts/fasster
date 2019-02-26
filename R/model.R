@@ -243,9 +243,8 @@ print.FASSTER <- function(x, ...){
 #' @export
 #' @importFrom tsibble group_by summarise transmute
 #' @importFrom rlang as_quosure sym
-summary.FASSTER <- function(object, ...){
-  print(object)
-  cat("Estimated variances:\n")
+report.FASSTER <- function(object, ...){
+  cat("\nEstimated variances:\n")
   cat(" State noise variances (W):\n")
   data.frame(term = colnames(object$dlm$FF), W = diag(object$dlm$W)) %>%
     group_by(!!sym("term")) %>%
