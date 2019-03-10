@@ -54,6 +54,8 @@ The model parameters are estimated using the following heuristic:
 }
 
 \examples{
-tsibbledata::UKLungDeaths \%>\% model(FASSTER(mdeaths ~ fdeaths + poly(1) + trig(12)))
+cbind(mdeaths, fdeaths) \%>\%
+  as_tsibble \%>\%
+  model(FASSTER(mdeaths ~ fdeaths + poly(1) + trig(12)))
 
 }

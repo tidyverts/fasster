@@ -196,7 +196,9 @@ fasster_model <- R6::R6Class("fasster",
 #' }
 #'
 #' @examples
-#' tsibbledata::UKLungDeaths %>% model(FASSTER(mdeaths ~ fdeaths + poly(1) + trig(12)))
+#' cbind(mdeaths, fdeaths) %>%
+#'   as_tsibble %>%
+#'   model(FASSTER(mdeaths ~ fdeaths + poly(1) + trig(12)))
 #'
 #' @rdname fasster-model
 #' @importFrom purrr reduce imap map_chr map
