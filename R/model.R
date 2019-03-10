@@ -146,16 +146,6 @@ train_fasster <- function(.data, formula, specials, include = NULL){
   }
 )
 
-fasster_model <- R6::R6Class("fasster",
-                             inherit = fablelite::model_definition,
-                             public = list(
-                               model = "FASSTER",
-                               train = train_fasster,
-                               specials = .specials
-                             )
-)
-
-
 #' Fast Additive Switching of Seasonality, Trend and Exogenous Regressors
 #'
 #' Implements FASSTER
@@ -204,7 +194,8 @@ fasster_model <- R6::R6Class("fasster",
 #' @importFrom purrr reduce imap map_chr map
 #' @export
 FASSTER <- function(formula, include = NULL, ...){
-  fasster_model$new(!!enquo(formula), include = include, ...)
+  fasster_model <- new_model_class("FASSTER", train_fasster, .specials)
+  new_model_definition(fasster_model, !!enquo(formula), include = include, ...)
 }
 
 #' @export
