@@ -12,5 +12,12 @@ components.FASSTER <- function(object, ...) {
     t
 
   combined <- as_tibble(object$states %*% t(states * object$dlm$FF[rep(1,NROW(states)),]))
-  transmute(object$est, !!!combined)
+  response <- measured_vars(object$est)[[1]]
+
+  aliases <- list2(
+    !!response := reduce(syms(colnames(combined)), function(x, y, fn) call2(fn, x, y), "+")
+  )
+
+  transmute(object$est, !!sym(response), !!!combined) %>%
+    as_dable(resp = !!sym(response), method = "FASSTER", aliases = aliases)
 }
