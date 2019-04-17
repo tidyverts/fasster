@@ -19,6 +19,7 @@ NULL
 #' @import dlm
 #' @import fablelite
 #' @import tsibble
+#' @importFrom dplyr mutate transmute summarise group_by
 NULL
 
 globalVariables(".")

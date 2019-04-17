@@ -12,11 +12,6 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "man/figure/"
 )
-library(fasster)
-library(tidyverse)
-library(lubridate)
-library(tsibble)
-library(fable)
 ```
 
 # fasster <img src="man/figure/logo.png" align="right" />
@@ -59,6 +54,12 @@ devtools::install_github("tidyverts/fasster")
 *fasster* allows flexible model specification by allowing the user to specify the model structure with standard formula conventions.
 
 ```{r xreg}
+library(fasster)
+library(tidyverse)
+library(lubridate)
+library(tsibble)
+library(fable)
+
 fit <- tsibbledata::UKLungDeaths %>%
   model(fasster = FASSTER(fdeaths ~ mdeaths))
 
@@ -85,7 +86,7 @@ The interface for creating a FASSTER model introduces a new formula construct, `
 
 ```{r complex}
 elec_tr <- tsibbledata::elecdemand %>%
-  dplyr::filter(index < lubridate::ymd("2014-03-01"))
+  filter(index < lubridate::ymd("2014-03-01"))
 
 elec_fit <- elec_tr %>%
   model(

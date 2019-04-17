@@ -93,47 +93,47 @@ train_fasster <- function(.data, formula, specials, include = NULL){
       reduce(`+`)
   },
   poly = function(...){
-    cl <- match.call()
+    cl <- sys.call()
     out <- dlmModPoly(...)
     colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
     out
   },
   seas = function(period, ...){
     period <- get_frequencies(period, self$data, .auto = "smallest")
-    cl <- match.call()
+    cl <- sys.call()
     out <- dlmModSeas(period, ...)
     colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
     out
   },
   seasonal = function(period, ...){
     period <- get_frequencies(period, self$data, .auto = "smallest")
-    cl <- match.call()
+    cl <- sys.call()
     out <- dlmModSeas(period, ...)
     colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
     out
   },
   trig = function(period, ...){
     period <- get_frequencies(period, self$data, .auto = "smallest")
-    cl <- match.call()
+    cl <- sys.call()
     out <- dlmModTrig(period, ...)
     colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
     out
   },
   fourier = function(period, ...){
     period <- get_frequencies(period, self$data, .auto = "smallest")
-    cl <- match.call()
+    cl <- sys.call()
     out <- dlmModTrig(period, ...)
     colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
     out
   },
   ARMA = function(...){
-    cl <- match.call()
+    cl <- sys.call()
     out <- dlmModARMA(...)
     colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
     out
   },
   custom = function(...){
-    cl <- match.call()
+    cl <- sys.call()
     out <- dlm(...)
     colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
     out
@@ -238,7 +238,6 @@ print.FASSTER <- function(x, ...){
 }
 
 #' @export
-#' @importFrom tsibble group_by summarise transmute
 #' @importFrom rlang as_quosure sym
 report.FASSTER <- function(object, ...){
   cat("\nEstimated variances:\n")
