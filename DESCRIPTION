@@ -26,7 +26,14 @@ Remotes:
     tidyverts/tsibble,
     tidyverts/tsibbledata,
     tidyverts/fablelite
-Authors@R: person("Mitchell", "O'Hara-Wild", email = "mail@mitchelloharawild.com", role = c("aut", "cre"))
+Authors@R: 
+    c(person(given = "Mitchell",
+             family = "O'Hara-Wild",
+             email = "mail@mitchelloharawild.com",
+             role = c("aut", "cre")),
+      person(given = "Rob",
+             family = "Hyndman",
+             role = c("aut", "ths")))
 URL: https://github.com/mitchelloharawild/fasster
 BugReports: https://github.com/mitchelloharawild/fasster/issues
 License: GPL-3
