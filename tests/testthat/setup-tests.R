@@ -1,6 +1,6 @@
 context("setup-tests.R")
 
-UKLungDeaths <- as_tsibble(cbind(mdeaths, fdeaths), gather = FALSE)
+UKLungDeaths <- as_tsibble(cbind(mdeaths, fdeaths), pivot_longer = FALSE)
 USAccDeaths <- as_tsibble(USAccDeaths)
 
 USAccDeaths_fit <- USAccDeaths %>%
