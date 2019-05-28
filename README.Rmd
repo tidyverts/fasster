@@ -60,10 +60,10 @@ library(lubridate)
 library(tsibble)
 library(fable)
 
-fit <- tsibbledata::UKLungDeaths %>%
+lung_deaths <- as_tsibble(cbind(mdeaths, fdeaths), pivot_longer = FALSE)
+fit <- lung_deaths %>%
   model(fasster = FASSTER(fdeaths ~ mdeaths))
-
-fit %>% summary
+fit %>% report()
 ```
 
 Commonly used state space components can be added using the following convenience functions:
@@ -76,17 +76,20 @@ Commonly used state space components can be added using the following convenienc
 
 For example, to create a model with trend and monthly seasonality, you can use:
 ```{r component}
-fit <- USAccDeaths %>% 
-  as_tsibble %>% 
+fit <- as_tsibble(USAccDeaths) %>% 
   model(fasster = FASSTER(value ~ poly(1) + trig(12)))
-fit %>% summary
+fit %>% report()
 ```
 
 The interface for creating a FASSTER model introduces a new formula construct, `%S%`, known as the switch operator. This allows modelling of more complex patterns such as multiple seasonality by modelling the components for each group separately and switching between them.
 
 ```{r complex}
-elec_tr <- tsibbledata::elecdemand %>%
-  filter(index < lubridate::ymd("2014-03-01"))
+elec_tr <- tsibbledata::aus_elec %>%
+  filter(
+    State == "Victoria",
+    Time < lubridate::ymd("2012-03-01")
+  ) %>% 
+  mutate(WorkDay = wday(Time) %in% 2:6 & !Holiday)
 
 elec_fit <- elec_tr %>%
   model(
@@ -103,12 +106,12 @@ Fitted FASSTER models can be decomposed to provide a description of how the unde
 These components can accessed from a fitted model using the `components()` function:
 ```{r decompose}
 fit %>% 
-  components
+  components()
 ```
 
 ```{r decompose-complex}
 elec_fit %>%
-  components
+  components()
 ```
 
 
@@ -116,10 +119,8 @@ The tools made available by *fasster* are designed to integrate seamlessly with 
 
 ### Forecasting
   
-*fasster* conforms to the object structure from the *forecast* package, allowing common visualisation and analysis tools to be applied on FASSTER models.
+*fasster* conforms to the object structure from the *fable* package, allowing common visualisation and analysis tools to be applied on FASSTER models.
 ```{r forecast}
-library(fable)
-
 fit %>% 
   forecast(h=24) %>%
   autoplot(as_tsibble(USAccDeaths))
@@ -128,9 +129,12 @@ fit %>%
 Future index values are automatically produced and used where necessary in the model specification. If additional information is required by the model (such as `WorkDay` and `Temperature`)
 
 ```{r complex_fc}
-elec_ts <- tsibbledata::elecdemand %>%
-  filter(index >= lubridate::ymd("2014-03-01"),
-         index < lubridate::ymd("2014-04-01")) %>% 
+elec_ts <- tsibbledata::aus_elec %>%
+  filter(
+    State == "Victoria",
+    yearmonth(Time) == yearmonth("2012 Mar")
+  ) %>% 
+  mutate(WorkDay = wday(Time) %in% 2:6 & !Holiday) %>% 
   select(-Demand)
 elec_fit %>% 
   forecast(new_data = elec_ts) %>% 
