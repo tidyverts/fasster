@@ -230,7 +230,8 @@ fit %>%
 
 Future index values are automatically produced and used where necessary
 in the model specification. If additional information is required by the
-model (such as `WorkDay` and `Temperature`)
+model (such as `WorkDay` and `Temperature`) they must be included in a
+tsibble of future values passed to `new_data`.
 
 ``` r
 elec_ts <- tsibbledata::aus_elec %>%
