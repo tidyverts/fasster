@@ -53,7 +53,7 @@ devtools::install_github("tidyverts/fasster")
 
 *fasster* allows flexible model specification by allowing the user to specify the model structure with standard formula conventions.
 
-```{r xreg}
+```{r xreg, message=FALSE}
 library(fasster)
 library(tidyverse)
 library(lubridate)
@@ -126,7 +126,7 @@ fit %>%
   autoplot(as_tsibble(USAccDeaths))
 ```
 
-Future index values are automatically produced and used where necessary in the model specification. If additional information is required by the model (such as `WorkDay` and `Temperature`) they must be included in a tsibble of future values passed to `new_data`.
+Future index values are automatically produced and used where necessary in the model specification. If additional information is required by the model (such as `WorkDay` and `Temperature`) they must be included in a `tsibble` of future values passed to `new_data`.
 
 ```{r complex_fc}
 elec_ts <- tsibbledata::aus_elec %>%

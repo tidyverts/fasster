@@ -59,31 +59,9 @@ specify the model structure with standard formula conventions.
 
 ``` r
 library(fasster)
-#> Loading required package: fablelite
 library(tidyverse)
-#> ── Attaching packages ────────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse 1.2.1 ──
-#> ✔ ggplot2 3.1.1     ✔ purrr   0.3.2
-#> ✔ tibble  2.1.1     ✔ dplyr   0.8.1
-#> ✔ tidyr   0.8.3     ✔ stringr 1.4.0
-#> ✔ readr   1.3.1     ✔ forcats 0.3.0
-#> ── Conflicts ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
-#> ✖ dplyr::filter() masks stats::filter()
-#> ✖ dplyr::lag()    masks stats::lag()
 library(lubridate)
-#> 
-#> Attaching package: 'lubridate'
-#> The following object is masked from 'package:base':
-#> 
-#>     date
 library(tsibble)
-#> 
-#> Attaching package: 'tsibble'
-#> The following objects are masked from 'package:lubridate':
-#> 
-#>     interval, new_interval
-#> The following object is masked from 'package:dplyr':
-#> 
-#>     id
 library(fable)
 
 lung_deaths <- as_tsibble(cbind(mdeaths, fdeaths), pivot_longer = FALSE)
@@ -231,7 +209,7 @@ fit %>%
 Future index values are automatically produced and used where necessary
 in the model specification. If additional information is required by the
 model (such as `WorkDay` and `Temperature`) they must be included in a
-tsibble of future values passed to `new_data`.
+`tsibble` of future values passed to `new_data`.
 
 ``` r
 elec_ts <- tsibbledata::aus_elec %>%
