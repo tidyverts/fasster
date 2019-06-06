@@ -23,7 +23,6 @@ Suggests:
     covr,
     ggplot2
 Remotes:
-    tidyverts/tsibble,
     tidyverts/tsibbledata,
     tidyverts/fablelite
 Authors@R: 
