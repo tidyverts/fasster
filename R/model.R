@@ -218,11 +218,6 @@ residuals.FASSTER <- function(object, ...){
 }
 
 #' @export
-augment.FASSTER <- function(x, ...){
-  x$est
-}
-
-#' @export
 model_sum.FASSTER <- function(x){
   "FASSTER"
 }
