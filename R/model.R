@@ -98,14 +98,21 @@ train_fasster <- function(.data, formula, specials, include = NULL){
     colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
     out
   },
-  seas = function(period, ...){
+  seas = function(period = NULL, ...){
     period <- get_frequencies(period, self$data, .auto = "smallest")
     cl <- sys.call()
     out <- dlmModSeas(period, ...)
     colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
     out
   },
-  seasonal = function(period, ...){
+  season = function(period = NULL, ...){
+    period <- get_frequencies(period, self$data, .auto = "smallest")
+    cl <- sys.call()
+    out <- dlmModSeas(period, ...)
+    colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
+    out
+  },
+  seasonal = function(period = NULL, ...){
     period <- get_frequencies(period, self$data, .auto = "smallest")
     cl <- sys.call()
     out <- dlmModSeas(period, ...)
