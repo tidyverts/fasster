@@ -25,7 +25,7 @@ This package is early in development, and there are plans to make
 substantial changes in the future.
 
 The latest usage examples of using fasster can be found in my useR! 2018
-talk: [slides](https://www.mitchelloharawild.com/user2018/#1),
+talk: [slides](https://slides.mitchelloharawild.com/user2018/#1),
 [video](https://www.youtube.com/watch?v=6YlboftSalY),
 [source](https://github.com/mitchelloharawild/fasster_user2018).
 
@@ -118,9 +118,8 @@ more complex patterns such as multiple seasonality by modelling the
 components for each group separately and switching between them.
 
 ``` r
-elec_tr <- tsibbledata::aus_elec %>%
+elec_tr <- tsibbledata::vic_elec %>%
   filter(
-    State == "Victoria",
     Time < lubridate::ymd("2012-03-01")
   ) %>% 
   mutate(WorkDay = wday(Time) %in% 2:6 & !Holiday)
@@ -166,24 +165,24 @@ fit %>%
 ``` r
 elec_fit %>%
   components()
-#> # A dable:               2,880 x 10 [30m] <UTC>
-#> # Key:                   State, .model [1]
+#> # A dable:               2,880 x 9 [30m] <UTC>
+#> # Key:                   .model [1]
 #> # FASSTER Decomposition: log(Demand) = `I(Temperature^2)` + Temperature +
 #> #   `WorkDay_FALSE/poly(1)` + `WorkDay_FALSE/trig(48, 16)` +
 #> #   `WorkDay_TRUE/poly(1)` + `WorkDay_TRUE/trig(48, 16)`
-#>    State .model Time                `log(Demand)` `I(Temperature^…
-#>    <chr> <chr>  <dttm>                      <dbl>            <dbl>
-#>  1 Vict… fasst… 2012-01-01 00:00:00          8.36         0.000996
-#>  2 Vict… fasst… 2012-01-01 00:30:00          8.31         0.000996
-#>  3 Vict… fasst… 2012-01-01 01:00:00          8.26         0.000997
-#>  4 Vict… fasst… 2012-01-01 01:30:00          8.30         0.000998
-#>  5 Vict… fasst… 2012-01-01 02:00:00          8.26         0.001000
-#>  6 Vict… fasst… 2012-01-01 02:30:00          8.21         0.00101 
-#>  7 Vict… fasst… 2012-01-01 03:00:00          8.18         0.00101 
-#>  8 Vict… fasst… 2012-01-01 03:30:00          8.14         0.000962
-#>  9 Vict… fasst… 2012-01-01 04:00:00          8.12         0.001000
-#> 10 Vict… fasst… 2012-01-01 04:30:00          8.11         0.000924
-#> # … with 2,870 more rows, and 5 more variables: Temperature <dbl>,
+#>    .model Time                `log(Demand)` `I(Temperature^… Temperature
+#>    <chr>  <dttm>                      <dbl>            <dbl>       <dbl>
+#>  1 fasst… 2012-01-01 00:00:00          8.36         0.000996     -0.0386
+#>  2 fasst… 2012-01-01 00:30:00          8.31         0.000996     -0.0386
+#>  3 fasst… 2012-01-01 01:00:00          8.26         0.000997     -0.0387
+#>  4 fasst… 2012-01-01 01:30:00          8.30         0.000998     -0.0387
+#>  5 fasst… 2012-01-01 02:00:00          8.26         0.00100      -0.0388
+#>  6 fasst… 2012-01-01 02:30:00          8.21         0.00101      -0.0391
+#>  7 fasst… 2012-01-01 03:00:00          8.18         0.00101      -0.0396
+#>  8 fasst… 2012-01-01 03:30:00          8.14         0.000956     -0.0360
+#>  9 fasst… 2012-01-01 04:00:00          8.12         0.00100      -0.0389
+#> 10 fasst… 2012-01-01 04:30:00          8.11         0.000916     -0.0328
+#> # … with 2,870 more rows, and 4 more variables:
 #> #   `WorkDay_FALSE/poly(1)` <dbl>, `WorkDay_FALSE/trig(48, 16)` <dbl>,
 #> #   `WorkDay_TRUE/poly(1)` <dbl>, `WorkDay_TRUE/trig(48, 16)` <dbl>
 ```
@@ -212,9 +211,8 @@ model (such as `WorkDay` and `Temperature`) they must be included in a
 `tsibble` of future values passed to `new_data`.
 
 ``` r
-elec_ts <- tsibbledata::aus_elec %>%
+elec_ts <- tsibbledata::vic_elec %>%
   filter(
-    State == "Victoria",
     yearmonth(Time) == yearmonth("2012 Mar")
   ) %>% 
   mutate(WorkDay = wday(Time) %in% 2:6 & !Holiday) %>% 

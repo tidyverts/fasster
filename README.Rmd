@@ -28,7 +28,7 @@ An implementation of the FASSTER (Forecasting with Additive Switching of Seasona
 
 This package is early in development, and there are plans to make substantial changes in the future. 
 
-The latest usage examples of using fasster can be found in my useR! 2018 talk: [slides](https://www.mitchelloharawild.com/user2018/#1), [video](https://www.youtube.com/watch?v=6YlboftSalY), [source](https://github.com/mitchelloharawild/fasster_user2018).
+The latest usage examples of using fasster can be found in my useR! 2018 talk: [slides](https://slides.mitchelloharawild.com/user2018/#1), [video](https://www.youtube.com/watch?v=6YlboftSalY), [source](https://github.com/mitchelloharawild/fasster_user2018).
 
 There are further plans to improve the heuristic optimisation techniques and better use sparse matrix algebra (removing the dlm package dependency) to make fasster even faster. Implementing this will likely result in a revision of the model object structure, but user directed functionality should remain the same.
 
@@ -84,9 +84,8 @@ fit %>% report()
 The interface for creating a FASSTER model introduces a new formula construct, `%S%`, known as the switch operator. This allows modelling of more complex patterns such as multiple seasonality by modelling the components for each group separately and switching between them.
 
 ```{r complex}
-elec_tr <- tsibbledata::aus_elec %>%
+elec_tr <- tsibbledata::vic_elec %>%
   filter(
-    State == "Victoria",
     Time < lubridate::ymd("2012-03-01")
   ) %>% 
   mutate(WorkDay = wday(Time) %in% 2:6 & !Holiday)
@@ -129,9 +128,8 @@ fit %>%
 Future index values are automatically produced and used where necessary in the model specification. If additional information is required by the model (such as `WorkDay` and `Temperature`) they must be included in a `tsibble` of future values passed to `new_data`.
 
 ```{r complex_fc}
-elec_ts <- tsibbledata::aus_elec %>%
+elec_ts <- tsibbledata::vic_elec %>%
   filter(
-    State == "Victoria",
     yearmonth(Time) == yearmonth("2012 Mar")
   ) %>% 
   mutate(WorkDay = wday(Time) %in% 2:6 & !Holiday) %>% 
