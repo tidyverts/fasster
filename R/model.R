@@ -239,6 +239,24 @@ print.FASSTER <- function(x, ...){
   cat(format(x))
 }
 
+#' Extract coefficients from a FASSTER model
+#'
+#' Obtains the mean and variance of the estimated initial states from a FASSTER
+#' model. Values in the `estimate` column are contains the mean, and the
+#' `std.error` column contains the standard deviation of the initial states.
+#'
+#' @param x An object containing a FASSTER model.
+#' @param ... Unused.
+#'
+#' @export
+tidy.FASSTER <- function(x, ...){
+  tibble(
+    term = colnames(x[["dlm"]][["FF"]]),
+    estimate = x[["dlm"]][["m0"]],
+    std.error = sqrt(diag(x[["dlm"]][["C0"]]))
+  )
+}
+
 #' @export
 #' @importFrom rlang as_quosure sym
 report.FASSTER <- function(object, ...){
