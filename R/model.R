@@ -52,7 +52,7 @@ train_fasster <- function(.data, formula, specials, include = NULL){
 .specials <- new_specials(
   `%S%` = function(group, expr){
     group_expr <- enexpr(group)
-    lhs <- factor(group)
+    lhs <- factor(eval_tidy(group_expr, data = self$data, env = env_parent(self$specials)))
     groups <- levels(lhs) %>% map(~ as.numeric(lhs == .x)) %>% set_names(levels(lhs))
 
     formula <- self$formula
