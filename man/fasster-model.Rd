@@ -30,8 +30,8 @@ This is implemented using a time-varying DLM with the switching behaviour encode
 
 Special DLM components can be specified using special functions defined below:
 \itemize{
-\item seas(s): Creates seasonal factors with seasonality s
-\item trig(s): Creates seasonal fourier terms with seasonality s
+\item seas(s): Creates seasonal factors with seasonal period s
+\item fourier(s, K): Creates seasonal fourier terms with seasonal period s and K harmonics
 \item poly(n): Creates a polynomial of order n (poly(1) creates a level, poly(2) creates a trend)
 \item ARMA(ar, ma): Creates ARMA terms with coefficient vectors ar and ma
 \item custom(dlm): Creates a custom dlm structure, using \code{\link[dlm]{dlm}}

@@ -126,10 +126,10 @@ train_fasster <- function(.data, formula, specials, include = NULL){
     colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
     out
   },
-  fourier = function(period, ...){
+  fourier = function(period, K, ...){
     period <- get_frequencies(period, self$data, .auto = "smallest")
     cl <- sys.call()
-    out <- dlmModTrig(period, ...)
+    out <- dlmModTrig(period, q = K, ...)
     colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
     out
   },
@@ -176,8 +176,8 @@ train_fasster <- function(.data, formula, specials, include = NULL){
 #'
 #' Special DLM components can be specified using special functions defined below:
 #' \itemize{
-#'    \item seas(s): Creates seasonal factors with seasonality s
-#'    \item trig(s): Creates seasonal fourier terms with seasonality s
+#'    \item seas(s): Creates seasonal factors with seasonal period s
+#'    \item fourier(s, K): Creates seasonal fourier terms with seasonal period s and K harmonics
 #'    \item poly(n): Creates a polynomial of order n (poly(1) creates a level, poly(2) creates a trend)
 #'    \item ARMA(ar, ma): Creates ARMA terms with coefficient vectors ar and ma
 #'    \item custom(dlm): Creates a custom dlm structure, using \code{\link[dlm]{dlm}}
