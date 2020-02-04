@@ -83,6 +83,26 @@ train_fasster <- function(.data, formula, specials, include = NULL){
       }) %>%
       reduce(`+`)
   },
+  `%?%` = function(group, spec){
+    group_expr <- enexpr(group)
+    group <- eval_tidy(group_expr, data = self$data, env = env_parent(self$specials))
+
+    if(is.null(spec$JFF)){
+      spec$JFF <- spec$FF
+      spec$X <- matrix(as.numeric(group), ncol = 1)
+    }
+    else{
+      spec$X <- spec$X * as.numeric(group)
+      if(any(new_X_pos <- spec$FF!=0 & spec$JFF==0)){
+        new_X_col <- NCOL(spec$X) + 1
+        spec$JFF[new_X_pos] <- new_X_col
+        spec$X <- cbind(spec$X, as.numeric(group))
+      }
+    }
+    colnames(spec$X) <- paste0(expr_text(group_expr), "_TRUE/", colnames(spec$X))
+    colnames(spec$FF) <- paste0(expr_text(group_expr), "_TRUE/", colnames(spec$FF))
+    spec
+  },
   `(` = function(expr){
     formula <- self$formula
     on.exit(self$formula <- formula)
