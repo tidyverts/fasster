@@ -22,9 +22,6 @@ Suggests:
     spelling,
     covr,
     ggplot2
-Remotes:
-    tidyverts/tsibbledata,
-    tidyverts/fabletools
 Authors@R: 
     c(person(given = "Mitchell",
              family = "O'Hara-Wild",
