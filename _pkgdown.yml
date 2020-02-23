@@ -1,0 +1,14 @@
+url: https://fasster.tidyverts.org
+
+template:
+  params:
+    bootswatch: cosmo
+
+development:
+  mode: auto
+
+authors:
+  Mitchell O'Hara-Wild:
+    href: https://mitchelloharawild.com
+  Rob Hyndman:
+    href: http://robjhyndman.com
