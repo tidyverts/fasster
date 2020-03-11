@@ -55,7 +55,7 @@ Obtain measurement noise variance from smoothed variance of \eqn{v_t}: \eqn{V=Va
 
 \examples{
 cbind(mdeaths, fdeaths) \%>\%
-  as_tsibble \%>\%
+  as_tsibble(pivot_longer = FALSE) \%>\%
   model(FASSTER(mdeaths ~ fdeaths + poly(1) + trig(12)))
 
 }
