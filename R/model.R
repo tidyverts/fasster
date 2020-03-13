@@ -4,14 +4,15 @@ train_fasster <- function(.data, formula, specials, include = NULL){
     abort("Only univariate responses are supported by FASSTER.")
   }
 
-  # Include only the end of the data
-  if (!is.null(include)){
-    .data <- tail(.data, include)
-  }
-
   dlmModel <- specials %>%
     unlist(recursive = FALSE) %>%
     reduce(`+`)
+
+  # Include only the end of the data
+  if (!is.null(include)){
+    .data <- tail(.data, include)
+    dlmModel$X <- tail(dlmModel$X, include)
+  }
 
   response <- .data[[measured_vars(.data)]]
 
