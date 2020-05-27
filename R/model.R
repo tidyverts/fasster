@@ -60,7 +60,7 @@ train_fasster <- function(.data, formula, specials, include = NULL){
     on.exit(self$formula <- formula)
     f_rhs(self$formula) <- enexpr(expr)
 
-    rhs <- parse_model_rhs(self)$specials %>%
+    rhs <- parse_model_rhs(self) %>%
       unlist(recursive = FALSE) %>%
       reduce(`+`)
 
@@ -109,7 +109,7 @@ train_fasster <- function(.data, formula, specials, include = NULL){
     on.exit(self$formula <- formula)
     f_rhs(self$formula) <- enexpr(expr)
 
-    parse_model_rhs(self)$specials %>%
+    parse_model_rhs(self) %>%
       unlist(recursive = FALSE) %>%
       reduce(`+`)
   },
