@@ -166,26 +166,26 @@ fit %>%
 ``` r
 elec_fit %>%
   components()
-#> # A dable:               2,880 x 9 [30m] <UTC>
+#> # A dable:               2,880 x 9 [30m] <Australia/Melbourne>
 #> # Key:                   .model [1]
-#> # FASSTER Decomposition: log(Demand) = `I(Temperature^2)` + Temperature +
-#> #   `WorkDay_FALSE/poly(1)` + `WorkDay_FALSE/trig(48, 16)` +
-#> #   `WorkDay_TRUE/poly(1)` + `WorkDay_TRUE/trig(48, 16)`
-#>    .model Time                `log(Demand)` `I(Temperature^… Temperature
-#>    <chr>  <dttm>                      <dbl>            <dbl>       <dbl>
-#>  1 fasst… 2012-01-01 00:00:00          8.39         0.000985     -0.0381
-#>  2 fasst… 2012-01-01 00:30:00          8.36         0.000985     -0.0381
-#>  3 fasst… 2012-01-01 01:00:00          8.31         0.000985     -0.0381
-#>  4 fasst… 2012-01-01 01:30:00          8.26         0.000985     -0.0381
-#>  5 fasst… 2012-01-01 02:00:00          8.30         0.000984     -0.0381
-#>  6 fasst… 2012-01-01 02:30:00          8.26         0.000984     -0.0382
-#>  7 fasst… 2012-01-01 03:00:00          8.21         0.000987     -0.0384
-#>  8 fasst… 2012-01-01 03:30:00          8.18         0.000989     -0.0389
-#>  9 fasst… 2012-01-01 04:00:00          8.14         0.000868     -0.0314
-#> 10 fasst… 2012-01-01 04:30:00          8.12         0.000919     -0.0350
-#> # … with 2,870 more rows, and 4 more variables: `WorkDay_FALSE/poly(1)` <dbl>,
-#> #   `WorkDay_FALSE/trig(48, 16)` <dbl>, `WorkDay_TRUE/poly(1)` <dbl>,
-#> #   `WorkDay_TRUE/trig(48, 16)` <dbl>
+#> # FASSTER Decomposition: log(Demand) = `WorkDay_FALSE/poly(1)` +
+#> #   `WorkDay_FALSE/trig(48, 16)` + `WorkDay_TRUE/poly(1)` +
+#> #   `WorkDay_TRUE/trig(48, 16)` + Temperature + `I(Temperature^2)`
+#>    .model Time                `log(Demand)` `WorkDay_FALSE/… `WorkDay_FALSE/…
+#>    <chr>  <dttm>                      <dbl>            <dbl>            <dbl>
+#>  1 fasst… 2012-01-01 00:00:00          8.39             8.75         -0.00345
+#>  2 fasst… 2012-01-01 00:30:00          8.36             8.75         -0.0234 
+#>  3 fasst… 2012-01-01 01:00:00          8.31             8.75         -0.0971 
+#>  4 fasst… 2012-01-01 01:30:00          8.26             8.76         -0.105  
+#>  5 fasst… 2012-01-01 02:00:00          8.30             8.76         -0.117  
+#>  6 fasst… 2012-01-01 02:30:00          8.26             8.78         -0.0812 
+#>  7 fasst… 2012-01-01 03:00:00          8.21             8.76         -0.251  
+#>  8 fasst… 2012-01-01 03:30:00          8.18             8.82         -0.144  
+#>  9 fasst… 2012-01-01 04:00:00          8.14             8.68         -0.374  
+#> 10 fasst… 2012-01-01 04:30:00          8.12             8.81         -0.202  
+#> # … with 2,870 more rows, and 4 more variables: `WorkDay_TRUE/poly(1)` <dbl>,
+#> #   `WorkDay_TRUE/trig(48, 16)` <dbl>, Temperature <dbl>,
+#> #   `I(Temperature^2)` <dbl>
 ```
 
 The tools made available by *fasster* are designed to integrate
