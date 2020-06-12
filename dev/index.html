@@ -121,28 +121,28 @@
 <p>Commonly used state space components can be added using the following convenience functions:</p>
 <ul>
 <li>
-<code><a href="https://rdrr.io/r/stats/poly.html">poly(n)</a></code> to include an n-th order polynomial</li>
+<code>trend(n)</code> to include an n-th order polynomial</li>
 <li>
-<code>seas(s)</code> to include a seasonal factor of frequency s</li>
+<code>season(s)</code> to include a seasonal factor of frequency s</li>
 <li>
-<code>trig(s, q)</code> to include seasonal fourier terms of frequency s with q harmonics</li>
+<code>fourier(s, q)</code> to include seasonal fourier terms of frequency s with q harmonics</li>
 <li>
 <code>arma(ar, ma)</code> to include an ARMA term (where ar and ma are vectors of coefficients)</li>
 <li>Exogenous regressors can be added by referring to their name</li>
 </ul>
 <p>For example, to create a model with trend and monthly seasonality, you can use:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>fit &lt;-<span class="st"> </span><span class="kw"><a href="https://tsibble.tidyverts.org/reference/as-tsibble.html">as_tsibble</a></span>(USAccDeaths) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb3-2"><a href="#cb3-2"></a><span class="st">  </span><span class="kw">model</span>(<span class="dt">fasster =</span> <span class="kw"><a href="reference/fasster-model.html">FASSTER</a></span>(value <span class="op">~</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/poly.html">poly</a></span>(<span class="dv">1</span>) <span class="op">+</span><span class="st"> </span><span class="kw">trig</span>(<span class="dv">12</span>)))</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="st">  </span><span class="kw">model</span>(<span class="dt">fasster =</span> <span class="kw"><a href="reference/fasster-model.html">FASSTER</a></span>(value <span class="op">~</span><span class="st"> </span><span class="kw">trend</span>(<span class="dv">1</span>) <span class="op">+</span><span class="st"> </span><span class="kw">fourier</span>(<span class="dv">12</span>)))</span>
 <span id="cb3-3"><a href="#cb3-3"></a>fit <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">report</span>()</span>
 <span id="cb3-4"><a href="#cb3-4"></a><span class="co">#&gt; Series: value </span></span>
 <span id="cb3-5"><a href="#cb3-5"></a><span class="co">#&gt; Model: FASSTER </span></span>
 <span id="cb3-6"><a href="#cb3-6"></a><span class="co">#&gt; </span></span>
 <span id="cb3-7"><a href="#cb3-7"></a><span class="co">#&gt; Estimated variances:</span></span>
 <span id="cb3-8"><a href="#cb3-8"></a><span class="co">#&gt;  State noise variances (W):</span></span>
-<span id="cb3-9"><a href="#cb3-9"></a><span class="co">#&gt;   poly(1)</span></span>
-<span id="cb3-10"><a href="#cb3-10"></a><span class="co">#&gt;    5.9382e+03</span></span>
-<span id="cb3-11"><a href="#cb3-11"></a><span class="co">#&gt;   trig(12)</span></span>
-<span id="cb3-12"><a href="#cb3-12"></a><span class="co">#&gt;    8.7014e-13 4.3753e-13 6.1525e-13 1.0068e-13 4.0775e-13 2.3503e-13 3.1338e-13 2.2672e-13 2.7455e-13 2.5930e-13 1.0622e-13</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="co">#&gt;   fourier(12)</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="co">#&gt;    6.6663e-13 7.5474e-13 3.6532e-13 3.6933e-13 3.3369e-13 2.8588e-13 4.2485e-13 2.2424e-13 3.2003e-13 2.1307e-13 1.8887e-13</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="co">#&gt;   trend(1)</span></span>
+<span id="cb3-12"><a href="#cb3-12"></a><span class="co">#&gt;    5.9382e+03</span></span>
 <span id="cb3-13"><a href="#cb3-13"></a><span class="co">#&gt; </span></span>
 <span id="cb3-14"><a href="#cb3-14"></a><span class="co">#&gt;  Observation noise variance (V):</span></span>
 <span id="cb3-15"><a href="#cb3-15"></a><span class="co">#&gt;   2.0543e+04</span></span></code></pre></div>
@@ -156,7 +156,7 @@
 <span id="cb4-7"><a href="#cb4-7"></a>elec_fit &lt;-<span class="st"> </span>elec_tr <span class="op">%&gt;%</span></span>
 <span id="cb4-8"><a href="#cb4-8"></a><span class="st">  </span><span class="kw">model</span>(</span>
 <span id="cb4-9"><a href="#cb4-9"></a>    <span class="dt">fasster =</span> <span class="kw"><a href="reference/fasster-model.html">fasster</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(Demand) <span class="op">~</span><span class="st"> </span></span>
-<span id="cb4-10"><a href="#cb4-10"></a><span class="st">      </span>WorkDay <span class="op">%S%</span><span class="st"> </span>(<span class="kw">trig</span>(<span class="dv">48</span>, <span class="dv">16</span>) <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/poly.html">poly</a></span>(<span class="dv">1</span>)) <span class="op">+</span><span class="st"> </span>Temperature <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/AsIs.html">I</a></span>(Temperature<span class="op">^</span><span class="dv">2</span>)</span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="st">      </span>WorkDay <span class="op">%S%</span><span class="st"> </span>(<span class="kw">fourier</span>(<span class="dv">48</span>, <span class="dv">16</span>) <span class="op">+</span><span class="st"> </span><span class="kw">trend</span>(<span class="dv">1</span>)) <span class="op">+</span><span class="st"> </span>Temperature <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/AsIs.html">I</a></span>(Temperature<span class="op">^</span><span class="dv">2</span>)</span>
 <span id="cb4-11"><a href="#cb4-11"></a>    )</span>
 <span id="cb4-12"><a href="#cb4-12"></a>  )</span></code></pre></div>
 </div>
@@ -169,41 +169,41 @@
 <span id="cb5-2"><a href="#cb5-2"></a><span class="st">  </span><span class="kw">components</span>()</span>
 <span id="cb5-3"><a href="#cb5-3"></a><span class="co">#&gt; # A dable:               72 x 5 [1M]</span></span>
 <span id="cb5-4"><a href="#cb5-4"></a><span class="co">#&gt; # Key:                   .model [1]</span></span>
-<span id="cb5-5"><a href="#cb5-5"></a><span class="co">#&gt; # FASSTER Decomposition: value = `poly(1)` + `trig(12)`</span></span>
-<span id="cb5-6"><a href="#cb5-6"></a><span class="co">#&gt;    .model     index value `poly(1)` `trig(12)`</span></span>
-<span id="cb5-7"><a href="#cb5-7"></a><span class="co">#&gt;    &lt;chr&gt;      &lt;mth&gt; &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;</span></span>
-<span id="cb5-8"><a href="#cb5-8"></a><span class="co">#&gt;  1 fasster 1973 Jan  9007     9740.     -795. </span></span>
-<span id="cb5-9"><a href="#cb5-9"></a><span class="co">#&gt;  2 fasster 1973 Feb  8106     9754.    -1546. </span></span>
-<span id="cb5-10"><a href="#cb5-10"></a><span class="co">#&gt;  3 fasster 1973 Mar  8928     9719.     -758. </span></span>
-<span id="cb5-11"><a href="#cb5-11"></a><span class="co">#&gt;  4 fasster 1973 Apr  9137     9706.     -536. </span></span>
-<span id="cb5-12"><a href="#cb5-12"></a><span class="co">#&gt;  5 fasster 1973 May 10017     9693.      322. </span></span>
-<span id="cb5-13"><a href="#cb5-13"></a><span class="co">#&gt;  6 fasster 1973 Jun 10826     9694.      802. </span></span>
-<span id="cb5-14"><a href="#cb5-14"></a><span class="co">#&gt;  7 fasster 1973 Jul 11317     9830.     1669. </span></span>
-<span id="cb5-15"><a href="#cb5-15"></a><span class="co">#&gt;  8 fasster 1973 Aug 10744     9755.      974. </span></span>
-<span id="cb5-16"><a href="#cb5-16"></a><span class="co">#&gt;  9 fasster 1973 Sep  9713     9761.      -65.7</span></span>
-<span id="cb5-17"><a href="#cb5-17"></a><span class="co">#&gt; 10 fasster 1973 Oct  9938     9768.      233. </span></span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="co">#&gt; # FASSTER Decomposition: value = `fourier(12)` + `trend(1)`</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="co">#&gt;    .model     index value `fourier(12)` `trend(1)`</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="co">#&gt;    &lt;chr&gt;      &lt;mth&gt; &lt;dbl&gt;         &lt;dbl&gt;      &lt;dbl&gt;</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="co">#&gt;  1 fasster 1973 Jan  9007        -795.       9740.</span></span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="co">#&gt;  2 fasster 1973 Feb  8106       -1546.       9754.</span></span>
+<span id="cb5-10"><a href="#cb5-10"></a><span class="co">#&gt;  3 fasster 1973 Mar  8928        -758.       9719.</span></span>
+<span id="cb5-11"><a href="#cb5-11"></a><span class="co">#&gt;  4 fasster 1973 Apr  9137        -536.       9706.</span></span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="co">#&gt;  5 fasster 1973 May 10017         322.       9693.</span></span>
+<span id="cb5-13"><a href="#cb5-13"></a><span class="co">#&gt;  6 fasster 1973 Jun 10826         802.       9694.</span></span>
+<span id="cb5-14"><a href="#cb5-14"></a><span class="co">#&gt;  7 fasster 1973 Jul 11317        1669.       9830.</span></span>
+<span id="cb5-15"><a href="#cb5-15"></a><span class="co">#&gt;  8 fasster 1973 Aug 10744         974.       9755.</span></span>
+<span id="cb5-16"><a href="#cb5-16"></a><span class="co">#&gt;  9 fasster 1973 Sep  9713         -65.7      9761.</span></span>
+<span id="cb5-17"><a href="#cb5-17"></a><span class="co">#&gt; 10 fasster 1973 Oct  9938         233.       9768.</span></span>
 <span id="cb5-18"><a href="#cb5-18"></a><span class="co">#&gt; # … with 62 more rows</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>elec_fit <span class="op">%&gt;%</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="st">  </span><span class="kw">components</span>()</span>
 <span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&gt; # A dable:               2,880 x 9 [30m] &lt;Australia/Melbourne&gt;</span></span>
 <span id="cb6-4"><a href="#cb6-4"></a><span class="co">#&gt; # Key:                   .model [1]</span></span>
-<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&gt; # FASSTER Decomposition: log(Demand) = `WorkDay_FALSE/poly(1)` +</span></span>
-<span id="cb6-6"><a href="#cb6-6"></a><span class="co">#&gt; #   `WorkDay_FALSE/trig(48, 16)` + `WorkDay_TRUE/poly(1)` +</span></span>
-<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt; #   `WorkDay_TRUE/trig(48, 16)` + Temperature + `I(Temperature^2)`</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&gt; # FASSTER Decomposition: log(Demand) = `WorkDay_FALSE/fourier(48, 16)` +</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="co">#&gt; #   `WorkDay_FALSE/trend(1)` + `WorkDay_TRUE/fourier(48, 16)` +</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt; #   `WorkDay_TRUE/trend(1)` + Temperature + `I(Temperature^2)`</span></span>
 <span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt;    .model Time                `log(Demand)` `WorkDay_FALSE/… `WorkDay_FALSE/…</span></span>
 <span id="cb6-9"><a href="#cb6-9"></a><span class="co">#&gt;    &lt;chr&gt;  &lt;dttm&gt;                      &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;</span></span>
-<span id="cb6-10"><a href="#cb6-10"></a><span class="co">#&gt;  1 fasst… 2012-01-01 00:00:00          8.39             8.75         -0.00345</span></span>
-<span id="cb6-11"><a href="#cb6-11"></a><span class="co">#&gt;  2 fasst… 2012-01-01 00:30:00          8.36             8.75         -0.0234 </span></span>
-<span id="cb6-12"><a href="#cb6-12"></a><span class="co">#&gt;  3 fasst… 2012-01-01 01:00:00          8.31             8.75         -0.0971 </span></span>
-<span id="cb6-13"><a href="#cb6-13"></a><span class="co">#&gt;  4 fasst… 2012-01-01 01:30:00          8.26             8.76         -0.105  </span></span>
-<span id="cb6-14"><a href="#cb6-14"></a><span class="co">#&gt;  5 fasst… 2012-01-01 02:00:00          8.30             8.76         -0.117  </span></span>
-<span id="cb6-15"><a href="#cb6-15"></a><span class="co">#&gt;  6 fasst… 2012-01-01 02:30:00          8.26             8.78         -0.0812 </span></span>
-<span id="cb6-16"><a href="#cb6-16"></a><span class="co">#&gt;  7 fasst… 2012-01-01 03:00:00          8.21             8.76         -0.251  </span></span>
-<span id="cb6-17"><a href="#cb6-17"></a><span class="co">#&gt;  8 fasst… 2012-01-01 03:30:00          8.18             8.82         -0.144  </span></span>
-<span id="cb6-18"><a href="#cb6-18"></a><span class="co">#&gt;  9 fasst… 2012-01-01 04:00:00          8.14             8.68         -0.374  </span></span>
-<span id="cb6-19"><a href="#cb6-19"></a><span class="co">#&gt; 10 fasst… 2012-01-01 04:30:00          8.12             8.81         -0.202  </span></span>
-<span id="cb6-20"><a href="#cb6-20"></a><span class="co">#&gt; # … with 2,870 more rows, and 4 more variables: `WorkDay_TRUE/poly(1)` &lt;dbl&gt;,</span></span>
-<span id="cb6-21"><a href="#cb6-21"></a><span class="co">#&gt; #   `WorkDay_TRUE/trig(48, 16)` &lt;dbl&gt;, Temperature &lt;dbl&gt;,</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="co">#&gt;  1 fasst… 2012-01-01 00:00:00          8.39         -0.00345             8.75</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="co">#&gt;  2 fasst… 2012-01-01 00:30:00          8.36         -0.0234              8.75</span></span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="co">#&gt;  3 fasst… 2012-01-01 01:00:00          8.31         -0.0971              8.75</span></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="co">#&gt;  4 fasst… 2012-01-01 01:30:00          8.26         -0.105               8.76</span></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="co">#&gt;  5 fasst… 2012-01-01 02:00:00          8.30         -0.117               8.76</span></span>
+<span id="cb6-15"><a href="#cb6-15"></a><span class="co">#&gt;  6 fasst… 2012-01-01 02:30:00          8.26         -0.0812              8.78</span></span>
+<span id="cb6-16"><a href="#cb6-16"></a><span class="co">#&gt;  7 fasst… 2012-01-01 03:00:00          8.21         -0.251               8.76</span></span>
+<span id="cb6-17"><a href="#cb6-17"></a><span class="co">#&gt;  8 fasst… 2012-01-01 03:30:00          8.18         -0.144               8.82</span></span>
+<span id="cb6-18"><a href="#cb6-18"></a><span class="co">#&gt;  9 fasst… 2012-01-01 04:00:00          8.14         -0.374               8.68</span></span>
+<span id="cb6-19"><a href="#cb6-19"></a><span class="co">#&gt; 10 fasst… 2012-01-01 04:30:00          8.12         -0.202               8.81</span></span>
+<span id="cb6-20"><a href="#cb6-20"></a><span class="co">#&gt; # … with 2,870 more rows, and 4 more variables: `WorkDay_TRUE/fourier(48,</span></span>
+<span id="cb6-21"><a href="#cb6-21"></a><span class="co">#&gt; #   16)` &lt;dbl&gt;, `WorkDay_TRUE/trend(1)` &lt;dbl&gt;, Temperature &lt;dbl&gt;,</span></span>
 <span id="cb6-22"><a href="#cb6-22"></a><span class="co">#&gt; #   `I(Temperature^2)` &lt;dbl&gt;</span></span></code></pre></div>
 <p>The tools made available by <em>fasster</em> are designed to integrate seamlessly with the tidyverse of packages, enabling familiar data manipulation and visualisation capabilities.</p>
 </div>
