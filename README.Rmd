@@ -68,16 +68,16 @@ fit %>% report()
 
 Commonly used state space components can be added using the following convenience functions:
 
-* `poly(n)` to include an n-th order polynomial
-* `seas(s)` to include a seasonal factor of frequency s
-* `trig(s, q)` to include seasonal fourier terms of frequency s with q harmonics
+* `trend(n)` to include an n-th order polynomial
+* `season(s)` to include a seasonal factor of frequency s
+* `fourier(s, q)` to include seasonal fourier terms of frequency s with q harmonics
 * `arma(ar, ma)` to include an ARMA term (where ar and ma are vectors of coefficients)
 * Exogenous regressors can be added by referring to their name
 
 For example, to create a model with trend and monthly seasonality, you can use:
 ```{r component}
 fit <- as_tsibble(USAccDeaths) %>% 
-  model(fasster = FASSTER(value ~ poly(1) + trig(12)))
+  model(fasster = FASSTER(value ~ trend(1) + fourier(12)))
 fit %>% report()
 ```
 
@@ -93,7 +93,7 @@ elec_tr <- tsibbledata::vic_elec %>%
 elec_fit <- elec_tr %>%
   model(
     fasster = fasster(log(Demand) ~ 
-      WorkDay %S% (trig(48, 16) + poly(1)) + Temperature + I(Temperature^2)
+      WorkDay %S% (fourier(48, 16) + trend(1)) + Temperature + I(Temperature^2)
     )
   )
 ```

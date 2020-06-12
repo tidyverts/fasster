@@ -114,12 +114,20 @@ train_fasster <- function(.data, formula, specials, include = NULL){
       reduce(`+`)
   },
   poly = function(...){
+    .Deprecated("trend")
+    cl <- sys.call()
+    out <- dlmModPoly(...)
+    colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
+    out
+  },
+  trend = function(...){
     cl <- sys.call()
     out <- dlmModPoly(...)
     colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
     out
   },
   seas = function(period = NULL, ...){
+    .Deprecated("season")
     period <- get_frequencies(period, self$data, .auto = "smallest")
     cl <- sys.call()
     out <- dlmModSeas(period, ...)
@@ -134,6 +142,7 @@ train_fasster <- function(.data, formula, specials, include = NULL){
     out
   },
   seasonal = function(period = NULL, ...){
+    .Deprecated("season")
     period <- get_frequencies(period, self$data, .auto = "smallest")
     cl <- sys.call()
     out <- dlmModSeas(period, ...)
@@ -141,13 +150,14 @@ train_fasster <- function(.data, formula, specials, include = NULL){
     out
   },
   trig = function(period, ...){
+    .Deprecated("fourier")
     period <- get_frequencies(period, self$data, .auto = "smallest")
     cl <- sys.call()
     out <- dlmModTrig(period, ...)
     colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
     out
   },
-  fourier = function(period, K, ...){
+  fourier = function(period, K = floor(period/2), ...){
     period <- get_frequencies(period, self$data, .auto = "smallest")
     cl <- sys.call()
     out <- dlmModTrig(period, q = K, ...)

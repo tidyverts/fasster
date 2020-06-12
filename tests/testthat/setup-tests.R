@@ -4,4 +4,4 @@ UKLungDeaths <- as_tsibble(cbind(mdeaths, fdeaths), pivot_longer = FALSE)
 USAccDeaths <- as_tsibble(USAccDeaths)
 
 USAccDeaths_fit <- USAccDeaths %>%
-  model(fasster = fasster(value ~ poly(1) + seas(12)))
+  model(fasster = fasster(value ~ trend(1) + season(12)))

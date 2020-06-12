@@ -84,10 +84,10 @@ fit %>% report()
 Commonly used state space components can be added using the following
 convenience functions:
 
--   `poly(n)` to include an n-th order polynomial
--   `seas(s)` to include a seasonal factor of frequency s
--   `trig(s, q)` to include seasonal fourier terms of frequency s with q
-    harmonics
+-   `trend(n)` to include an n-th order polynomial
+-   `season(s)` to include a seasonal factor of frequency s
+-   `fourier(s, q)` to include seasonal fourier terms of frequency s
+    with q harmonics
 -   `arma(ar, ma)` to include an ARMA term (where ar and ma are vectors
     of coefficients)
 -   Exogenous regressors can be added by referring to their name
@@ -97,17 +97,17 @@ can use:
 
 ``` r
 fit <- as_tsibble(USAccDeaths) %>% 
-  model(fasster = FASSTER(value ~ poly(1) + trig(12)))
+  model(fasster = FASSTER(value ~ trend(1) + fourier(12)))
 fit %>% report()
 #> Series: value 
 #> Model: FASSTER 
 #> 
 #> Estimated variances:
 #>  State noise variances (W):
-#>   poly(1)
+#>   fourier(12)
+#>    6.6663e-13 7.5474e-13 3.6532e-13 3.6933e-13 3.3369e-13 2.8588e-13 4.2485e-13 2.2424e-13 3.2003e-13 2.1307e-13 1.8887e-13
+#>   trend(1)
 #>    5.9382e+03
-#>   trig(12)
-#>    8.7014e-13 4.3753e-13 6.1525e-13 1.0068e-13 4.0775e-13 2.3503e-13 3.1338e-13 2.2672e-13 2.7455e-13 2.5930e-13 1.0622e-13
 #> 
 #>  Observation noise variance (V):
 #>   2.0543e+04
@@ -128,7 +128,7 @@ elec_tr <- tsibbledata::vic_elec %>%
 elec_fit <- elec_tr %>%
   model(
     fasster = fasster(log(Demand) ~ 
-      WorkDay %S% (trig(48, 16) + poly(1)) + Temperature + I(Temperature^2)
+      WorkDay %S% (fourier(48, 16) + trend(1)) + Temperature + I(Temperature^2)
     )
   )
 ```
@@ -147,19 +147,19 @@ fit %>%
   components()
 #> # A dable:               72 x 5 [1M]
 #> # Key:                   .model [1]
-#> # FASSTER Decomposition: value = `poly(1)` + `trig(12)`
-#>    .model     index value `poly(1)` `trig(12)`
-#>    <chr>      <mth> <dbl>     <dbl>      <dbl>
-#>  1 fasster 1973 Jan  9007     9740.     -795. 
-#>  2 fasster 1973 Feb  8106     9754.    -1546. 
-#>  3 fasster 1973 Mar  8928     9719.     -758. 
-#>  4 fasster 1973 Apr  9137     9706.     -536. 
-#>  5 fasster 1973 May 10017     9693.      322. 
-#>  6 fasster 1973 Jun 10826     9694.      802. 
-#>  7 fasster 1973 Jul 11317     9830.     1669. 
-#>  8 fasster 1973 Aug 10744     9755.      974. 
-#>  9 fasster 1973 Sep  9713     9761.      -65.7
-#> 10 fasster 1973 Oct  9938     9768.      233. 
+#> # FASSTER Decomposition: value = `fourier(12)` + `trend(1)`
+#>    .model     index value `fourier(12)` `trend(1)`
+#>    <chr>      <mth> <dbl>         <dbl>      <dbl>
+#>  1 fasster 1973 Jan  9007        -795.       9740.
+#>  2 fasster 1973 Feb  8106       -1546.       9754.
+#>  3 fasster 1973 Mar  8928        -758.       9719.
+#>  4 fasster 1973 Apr  9137        -536.       9706.
+#>  5 fasster 1973 May 10017         322.       9693.
+#>  6 fasster 1973 Jun 10826         802.       9694.
+#>  7 fasster 1973 Jul 11317        1669.       9830.
+#>  8 fasster 1973 Aug 10744         974.       9755.
+#>  9 fasster 1973 Sep  9713         -65.7      9761.
+#> 10 fasster 1973 Oct  9938         233.       9768.
 #> # … with 62 more rows
 ```
 
@@ -168,23 +168,23 @@ elec_fit %>%
   components()
 #> # A dable:               2,880 x 9 [30m] <Australia/Melbourne>
 #> # Key:                   .model [1]
-#> # FASSTER Decomposition: log(Demand) = `WorkDay_FALSE/poly(1)` +
-#> #   `WorkDay_FALSE/trig(48, 16)` + `WorkDay_TRUE/poly(1)` +
-#> #   `WorkDay_TRUE/trig(48, 16)` + Temperature + `I(Temperature^2)`
+#> # FASSTER Decomposition: log(Demand) = `WorkDay_FALSE/fourier(48, 16)` +
+#> #   `WorkDay_FALSE/trend(1)` + `WorkDay_TRUE/fourier(48, 16)` +
+#> #   `WorkDay_TRUE/trend(1)` + Temperature + `I(Temperature^2)`
 #>    .model Time                `log(Demand)` `WorkDay_FALSE/… `WorkDay_FALSE/…
 #>    <chr>  <dttm>                      <dbl>            <dbl>            <dbl>
-#>  1 fasst… 2012-01-01 00:00:00          8.39             8.75         -0.00345
-#>  2 fasst… 2012-01-01 00:30:00          8.36             8.75         -0.0234 
-#>  3 fasst… 2012-01-01 01:00:00          8.31             8.75         -0.0971 
-#>  4 fasst… 2012-01-01 01:30:00          8.26             8.76         -0.105  
-#>  5 fasst… 2012-01-01 02:00:00          8.30             8.76         -0.117  
-#>  6 fasst… 2012-01-01 02:30:00          8.26             8.78         -0.0812 
-#>  7 fasst… 2012-01-01 03:00:00          8.21             8.76         -0.251  
-#>  8 fasst… 2012-01-01 03:30:00          8.18             8.82         -0.144  
-#>  9 fasst… 2012-01-01 04:00:00          8.14             8.68         -0.374  
-#> 10 fasst… 2012-01-01 04:30:00          8.12             8.81         -0.202  
-#> # … with 2,870 more rows, and 4 more variables: `WorkDay_TRUE/poly(1)` <dbl>,
-#> #   `WorkDay_TRUE/trig(48, 16)` <dbl>, Temperature <dbl>,
+#>  1 fasst… 2012-01-01 00:00:00          8.39         -0.00345             8.75
+#>  2 fasst… 2012-01-01 00:30:00          8.36         -0.0234              8.75
+#>  3 fasst… 2012-01-01 01:00:00          8.31         -0.0971              8.75
+#>  4 fasst… 2012-01-01 01:30:00          8.26         -0.105               8.76
+#>  5 fasst… 2012-01-01 02:00:00          8.30         -0.117               8.76
+#>  6 fasst… 2012-01-01 02:30:00          8.26         -0.0812              8.78
+#>  7 fasst… 2012-01-01 03:00:00          8.21         -0.251               8.76
+#>  8 fasst… 2012-01-01 03:30:00          8.18         -0.144               8.82
+#>  9 fasst… 2012-01-01 04:00:00          8.14         -0.374               8.68
+#> 10 fasst… 2012-01-01 04:30:00          8.12         -0.202               8.81
+#> # … with 2,870 more rows, and 4 more variables: `WorkDay_TRUE/fourier(48,
+#> #   16)` <dbl>, `WorkDay_TRUE/trend(1)` <dbl>, Temperature <dbl>,
 #> #   `I(Temperature^2)` <dbl>
 ```
 
