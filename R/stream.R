@@ -41,7 +41,7 @@ stream.FASSTER <- function(object, new_data, specials = NULL, ...){
   object$dlmModel <- dlmModel
   object$dlm_future <- modFuture
   object$states <- states
-  object$est <- rbind(object$est, est %>% mutate(.fitted = filtered$f, .resid = filtered$y - filtered$f))
+  object$est <- dplyr::bind_rows(object$est, mutate(est, .fitted = filtered$f, .resid = filtered$y - filtered$f))
 
   object
 }
