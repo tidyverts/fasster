@@ -11,7 +11,8 @@ Imports:
     purrr,
     rlang,
     stats,
-    dplyr (>= 0.8.0)
+    dplyr (>= 0.8.0),
+    distributional
 Suggests:
     tsibbledata (>= 0.2.0),
     lubridate,
