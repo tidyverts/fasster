@@ -1,9 +1,10 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
 fasster <img src="man/figure/logo.png" align="right" />
 =======================================================
 
-[![Travis-CI Build
-Status](https://travis-ci.org/tidyverts/fasster.svg?branch=master)](https://travis-ci.org/tidyverts/fasster)
+[![R build
+status](https://github.com/tidyverts/fasster/workflows/R-CMD-check/badge.svg)](https://github.com/tidyverts/fasster)
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 [![Coverage
 status](https://codecov.io/gh/tidyverts/fasster/branch/master/graph/badge.svg)](https://codecov.io/github/tidyverts/fasster?branch=master)
@@ -172,19 +173,19 @@ elec_fit %>%
 #> #   `WorkDay_TRUE/poly(1)` + `WorkDay_TRUE/trig(48, 16)`
 #>    .model Time                `log(Demand)` `I(Temperature^… Temperature
 #>    <chr>  <dttm>                      <dbl>            <dbl>       <dbl>
-#>  1 fasst… 2012-01-01 00:00:00          8.36         0.000996     -0.0386
-#>  2 fasst… 2012-01-01 00:30:00          8.31         0.000996     -0.0386
-#>  3 fasst… 2012-01-01 01:00:00          8.26         0.000997     -0.0387
-#>  4 fasst… 2012-01-01 01:30:00          8.30         0.000998     -0.0387
-#>  5 fasst… 2012-01-01 02:00:00          8.26         0.00100      -0.0388
-#>  6 fasst… 2012-01-01 02:30:00          8.21         0.00101      -0.0391
-#>  7 fasst… 2012-01-01 03:00:00          8.18         0.00101      -0.0396
-#>  8 fasst… 2012-01-01 03:30:00          8.14         0.000956     -0.0360
-#>  9 fasst… 2012-01-01 04:00:00          8.12         0.00100      -0.0389
-#> 10 fasst… 2012-01-01 04:30:00          8.11         0.000916     -0.0328
-#> # … with 2,870 more rows, and 4 more variables:
-#> #   `WorkDay_FALSE/poly(1)` <dbl>, `WorkDay_FALSE/trig(48, 16)` <dbl>,
-#> #   `WorkDay_TRUE/poly(1)` <dbl>, `WorkDay_TRUE/trig(48, 16)` <dbl>
+#>  1 fasst… 2012-01-01 00:00:00          8.39         0.000985     -0.0381
+#>  2 fasst… 2012-01-01 00:30:00          8.36         0.000985     -0.0381
+#>  3 fasst… 2012-01-01 01:00:00          8.31         0.000985     -0.0381
+#>  4 fasst… 2012-01-01 01:30:00          8.26         0.000985     -0.0381
+#>  5 fasst… 2012-01-01 02:00:00          8.30         0.000984     -0.0381
+#>  6 fasst… 2012-01-01 02:30:00          8.26         0.000984     -0.0382
+#>  7 fasst… 2012-01-01 03:00:00          8.21         0.000987     -0.0384
+#>  8 fasst… 2012-01-01 03:30:00          8.18         0.000989     -0.0389
+#>  9 fasst… 2012-01-01 04:00:00          8.14         0.000868     -0.0314
+#> 10 fasst… 2012-01-01 04:30:00          8.12         0.000919     -0.0350
+#> # … with 2,870 more rows, and 4 more variables: `WorkDay_FALSE/poly(1)` <dbl>,
+#> #   `WorkDay_FALSE/trig(48, 16)` <dbl>, `WorkDay_TRUE/poly(1)` <dbl>,
+#> #   `WorkDay_TRUE/trig(48, 16)` <dbl>
 ```
 
 The tools made available by *fasster* are designed to integrate
