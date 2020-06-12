@@ -185,26 +185,26 @@
 <span id="cb5-18"><a href="#cb5-18"></a><span class="co">#&gt; # … with 62 more rows</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>elec_fit <span class="op">%&gt;%</span></span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="st">  </span><span class="kw">components</span>()</span>
-<span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&gt; # A dable:               2,880 x 9 [30m] &lt;UTC&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&gt; # A dable:               2,880 x 9 [30m] &lt;Australia/Melbourne&gt;</span></span>
 <span id="cb6-4"><a href="#cb6-4"></a><span class="co">#&gt; # Key:                   .model [1]</span></span>
-<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&gt; # FASSTER Decomposition: log(Demand) = `I(Temperature^2)` + Temperature +</span></span>
-<span id="cb6-6"><a href="#cb6-6"></a><span class="co">#&gt; #   `WorkDay_FALSE/poly(1)` + `WorkDay_FALSE/trig(48, 16)` +</span></span>
-<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt; #   `WorkDay_TRUE/poly(1)` + `WorkDay_TRUE/trig(48, 16)`</span></span>
-<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt;    .model Time                `log(Demand)` `I(Temperature^… Temperature</span></span>
-<span id="cb6-9"><a href="#cb6-9"></a><span class="co">#&gt;    &lt;chr&gt;  &lt;dttm&gt;                      &lt;dbl&gt;            &lt;dbl&gt;       &lt;dbl&gt;</span></span>
-<span id="cb6-10"><a href="#cb6-10"></a><span class="co">#&gt;  1 fasst… 2012-01-01 00:00:00          8.36         0.000996     -0.0386</span></span>
-<span id="cb6-11"><a href="#cb6-11"></a><span class="co">#&gt;  2 fasst… 2012-01-01 00:30:00          8.31         0.000996     -0.0386</span></span>
-<span id="cb6-12"><a href="#cb6-12"></a><span class="co">#&gt;  3 fasst… 2012-01-01 01:00:00          8.26         0.000997     -0.0387</span></span>
-<span id="cb6-13"><a href="#cb6-13"></a><span class="co">#&gt;  4 fasst… 2012-01-01 01:30:00          8.30         0.000998     -0.0387</span></span>
-<span id="cb6-14"><a href="#cb6-14"></a><span class="co">#&gt;  5 fasst… 2012-01-01 02:00:00          8.26         0.00100      -0.0388</span></span>
-<span id="cb6-15"><a href="#cb6-15"></a><span class="co">#&gt;  6 fasst… 2012-01-01 02:30:00          8.21         0.00101      -0.0391</span></span>
-<span id="cb6-16"><a href="#cb6-16"></a><span class="co">#&gt;  7 fasst… 2012-01-01 03:00:00          8.18         0.00101      -0.0396</span></span>
-<span id="cb6-17"><a href="#cb6-17"></a><span class="co">#&gt;  8 fasst… 2012-01-01 03:30:00          8.14         0.000956     -0.0360</span></span>
-<span id="cb6-18"><a href="#cb6-18"></a><span class="co">#&gt;  9 fasst… 2012-01-01 04:00:00          8.12         0.00100      -0.0389</span></span>
-<span id="cb6-19"><a href="#cb6-19"></a><span class="co">#&gt; 10 fasst… 2012-01-01 04:30:00          8.11         0.000916     -0.0328</span></span>
-<span id="cb6-20"><a href="#cb6-20"></a><span class="co">#&gt; # … with 2,870 more rows, and 4 more variables:</span></span>
-<span id="cb6-21"><a href="#cb6-21"></a><span class="co">#&gt; #   `WorkDay_FALSE/poly(1)` &lt;dbl&gt;, `WorkDay_FALSE/trig(48, 16)` &lt;dbl&gt;,</span></span>
-<span id="cb6-22"><a href="#cb6-22"></a><span class="co">#&gt; #   `WorkDay_TRUE/poly(1)` &lt;dbl&gt;, `WorkDay_TRUE/trig(48, 16)` &lt;dbl&gt;</span></span></code></pre></div>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&gt; # FASSTER Decomposition: log(Demand) = `WorkDay_FALSE/poly(1)` +</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="co">#&gt; #   `WorkDay_FALSE/trig(48, 16)` + `WorkDay_TRUE/poly(1)` +</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt; #   `WorkDay_TRUE/trig(48, 16)` + Temperature + `I(Temperature^2)`</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt;    .model Time                `log(Demand)` `WorkDay_FALSE/… `WorkDay_FALSE/…</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="co">#&gt;    &lt;chr&gt;  &lt;dttm&gt;                      &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="co">#&gt;  1 fasst… 2012-01-01 00:00:00          8.39             8.75         -0.00345</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="co">#&gt;  2 fasst… 2012-01-01 00:30:00          8.36             8.75         -0.0234 </span></span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="co">#&gt;  3 fasst… 2012-01-01 01:00:00          8.31             8.75         -0.0971 </span></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="co">#&gt;  4 fasst… 2012-01-01 01:30:00          8.26             8.76         -0.105  </span></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="co">#&gt;  5 fasst… 2012-01-01 02:00:00          8.30             8.76         -0.117  </span></span>
+<span id="cb6-15"><a href="#cb6-15"></a><span class="co">#&gt;  6 fasst… 2012-01-01 02:30:00          8.26             8.78         -0.0812 </span></span>
+<span id="cb6-16"><a href="#cb6-16"></a><span class="co">#&gt;  7 fasst… 2012-01-01 03:00:00          8.21             8.76         -0.251  </span></span>
+<span id="cb6-17"><a href="#cb6-17"></a><span class="co">#&gt;  8 fasst… 2012-01-01 03:30:00          8.18             8.82         -0.144  </span></span>
+<span id="cb6-18"><a href="#cb6-18"></a><span class="co">#&gt;  9 fasst… 2012-01-01 04:00:00          8.14             8.68         -0.374  </span></span>
+<span id="cb6-19"><a href="#cb6-19"></a><span class="co">#&gt; 10 fasst… 2012-01-01 04:30:00          8.12             8.81         -0.202  </span></span>
+<span id="cb6-20"><a href="#cb6-20"></a><span class="co">#&gt; # … with 2,870 more rows, and 4 more variables: `WorkDay_TRUE/poly(1)` &lt;dbl&gt;,</span></span>
+<span id="cb6-21"><a href="#cb6-21"></a><span class="co">#&gt; #   `WorkDay_TRUE/trig(48, 16)` &lt;dbl&gt;, Temperature &lt;dbl&gt;,</span></span>
+<span id="cb6-22"><a href="#cb6-22"></a><span class="co">#&gt; #   `I(Temperature^2)` &lt;dbl&gt;</span></span></code></pre></div>
 <p>The tools made available by <em>fasster</em> are designed to integrate seamlessly with the tidyverse of packages, enabling familiar data manipulation and visualisation capabilities.</p>
 </div>
 <div id="forecasting" class="section level3">
@@ -218,7 +218,7 @@
 <p>Future index values are automatically produced and used where necessary in the model specification. If additional information is required by the model (such as <code>WorkDay</code> and <code>Temperature</code>) they must be included in a <code>tsibble</code> of future values passed to <code>new_data</code>.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>elec_ts &lt;-<span class="st"> </span>tsibbledata<span class="op">::</span>vic_elec <span class="op">%&gt;%</span></span>
 <span id="cb8-2"><a href="#cb8-2"></a><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span>(</span>
-<span id="cb8-3"><a href="#cb8-3"></a>    <span class="kw"><a href="https://tsibble.tidyverts.org/reference/period.html">yearmonth</a></span>(Time) <span class="op">==</span><span class="st"> </span><span class="kw"><a href="https://tsibble.tidyverts.org/reference/period.html">yearmonth</a></span>(<span class="st">"2012 Mar"</span>)</span>
+<span id="cb8-3"><a href="#cb8-3"></a>    <span class="kw"><a href="https://tsibble.tidyverts.org/reference/year-month.html">yearmonth</a></span>(Time) <span class="op">==</span><span class="st"> </span><span class="kw"><a href="https://tsibble.tidyverts.org/reference/year-month.html">yearmonth</a></span>(<span class="st">"2012 Mar"</span>)</span>
 <span id="cb8-4"><a href="#cb8-4"></a>  ) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb8-5"><a href="#cb8-5"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">WorkDay =</span> <span class="kw"><a href="http://lubridate.tidyverse.org/reference/day.html">wday</a></span>(Time) <span class="op">%in%</span><span class="st"> </span><span class="dv">2</span><span class="op">:</span><span class="dv">6</span> <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span>Holiday) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb8-6"><a href="#cb8-6"></a><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>Demand)</span>
@@ -269,7 +269,7 @@
   <div class="dev-status">
 <h2>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://travis-ci.org/tidyverts/fasster"><img src="https://travis-ci.org/tidyverts/fasster.svg?branch=master" alt="Travis-CI Build Status"></a></li>
+<li><a href="https://github.com/tidyverts/fasster"><img src="https://github.com/tidyverts/fasster/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
 <li><a href="https://www.tidyverse.org/lifecycle/#experimental"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="lifecycle"></a></li>
 <li><a href="https://codecov.io/github/tidyverts/fasster?branch=master"><img src="https://codecov.io/gh/tidyverts/fasster/branch/master/graph/badge.svg" alt="Coverage status"></a></li>
 </ul>
