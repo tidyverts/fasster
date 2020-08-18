@@ -14,6 +14,15 @@ forecast.FASSTER <- function(object, new_data, specials = NULL, ...){
     reduce(`+`) %>%
     .$X
 
+  # Add missing levels of switching
+  if(!is.null(mod$X)) {
+    X_match <- match(colnames(mod$X), colnames(X))
+    X_missing <- is.na(X_match)
+    X_extra <- matrix(0, nrow = nrow(X), ncol = sum(X_missing), dimnames = list(NULL, colnames(mod$X)[X_missing]))
+    X_match[X_missing] <- seq_len(sum(X_missing)) + sum(!X_missing)
+    X <- cbind(X, X_extra)[,X_match,drop=FALSE]
+  }
+
   fit <- mod
 
   p <- length(mod$m0)
