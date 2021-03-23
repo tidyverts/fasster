@@ -303,3 +303,19 @@ report.FASSTER <- function(object, ...){
     cat
   cat(paste(" Observation noise variance (V):\n ", format(object$dlm$V, digits=5, scientific = TRUE)))
 }
+
+#' @export
+interpolate.FASSTER <- function(object, new_data, specials) {
+  # Get missing values
+  y <- unclass(new_data)[[measured_vars(new_data)]]
+  miss_val <- which(is.na(y))
+  fits <- fitted(object)
+  if(length(y) != length(fits)) {
+    abort("Interpolation for fasster models is only supported for data used to estimate the model.")
+  }
+
+  # Update data
+  y[miss_val] <- fits[miss_val]
+  new_data[[measured_vars(new_data)]] <- y
+  new_data
+}
