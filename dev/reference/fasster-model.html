@@ -77,7 +77,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -88,7 +88,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/mitchelloharawild/fasster">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -171,11 +171,11 @@ Obtain measurement noise variance from smoothed variance of \(v_t\): \(V=Var(v^{
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span>(<span class='no'>mdeaths</span>, <span class='no'>fdeaths</span>) <span class='kw'>%&gt;%</span>
   <span class='fu'>as_tsibble</span>(<span class='kw'>pivot_longer</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'>model</span>(<span class='fu'>FASSTER</span>(<span class='no'>mdeaths</span> ~ <span class='no'>fdeaths</span> + <span class='fu'>trend</span>(<span class='fl'>1</span>) + <span class='fu'>fourier</span>(<span class='fl'>12</span>)))</div><div class='output co'>#&gt; <span style='color: #555555;'># A mable: 1 x 1</span><span>
+  <span class='fu'>model</span>(<span class='fu'>FASSTER</span>(<span class='no'>mdeaths</span> ~ <span class='no'>fdeaths</span> + <span class='fu'>trend</span>(<span class='fl'>1</span>) + <span class='fu'>fourier</span>(<span class='fl'>12</span>)))</div><div class='output co'>#&gt; # A mable: 1 x 1
 #&gt;   `FASSTER(mdeaths ~ fdeaths + trend(1) + fourier(12))`
-#&gt;                                                 </span><span style='color: #555555;font-style: italic;'>&lt;model&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>                                             &lt;FASSTER&gt;</div><div class='input'>
-</div></span></pre>
+#&gt;                                                 &lt;model&gt;
+#&gt; 1                                             &lt;FASSTER&gt;</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
