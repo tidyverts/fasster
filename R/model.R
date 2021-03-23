@@ -149,7 +149,7 @@ train_fasster <- function(.data, formula, specials, include = NULL){
     colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
     out
   },
-  trig = function(period, ...){
+  trig = function(period = NULL, ...){
     .Deprecated("fourier")
     period <- get_frequencies(period, self$data, .auto = "smallest")
     cl <- sys.call()
@@ -157,7 +157,7 @@ train_fasster <- function(.data, formula, specials, include = NULL){
     colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
     out
   },
-  fourier = function(period, K = floor(period/2), ...){
+  fourier = function(period = NULL, K = floor(period/2), ...){
     period <- get_frequencies(period, self$data, .auto = "smallest")
     cl <- sys.call()
     out <- dlmModTrig(period, q = K, ...)
