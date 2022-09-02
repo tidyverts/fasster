@@ -3,6 +3,9 @@ url: https://fasster.tidyverts.org
 template:
   params:
     bootswatch: cosmo
+  includes:
+    in_header: |
+      <script defer data-domain="fasster.tidyverts.org" src="https://track.mitchelloharawild.com/js/plausible.js"></script>
 
 development:
   mode: auto
