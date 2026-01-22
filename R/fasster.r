@@ -6,13 +6,12 @@
 #' \tabular{ll}{ Package: \tab fasster\cr Type: \tab Package\cr License: \tab
 #' GPL3\cr LazyLoad: \tab yes\cr }
 #'
-#' @docType package
 #' @name fasster-package
 #' @author Mitchell O'Hara-Wild
 #'
 #' Maintainer: mail@@mitchelloharawild.com
 #' @keywords package
-NULL
+"_PACKAGE"
 
 #' @rawNamespace import(stats, except = c(simulate, filter, lag))
 #' @import rlang
