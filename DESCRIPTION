@@ -8,7 +8,7 @@ Description: Implementation of the FASSTER (Forecasting with Additive Switching
     flexible modeling of complex seasonal patterns, including time-varying 
     effects and multiple seasonalities.
 Depends:
-    R (>= 3.2.0),
+    R (>= 4.1.0),
     fabletools (>= 0.2.0)
 Imports:
     dlm,
@@ -39,7 +39,6 @@ URL: https://github.com/tidyverts/fasster, https://fasster.tidyverts.org/
 BugReports: https://github.com/tidyverts/fasster/issues
 License: GPL-3
 Encoding: UTF-8
-LazyData: true
 ByteCompile: true
 RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE, roclets=c('rd', 'collate', 'namespace'))
