@@ -34,13 +34,13 @@ Authors@R:
       person(given = "Rob",
              family = "Hyndman",
              role = c("aut", "ths")))
-URL: https://github.com/mitchelloharawild/fasster
-BugReports: https://github.com/mitchelloharawild/fasster/issues
+URL: https://github.com/tidyverts/fasster
+BugReports: https://github.com/tidyverts/fasster/issues
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
 ByteCompile: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE, roclets=c('rd', 'collate', 'namespace'))
 Language: en-GB
 VignetteBuilder: knitr

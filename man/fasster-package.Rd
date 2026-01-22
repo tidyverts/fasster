@@ -12,6 +12,14 @@ with multiple seasonalities using switching states.
 \tabular{ll}{ Package: \tab fasster\cr Type: \tab Package\cr License: \tab
 GPL3\cr LazyLoad: \tab yes\cr }
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/tidyverts/fasster}
+  \item Report bugs at \url{https://github.com/tidyverts/fasster/issues}
+}
+
+}
 \author{
 Mitchell O'Hara-Wild
 
