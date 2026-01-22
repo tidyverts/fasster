@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 # fasster <img src="man/figure/logo.png" align="right" />
 
-[![R build status](https://github.com/tidyverts/fasster/workflows/R-CMD-check/badge.svg)](https://github.com/tidyverts/fasster)
+[![R-CMD-check](https://github.com/tidyverts/fasster/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tidyverts/fasster/actions/workflows/R-CMD-check.yaml)
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 [![Coverage status](https://codecov.io/gh/tidyverts/fasster/branch/master/graph/badge.svg)](https://codecov.io/github/tidyverts/fasster?branch=master)
 <!-- [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/fasster)](https://cran.r-project.org/package=fasster) -->
@@ -34,11 +34,11 @@ There are further plans to improve the heuristic optimisation techniques and bet
 
 ## Installation
 
-<!-- The **stable** version can be installed from CRAN: -->
+The **stable** version can be installed from CRAN:
 
-<!-- ```{r, eval = FALSE} -->
-<!-- install.packages("fasster") -->
-<!-- ``` -->
+```{r, eval = FALSE}
+install.packages("fasster")
+```
 
 The **development** version can be installed from GitHub using:
 
@@ -140,5 +140,6 @@ elec_fit %>%
 ```
 
 ---
+
 Please note that this project is released with a [Contributor Code of Conduct](.github/CODE_OF_CONDUCT.md).
 By participating in this project you agree to abide by its terms.

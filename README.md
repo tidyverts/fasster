@@ -1,10 +1,8 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-fasster <img src="man/figure/logo.png" align="right" />
-=======================================================
+# fasster <img src="man/figure/logo.png" align="right" />
 
-[![R build
-status](https://github.com/tidyverts/fasster/workflows/R-CMD-check/badge.svg)](https://github.com/tidyverts/fasster)
+[![R-CMD-check](https://github.com/tidyverts/fasster/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tidyverts/fasster/actions/workflows/R-CMD-check.yaml)
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 [![Coverage
 status](https://codecov.io/gh/tidyverts/fasster/branch/master/graph/badge.svg)](https://codecov.io/github/tidyverts/fasster?branch=master)
@@ -19,8 +17,7 @@ flexibility, computational speed and accuracy to provide convenient
 tools for modelling, predicting and understanding high frequency
 time-series.
 
-Development cycle
------------------
+## Development cycle
 
 This package is early in development, and there are plans to make
 substantial changes in the future.
@@ -36,8 +33,7 @@ dependency) to make fasster even faster. Implementing this will likely
 result in a revision of the model object structure, but user directed
 functionality should remain the same.
 
-Installation
-------------
+## Installation
 
 The **stable** version can be installed from CRAN:
 
@@ -52,8 +48,7 @@ The **development** version can be installed from GitHub using:
 devtools::install_github("tidyverts/fasster")
 ```
 
-Usage
------
+## Usage
 
 ### Model specification
 
@@ -107,7 +102,7 @@ fit %>% report()
 #> Estimated variances:
 #>  State noise variances (W):
 #>   fourier(12)
-#>    6.6663e-13 7.5474e-13 3.6532e-13 3.6933e-13 3.3369e-13 2.8588e-13 4.2485e-13 2.2424e-13 3.2003e-13 2.1307e-13 1.8887e-13
+#>    3.5590e-13 2.3103e-13 3.5905e-13 4.3745e-13 3.6531e-13 8.4136e-13 2.6433e-13 3.4998e-13 4.1144e-13 3.6736e-13 1.3359e-13
 #>   trend(1)
 #>    5.9382e+03
 #> 
@@ -147,9 +142,9 @@ These components can accessed from a fitted model using the
 ``` r
 fit %>% 
   components()
-#> # A dable:               72 x 5 [1M]
-#> # Key:                   .model [1]
-#> # FASSTER Decomposition: value = `fourier(12)` + `trend(1)`
+#> # A dable: 72 x 5 [1M]
+#> # Key:     .model [1]
+#> # :        value = `fourier(12)` + `trend(1)`
 #>    .model     index value `fourier(12)` `trend(1)`
 #>    <chr>      <mth> <dbl>         <dbl>      <dbl>
 #>  1 fasster 1973 Jan  9007        -795.       9740.
@@ -162,32 +157,33 @@ fit %>%
 #>  8 fasster 1973 Aug 10744         974.       9755.
 #>  9 fasster 1973 Sep  9713         -65.7      9761.
 #> 10 fasster 1973 Oct  9938         233.       9768.
-#> # … with 62 more rows
+#> # ℹ 62 more rows
 ```
 
 ``` r
 elec_fit %>%
   components()
-#> # A dable:               2,880 x 9 [30m] <Australia/Melbourne>
-#> # Key:                   .model [1]
-#> # FASSTER Decomposition: log(Demand) = `WorkDay_FALSE/fourier(48, 16)` +
+#> # A dable: 2,880 x 9 [30m] <Australia/Melbourne>
+#> # Key:     .model [1]
+#> # :        log(Demand) = `WorkDay_FALSE/fourier(48, 16)` +
 #> #   `WorkDay_FALSE/trend(1)` + `WorkDay_TRUE/fourier(48, 16)` +
 #> #   `WorkDay_TRUE/trend(1)` + Temperature + `I(Temperature^2)`
-#>    .model Time                `log(Demand)` `WorkDay_FALSE/… `WorkDay_FALSE/…
-#>    <chr>  <dttm>                      <dbl>            <dbl>            <dbl>
-#>  1 fasst… 2012-01-01 00:00:00          8.39         -0.00345             8.75
-#>  2 fasst… 2012-01-01 00:30:00          8.36         -0.0234              8.75
-#>  3 fasst… 2012-01-01 01:00:00          8.31         -0.0971              8.75
-#>  4 fasst… 2012-01-01 01:30:00          8.26         -0.105               8.76
-#>  5 fasst… 2012-01-01 02:00:00          8.30         -0.117               8.76
-#>  6 fasst… 2012-01-01 02:30:00          8.26         -0.0812              8.78
-#>  7 fasst… 2012-01-01 03:00:00          8.21         -0.251               8.76
-#>  8 fasst… 2012-01-01 03:30:00          8.18         -0.144               8.82
-#>  9 fasst… 2012-01-01 04:00:00          8.14         -0.374               8.68
-#> 10 fasst… 2012-01-01 04:30:00          8.12         -0.202               8.81
-#> # … with 2,870 more rows, and 4 more variables: `WorkDay_TRUE/fourier(48,
-#> #   16)` <dbl>, `WorkDay_TRUE/trend(1)` <dbl>, Temperature <dbl>,
-#> #   `I(Temperature^2)` <dbl>
+#>    .model  Time                `log(Demand)` `WorkDay_FALSE/fourier(48, 16)`
+#>    <chr>   <dttm>                      <dbl>                           <dbl>
+#>  1 fasster 2012-01-01 00:00:00          8.39                        -0.00345
+#>  2 fasster 2012-01-01 00:30:00          8.36                        -0.0234 
+#>  3 fasster 2012-01-01 01:00:00          8.31                        -0.0971 
+#>  4 fasster 2012-01-01 01:30:00          8.26                        -0.105  
+#>  5 fasster 2012-01-01 02:00:00          8.30                        -0.117  
+#>  6 fasster 2012-01-01 02:30:00          8.26                        -0.0812 
+#>  7 fasster 2012-01-01 03:00:00          8.21                        -0.251  
+#>  8 fasster 2012-01-01 03:30:00          8.18                        -0.144  
+#>  9 fasster 2012-01-01 04:00:00          8.14                        -0.374  
+#> 10 fasster 2012-01-01 04:30:00          8.12                        -0.202  
+#> # ℹ 2,870 more rows
+#> # ℹ 5 more variables: `WorkDay_FALSE/trend(1)` <dbl>,
+#> #   `WorkDay_TRUE/fourier(48, 16)` <dbl>, `WorkDay_TRUE/trend(1)` <dbl>,
+#> #   Temperature <dbl>, `I(Temperature^2)` <dbl>
 ```
 
 The tools made available by *fasster* are designed to integrate
