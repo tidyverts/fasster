@@ -58,7 +58,7 @@
 
 
 <dl><dt id="arg-formula">formula<a class="anchor" aria-label="anchor" href="#arg-formula"></a></dt>
-<dd><p>An object of class "formula" (refer to 'Formula' for usage)</p></dd>
+<dd><p>An object of class "formula" (refer to 'Specials' section for usage)</p></dd>
 
 
 <dt id="arg-include">include<a class="anchor" aria-label="anchor" href="#arg-include"></a></dt>
@@ -78,17 +78,85 @@
     <p>The fasster model extends commonly used state space models by introducing a switching component to the measurement equation.
 This is implemented using a time-varying DLM with the switching behaviour encoded in the measurement matrix.</p>
     </div>
-    <div id="formula">
-    <h2>Formula</h2>
+    <div id="specials">
+    <h2>Specials</h2>
 
 
-<p><code>fasster</code> inherits the standard formula specification from <code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></code> for specifying exogenous regressors, including interactions and <code><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I()</a></code> functionality as described in <code><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></code>.</p>
-<p>Special DLM components can be specified using special functions defined below:</p><ul><li><p>season(s): Creates seasonal factors with seasonal period s</p></li>
-<li><p>fourier(s, K): Creates seasonal fourier terms with seasonal period s and K harmonics</p></li>
-<li><p>trend(n): Creates a polynomial of order n (poly(1) creates a level, poly(2) creates a trend)</p></li>
-<li><p>ARMA(ar, ma): Creates ARMA terms with coefficient vectors ar and ma</p></li>
-<li><p>custom(dlm): Creates a custom dlm structure, using <code><a href="https://rdrr.io/pkg/dlm/man/dlm.html" class="external-link">dlm</a></code></p></li>
-</ul><p>The switching operator, <code>%S%</code> requires the switching factor variable on the LHS, and the model to switch over on the RHS (as built using the above components)</p>
+
+<p>The <em>specials</em> define the model structure for <code>FASSTER</code>. The model can include
+trend, seasonal, ARMA, and exogenous regressor components, with optional
+switching behaviour controlled by grouping factors.</p>
+<div class="section">
+<h3 id="trend">trend<a class="anchor" aria-label="anchor" href="#trend"></a></h3>
+<p>The <code>trend</code> special specifies polynomial trend components.</p><div class="sourceCode"><pre><code><span></span>
+<span><span class="fu">trend</span><span class="op">(</span><span class="va">n</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+
+<table class="table table"><tr><td><code>n</code></td><td>The order of the polynomial trend. Use 1 for level, 2 for linear trend, etc.</td></tr><tr><td><code>...</code></td><td>Additional arguments passed to <code><a href="https://rdrr.io/pkg/dlm/man/dlmModPoly.html" class="external-link">dlm::dlmModPoly()</a></code>. Common arguments include <code>dV</code> (observation variance) and <code>dW</code> (state variance, can be a scalar or vector).</td></tr></table></div>
+
+<div class="section">
+<h3 id="season">season<a class="anchor" aria-label="anchor" href="#season"></a></h3>
+<p>The <code>season</code> special specifies seasonal factors using indicator variables.</p><div class="sourceCode"><pre><code><span></span>
+<span><span class="fu">season</span><span class="op">(</span>period <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+
+<table class="table table"><tr><td><code>period</code></td><td>The seasonal period. If <code>NULL</code>, automatically detected from the data (uses the smallest frequency). Can be a number or text like "1 year".</td></tr><tr><td><code>...</code></td><td>Additional arguments passed to <code><a href="https://rdrr.io/pkg/dlm/man/dlmModSeas.html" class="external-link">dlm::dlmModSeas()</a></code>. Common arguments include <code>dV</code> and <code>dW</code>.</td></tr></table></div>
+
+<div class="section">
+<h3 id="fourier">fourier<a class="anchor" aria-label="anchor" href="#fourier"></a></h3>
+<p>The <code>fourier</code> special specifies seasonal components using Fourier terms (trigonometric functions).</p><div class="sourceCode"><pre><code><span></span>
+<span><span class="fu">fourier</span><span class="op">(</span>period <span class="op">=</span> <span class="cn">NULL</span>, K <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="va">period</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+
+<table class="table table"><tr><td><code>period</code></td><td>The seasonal period. If <code>NULL</code>, automatically detected from the data.</td></tr><tr><td><code>K</code></td><td>The number of Fourier terms (harmonics) to include. Maximum is <code>floor(period/2)</code>. More harmonics capture more complex seasonal patterns but increase model complexity.</td></tr><tr><td><code>...</code></td><td>Additional arguments passed to <code><a href="https://rdrr.io/pkg/dlm/man/dlmModTrig.html" class="external-link">dlm::dlmModTrig()</a></code>.</td></tr></table></div>
+
+<div class="section">
+<h3 id="arma">ARMA<a class="anchor" aria-label="anchor" href="#arma"></a></h3>
+<p>The <code>ARMA</code> special includes autoregressive moving average components.</p><div class="sourceCode"><pre><code><span></span>
+<span><span class="fu">ARMA</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div>
+
+<table class="table table"><tr><td><code>...</code></td><td>Arguments passed to <code><a href="https://rdrr.io/pkg/dlm/man/dlmModARMA.html" class="external-link">dlm::dlmModARMA()</a></code>. Typically includes <code>ar</code> (vector of AR coefficients) and <code>ma</code> (vector of MA coefficients).</td></tr></table></div>
+
+<div class="section">
+<h3 id="xreg">xreg<a class="anchor" aria-label="anchor" href="#xreg"></a></h3>
+<p>The <code>xreg</code> special includes exogenous regressors in the model.</p><div class="sourceCode"><pre><code><span></span>
+<span><span class="fu">xreg</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div>
+
+<table class="table table"><tr><td><code>...</code></td><td>Bare expressions for the exogenous regressors. These are evaluated in the context of the data, so you can use transformations like <code>log(x)</code> or interactions.</td></tr></table></div>
+
+<div class="section">
+<h3 id="custom">custom<a class="anchor" aria-label="anchor" href="#custom"></a></h3>
+<p>The <code>custom</code> special allows you to specify custom DLM structures.</p><div class="sourceCode"><pre><code><span></span>
+<span><span class="fu">custom</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div>
+
+<table class="table table"><tr><td><code>...</code></td><td>Arguments passed to <code><a href="https://rdrr.io/pkg/dlm/man/dlm.html" class="external-link">dlm::dlm()</a></code> to create a custom DLM component.</td></tr></table></div>
+
+<div class="section">
+<h3 id="-the-s-operator-creates-switching-models-where-different-model-structures-apply-to-different-groups-defined-by-a-factor-variable-group-s-model-groupa-factor-variable-or-expression-that-evaluates-to-a-factor-defining-the-groups-each-level-of-the-factor-will-have-its-own-version-of-the-model-component-on-the-rhs-specthe-model-specifications-to-replicate-for-each-group-this-can-be-any-combination-of-trend-season-fourier-etc-for-example-group-s-trend-creates-a-separate-level-for-each-value-of-group-allowing-the-mean-to-switch-between-groups-">\<!-- %S\\% (Switching operator)}{ -->
+The <code>\%S\%</code> operator creates switching models where different model structures
+apply to different groups defined by a factor variable.
+<div class="sourceCode"><pre><code><span></span>
+<span><span class="va">group</span> <span class="op">%S%</span> <span class="va">model</span></span></code></pre></div>
+
+<a class="anchor" aria-label="anchor" href="#-the-s-operator-creates-switching-models-where-different-model-structures-apply-to-different-groups-defined-by-a-factor-variable-group-s-model-groupa-factor-variable-or-expression-that-evaluates-to-a-factor-defining-the-groups-each-level-of-the-factor-will-have-its-own-version-of-the-model-component-on-the-rhs-specthe-model-specifications-to-replicate-for-each-group-this-can-be-any-combination-of-trend-season-fourier-etc-for-example-group-s-trend-creates-a-separate-level-for-each-value-of-group-allowing-the-mean-to-switch-between-groups-"></a></h3><table class="table table"><tr><td><code>group</code></td><td>A factor variable (or expression that evaluates to a factor) defining the groups. Each level of the factor will have its own version of the model component on the RHS.</td></tr><tr><td><code>spec</code></td><td>The model specifications to replicate for each group. This can be any combination of <code>trend()</code>, <code>season()</code>, <code>fourier()</code>, etc.</td></tr></table>
+
+
+For example, <code>group \%S\% trend(1)</code> creates a separate level for each value of <code>group</code>,
+allowing the mean to switch between groups.
+
+<p></p>
+</div>
+<div class="section">
+<h3 id="-the-operator-creates-conditional-models-where-a-component-is-only-active-when-a-logical-condition-is-true-condition-model-conditiona-logical-variable-or-expression-the-model-component-will-only-contribute-when-this-is-true-specthe-model-component-to-conditionally-include-for-example-year-gt-trend-includes-a-level-component-only-for-observations-after-">\<!-- %?\\% (Conditional operator)}{ -->
+The <code>\%?\%</code> operator creates conditional models where a component is only active
+when a logical condition is TRUE.
+<div class="sourceCode"><pre><code><span></span>
+<span><span class="va">condition</span> <span class="op">%?%</span> <span class="va">model</span></span></code></pre></div>
+
+<a class="anchor" aria-label="anchor" href="#-the-operator-creates-conditional-models-where-a-component-is-only-active-when-a-logical-condition-is-true-condition-model-conditiona-logical-variable-or-expression-the-model-component-will-only-contribute-when-this-is-true-specthe-model-component-to-conditionally-include-for-example-year-gt-trend-includes-a-level-component-only-for-observations-after-"></a></h3><table class="table table"><tr><td><code>condition</code></td><td>A logical variable or expression. The model component will only contribute when this is TRUE.</td></tr><tr><td><code>spec</code></td><td>The model component to conditionally include.</td></tr></table>
+
+
+For example, <code>(year &gt; 2000) \%?\% trend(1)</code> includes a level component only for observations after 2000.
+
+<p></p>
+</div>
     </div>
     <div id="heuristic">
     <h2>Heuristic</h2>
@@ -104,13 +172,36 @@ Obtain measurement noise variance from smoothed variance of \(v_t\): \(V=Var(v^{
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">mdeaths</span>, <span class="va">fdeaths</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Basic model with trend and seasonality</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">mdeaths</span>, <span class="va">fdeaths</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://tsibble.tidyverts.org/reference/as-tsibble.html" class="external-link">as_tsibble</a></span><span class="op">(</span>pivot_longer <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://fabletools.tidyverts.org/reference/model.html" class="external-link">model</a></span><span class="op">(</span><span class="fu">FASSTER</span><span class="op">(</span><span class="va">mdeaths</span> <span class="op">~</span> <span class="fu">trend</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">fourier</span><span class="op">(</span><span class="fl">12</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A mable: 1 x 1</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   `FASSTER(mdeaths ~ trend(1) + fourier(12))`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                       <span style="color: #949494; font-style: italic;">&lt;model&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>                                   &lt;FASSTER&gt;</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Model with exogenous regressor</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">mdeaths</span>, <span class="va">fdeaths</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://tsibble.tidyverts.org/reference/as-tsibble.html" class="external-link">as_tsibble</a></span><span class="op">(</span>pivot_longer <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://fabletools.tidyverts.org/reference/model.html" class="external-link">model</a></span><span class="op">(</span><span class="fu">FASSTER</span><span class="op">(</span><span class="va">mdeaths</span> <span class="op">~</span> <span class="va">fdeaths</span> <span class="op">+</span> <span class="fu">trend</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">fourier</span><span class="op">(</span><span class="fl">12</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A mable: 1 x 1</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   `FASSTER(mdeaths ~ fdeaths + trend(1) + fourier(12))`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                 <span style="color: #949494; font-style: italic;">&lt;model&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>                                             &lt;FASSTER&gt;</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Switching model with different trends for different periods</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">mdeaths</span>, <span class="va">fdeaths</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://tsibble.tidyverts.org/reference/as-tsibble.html" class="external-link">as_tsibble</a></span><span class="op">(</span>pivot_longer <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://fabletools.tidyverts.org/reference/model.html" class="external-link">model</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="fu">FASSTER</span><span class="op">(</span><span class="va">mdeaths</span> <span class="op">~</span> <span class="op">(</span><span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/year.html" class="external-link">year</a></span><span class="op">(</span><span class="va">index</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">1977</span><span class="op">)</span> <span class="op">%S%</span> <span class="fu">trend</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span> <span class="fu">fourier</span><span class="op">(</span><span class="fl">12</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A mable: 1 x 1</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   FASSTER(mdeaths ~ (lubridate::year(index) &gt; 1977) %S% trend(1) + \n    fouri…¹</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                          <span style="color: #949494; font-style: italic;">&lt;model&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>                                                                      &lt;FASSTER&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ abbreviated name:</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ¹​`FASSTER(mdeaths ~ (lubridate::year(index) &gt; 1977) %S% trend(1) + \n    fourier(12))`</span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
