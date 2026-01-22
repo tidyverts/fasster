@@ -26,7 +26,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://github.com/mitchelloharawild/fasster/" class="external-link">
+  <a href="https://github.com/tidyverts/fasster/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
 
   </a>
@@ -41,7 +41,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Fast Additive Switching of Seasonality, Trend and Exogenous Regressors</h1>
-    <small class="dont-index">Source: <a href="https://github.com/mitchelloharawild/fasster/blob/main/R/model.R" class="external-link"><code>R/model.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/tidyverts/fasster/blob/main/R/model.R" class="external-link"><code>R/model.R</code></a></small>
     <div class="hidden name"><code>fasster-model.Rd</code></div>
     </div>
 
@@ -83,9 +83,9 @@ This is implemented using a time-varying DLM with the switching behaviour encode
 
 
 <p><code>fasster</code> inherits the standard formula specification from <code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></code> for specifying exogenous regressors, including interactions and <code><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I()</a></code> functionality as described in <code><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></code>.</p>
-<p>Special DLM components can be specified using special functions defined below:</p><ul><li><p>seas(s): Creates seasonal factors with seasonal period s</p></li>
+<p>Special DLM components can be specified using special functions defined below:</p><ul><li><p>season(s): Creates seasonal factors with seasonal period s</p></li>
 <li><p>fourier(s, K): Creates seasonal fourier terms with seasonal period s and K harmonics</p></li>
-<li><p>poly(n): Creates a polynomial of order n (poly(1) creates a level, poly(2) creates a trend)</p></li>
+<li><p>trend(n): Creates a polynomial of order n (poly(1) creates a level, poly(2) creates a trend)</p></li>
 <li><p>ARMA(ar, ma): Creates ARMA terms with coefficient vectors ar and ma</p></li>
 <li><p>custom(dlm): Creates a custom dlm structure, using <code><a href="https://rdrr.io/pkg/dlm/man/dlm.html" class="external-link">dlm</a></code></p></li>
 </ul><p>The switching operator, <code>%S%</code> requires the switching factor variable on the LHS, and the model to switch over on the RHS (as built using the above components)</p>
