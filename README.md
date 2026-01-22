@@ -1,6 +1,6 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# fasster <img src="man/figure/logo.png" align="right" />
+# fasster <a href="https://fasster.tidyverts.org"><img src="man/figures/logo.png" align="right" height="139" alt="fasster website" /></a>
 
 [![R-CMD-check](https://github.com/tidyverts/fasster/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tidyverts/fasster/actions/workflows/R-CMD-check.yaml)
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
