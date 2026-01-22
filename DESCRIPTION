@@ -37,7 +37,7 @@ Authors@R:
       person(given = "Rob",
              family = "Hyndman",
              role = c("aut", "ths")))
-URL: https://github.com/tidyverts/fasster
+URL: https://github.com/tidyverts/fasster, https://fasster.tidyverts.org/
 BugReports: https://github.com/tidyverts/fasster/issues
 License: GPL-3
 Encoding: UTF-8
