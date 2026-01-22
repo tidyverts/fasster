@@ -1,5 +1,9 @@
-pandoc: 2.7.3
-pkgdown: 1.4.1.9000
-pkgdown_sha: 732fb5b9ccc0ef87a73dfd0772ae661a4039b2a8
-articles: []
-
+pandoc: 3.1.11
+pkgdown: 2.2.0
+pkgdown_sha: ~
+articles:
+  fasster: fasster.html
+last_built: 2026-01-22T11:25Z
+urls:
+  reference: https://fasster.tidyverts.org/reference
+  article: https://fasster.tidyverts.org/articles
