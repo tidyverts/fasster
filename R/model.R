@@ -101,7 +101,7 @@ train_fasster <- function(.data, specials, include = NULL, ...){
   poly = function(...){
     cl <- sys.call()
     out <- dlmModPoly(...)
-    colnames(out$FF) <- paste0(deparse(cl), seq_len(NCOL(out$FF)))
+    colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
     out
   },
   trend = function(...){
@@ -115,7 +115,7 @@ train_fasster <- function(.data, specials, include = NULL, ...){
     period <- get_frequencies(period, self$data, .auto = "smallest")
     cl <- sys.call()
     out <- dlmModSeas(period, ...)
-    colnames(out$FF) <- paste0(deparse(cl), seq_len(NCOL(out$FF)))
+    colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
     out
   },
   seasonal = function(period = NULL, ...){
@@ -135,7 +135,7 @@ train_fasster <- function(.data, specials, include = NULL, ...){
     } else {
       out <- dlmModTrig(tau = period, q = K, ...)
     }
-    colnames(out$FF) <- paste0(deparse(cl), rep(c("C", "S"), K), rep(seq_len(K), each = 2L))[seq_len(NCOL(out$FF))]
+    colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
     out
   },
   ARMA = function(...){
