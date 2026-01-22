@@ -27,8 +27,6 @@ Suggests:
     testthat,
     spelling,
     covr
-Remotes:
-    tidyverts/fabletools
 Authors@R: 
     c(person(given = "Mitchell",
              family = "O'Hara-Wild",
