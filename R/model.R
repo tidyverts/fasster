@@ -487,7 +487,16 @@ report.FASSTER <- function(object, ...){
     paste0("\n\n") %>%
     cat
   cat(paste(" Observation noise variance (V):\n ", format(object$dlm$V, digits=5, scientific = TRUE)))
+  
+  cat("\n\nInitial states (m0):\n")
+  data.frame(term = colnames(object$dlm$FF), m0 = object$dlm$m0) %>%
+    transmute(!!"Val" := paste0("  ", !!sym("term"), ": ", format(!!sym("m0"), digits=5, scientific=TRUE))) %>%
+    .[["Val"]] %>%
+    paste(collapse="\n") %>%
+    cat
+  cat("\n")
 }
+
 
 #' Interpolate missing values in a FASSTER model
 #'
