@@ -49,10 +49,7 @@
 #' @export
 stream.FASSTER <- function(object, new_data, specials = NULL, ...){
   # Extend model
-  X <- specials %>%
-    unlist(recursive = FALSE) %>%
-    reduce(`+`) %>%
-    .$X
+  X <- reduce(unlist(specials, recursive = FALSE), `+`)$X
 
   mod <- object$dlm_future
 
@@ -81,9 +78,7 @@ stream.FASSTER <- function(object, new_data, specials = NULL, ...){
   states <- rbind(object$states, filtered$a)
 
   # Update model variance
-  filtered$mod$V <- resid %>%
-    as.numeric() %>%
-    var(na.rm = TRUE)
+  filtered$mod$V <- var(as.numeric(resid), na.rm = TRUE)
 
   # Model to start forecasting from
   modFuture <- mod
@@ -94,7 +89,7 @@ stream.FASSTER <- function(object, new_data, specials = NULL, ...){
   ))
   wt <- states[seq_len(NROW(states) - 1) + 1, ] - states[seq_len(NROW(states) - 1), ]%*%t(mod$GG)
   modFuture$W <- var(wt)
-  modFuture$m0 <- filtered$m %>% tail(1) %>% as.numeric()
+  modFuture$m0 <- as.numeric(tail(filtered$m, 1))
 
   object$dlmModel <- mod
   object$dlm_future <- modFuture
@@ -103,5 +98,3 @@ stream.FASSTER <- function(object, new_data, specials = NULL, ...){
 
   object
 }
-
-

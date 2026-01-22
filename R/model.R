@@ -4,9 +4,7 @@ train_fasster <- function(.data, specials, include = NULL, ...){
     abort("Only univariate responses are supported by FASSTER.")
   }
 
-  dlmModel <- specials %>%
-    unlist(recursive = FALSE) %>%
-    reduce(`+`)
+  dlmModel <- reduce(unlist(specials, recursive = FALSE), `+`)
 
   # Include only the end of the data
   if (!is.null(include)){
@@ -16,8 +14,7 @@ train_fasster <- function(.data, specials, include = NULL, ...){
 
   response <- .data[[measured_vars(.data)]]
 
-  dlmModel <- response %>%
-    dlm_filterSmoothHeuristic(dlmModel)
+  dlmModel <- dlm_filterSmoothHeuristic(response, dlmModel)
 
   # Fit model
   filtered <- dlmFilter(response, dlmModel)
@@ -28,9 +25,7 @@ train_fasster <- function(.data, specials, include = NULL, ...){
 
   # Update model variance
   resid <- filtered$y - filtered$f
-  filtered$mod$V <- resid %>%
-    as.numeric() %>%
-    var(na.rm = TRUE)
+  filtered$mod$V <- var(as.numeric(resid), na.rm = TRUE)
 
   # Model to start forecasting from
   modFuture <- filtered$mod
@@ -41,11 +36,11 @@ train_fasster <- function(.data, specials, include = NULL, ...){
   ))
   wt <- filtered$a[seq_len(NROW(filtered$a) - 1) + 1, ] - filtered$a[seq_len(NROW(filtered$a) - 1), ]%*%t(dlmModel$GG)
   modFuture$W <- var(wt)
-  modFuture$m0 <- filtered$m %>% tail(1) %>% as.numeric()
-
+  modFuture$m0 <- as.numeric(tail(filtered$m, 1))
+  
   structure(
     list(dlm = dlmModel, dlm_future = modFuture,
-         est = .data %>% mutate(.fitted = filtered$f, .resid = resid),
+         est = mutate(.data, .fitted = filtered$f, .resid = resid),
          states = filtered$a),
     class = "FASSTER")
 }
@@ -54,27 +49,27 @@ train_fasster <- function(.data, specials, include = NULL, ...){
   `%S%` = function(group, spec){
     group_expr <- enexpr(group)
     group_unique <- unique(group)
-    groups <- group_unique %>% map(~ as.numeric(group == .x)) %>% set_names(group_unique)
+    groups <- map(group_unique, ~ as.numeric(group == .x))
+    names(groups) <- group_unique
 
-    groups %>%
-      imap(function(X, groupVal){
-        if(is.null(spec$JFF)){
-          spec$JFF <- spec$FF
-          spec$X <- matrix(X, ncol = 1)
+    result <- imap(groups, function(X, groupVal){
+      if(is.null(spec$JFF)){
+        spec$JFF <- spec$FF
+        spec$X <- matrix(X, ncol = 1)
+      }
+      else{
+        spec$X <- spec$X * X
+        if(any(new_X_pos <- spec$FF!=0 & spec$JFF==0)){
+          new_X_col <- NCOL(spec$X) + 1
+          spec$JFF[new_X_pos] <- new_X_col
+          spec$X <- cbind(spec$X, X)
         }
-        else{
-          spec$X <- spec$X * X
-          if(any(new_X_pos <- spec$FF!=0 & spec$JFF==0)){
-            new_X_col <- NCOL(spec$X) + 1
-            spec$JFF[new_X_pos] <- new_X_col
-            spec$X <- cbind(spec$X, X)
-          }
-        }
-        colnames(spec$X) <- paste0(expr_text(group_expr), "_", groupVal, "/", colnames(spec$X))
-        colnames(spec$FF) <- paste0(expr_text(group_expr), "_", groupVal, "/", colnames(spec$FF))
-        spec
-      }) %>%
-      reduce(`+`)
+      }
+      colnames(spec$X) <- paste0(expr_text(group_expr), "_", groupVal, "/", colnames(spec$X))
+      colnames(spec$FF) <- paste0(expr_text(group_expr), "_", groupVal, "/", colnames(spec$FF))
+      spec
+    })
+    reduce(result, `+`)
   },
   `%?%` = function(condition, spec){
     cond_expr <- enexpr(condition)
@@ -293,18 +288,18 @@ train_fasster <- function(.data, specials, include = NULL, ...){
 #'
 #' @examples
 #' # Basic model with trend and seasonality
-#' cbind(mdeaths, fdeaths) %>%
-#'   as_tsibble(pivot_longer = FALSE) %>%
+#' cbind(mdeaths, fdeaths) |>
+#'   as_tsibble(pivot_longer = FALSE) |>
 #'   model(FASSTER(mdeaths ~ trend(1) + fourier(12)))
 #'
 #' # Model with exogenous regressor
-#' cbind(mdeaths, fdeaths) %>%
-#'   as_tsibble(pivot_longer = FALSE) %>%
+#' cbind(mdeaths, fdeaths) |>
+#'   as_tsibble(pivot_longer = FALSE) |>
 #'   model(FASSTER(mdeaths ~ fdeaths + trend(1) + fourier(12)))
 #'
 #' # Switching model with different trends for different periods
-#' cbind(mdeaths, fdeaths) %>%
-#'   as_tsibble(pivot_longer = FALSE) %>%
+#' cbind(mdeaths, fdeaths) |>
+#'   as_tsibble(pivot_longer = FALSE) |>
 #'   model(
 #'     FASSTER(mdeaths ~ (lubridate::year(index) > 1977) %S% trend(1) + fourier(12))
 #'   )
@@ -475,22 +470,22 @@ glance.FASSTER <- function(x, ...){
 report.FASSTER <- function(object, ...){
   cat("\nEstimated variances:\n")
   cat(" State noise variances (W):\n")
-  data.frame(term = colnames(object$dlm$FF), W = diag(object$dlm$W)) %>%
-    group_by(!!sym("term")) %>%
-    summarise(!!"W" := paste(format(!!sym("W"), digits=5, scientific=TRUE), collapse=" ")) %>%
-    transmute(!!"Val" := paste0("  ", !!sym("term"), "\n   ", !!sym("W"))) %>%
-    .[["Val"]] %>%
-    paste(collapse="\n") %>%
-    paste0("\n\n") %>%
-    cat
+  df <- data.frame(term = colnames(object$dlm$FF), W = diag(object$dlm$W))
+  df <- group_by(df, !!sym("term"))
+  df <- summarise(df, !!"W" := paste(format(!!sym("W"), digits=5, scientific=TRUE), collapse=" "))
+  df <- transmute(df, !!"Val" := paste0("  ", !!sym("term"), "\n   ", !!sym("W")))
+  vals <- df[["Val"]]
+  output <- paste(vals, collapse="\n")
+  output <- paste0(output, "\n\n")
+  cat(output)
   cat(paste(" Observation noise variance (V):\n ", format(object$dlm$V, digits=5, scientific = TRUE)))
   
   cat("\n\nInitial states (m0):\n")
-  data.frame(term = colnames(object$dlm$FF), m0 = object$dlm$m0) %>%
-    transmute(!!"Val" := paste0("  ", !!sym("term"), ": ", format(!!sym("m0"), digits=5, scientific=TRUE))) %>%
-    .[["Val"]] %>%
-    paste(collapse="\n") %>%
-    cat
+  df <- data.frame(term = colnames(object$dlm$FF), m0 = object$dlm$m0)
+  df <- transmute(df, !!"Val" := paste0("  ", !!sym("term"), ": ", format(!!sym("m0"), digits=5, scientific=TRUE)))
+  vals <- df[["Val"]]
+  output <- paste(vals, collapse="\n")
+  cat(output)
   cat("\n")
 }
 
@@ -564,7 +559,7 @@ interpolate.FASSTER <- function(object, new_data, specials, ...) {
 #' library(tsibble)
 #' 
 #' # Fit model to male deaths
-#' fit_male <- as_tsibble(mdeaths) %>%
+#' fit_male <- as_tsibble(mdeaths) |>
 #'   model(FASSTER(value ~ trend(1) + fourier(12)))
 #' 
 #' # Refit to female deaths without re-estimating parameters
@@ -605,11 +600,11 @@ refit.FASSTER <- function(object, new_data, specials = NULL, reestimate = FALSE,
   ))
   wt <- filtered$a[seq_len(NROW(filtered$a) - 1) + 1, ] - filtered$a[seq_len(NROW(filtered$a) - 1), ]%*%t(dlmModel$GG)
   modFuture$W <- var(wt)
-  modFuture$m0 <- filtered$m %>% tail(1) %>% as.numeric()
+  modFuture$m0 <- as.numeric(tail(filtered$m, 1))
   
   structure(
     list(dlm = dlmModel, dlm_future = modFuture,
-         est = new_data %>% mutate(.fitted = filtered$f, .resid = resid),
+         est = mutate(new_data, .fitted = filtered$f, .resid = resid),
          states = filtered$a),
     class = "FASSTER")
 }

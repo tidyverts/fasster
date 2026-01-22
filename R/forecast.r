@@ -43,10 +43,8 @@ forecast.FASSTER <- function(object, new_data, specials = NULL, ...){
 
   mod <- object$"dlm_future"
 
-  X <- specials %>%
-    unlist(recursive = FALSE) %>%
-    reduce(`+`) %>%
-    .$X
+  X <- unlist(specials, recursive = FALSE)
+  X <- reduce(X, `+`)$X
 
   # Add missing levels of switching
   if(!is.null(mod$X)) {

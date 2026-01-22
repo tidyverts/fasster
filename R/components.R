@@ -49,6 +49,8 @@ components.FASSTER <- function(object, ...) {
     !!response := reduce(syms(colnames(combined)), function(x, y, fn) call2(fn, x, y), "+")
   )
 
-  transmute(object$est, !!sym(response), !!!combined) %>%
-    as_dable(resp = !!sym(response), method = "FASSTER", aliases = aliases)
+  as_dable(
+    transmute(object$est, !!sym(response), !!!combined),
+    resp = !!sym(response), method = "FASSTER", aliases = aliases
+  )
 }
