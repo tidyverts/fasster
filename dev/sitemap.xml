@@ -1,15 +1,23 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
-<url><loc>https://fasster.tidyverts.org/CODE_OF_CONDUCT.html</loc></url>
-<url><loc>https://fasster.tidyverts.org/CONTRIBUTING.html</loc></url>
-<url><loc>https://fasster.tidyverts.org/ISSUE_TEMPLATE.html</loc></url>
-<url><loc>https://fasster.tidyverts.org/SUPPORT.html</loc></url>
-<url><loc>https://fasster.tidyverts.org/authors.html</loc></url>
-<url><loc>https://fasster.tidyverts.org/index.html</loc></url>
-<url><loc>https://fasster.tidyverts.org/news/index.html</loc></url>
-<url><loc>https://fasster.tidyverts.org/reference/fasster-model.html</loc></url>
-<url><loc>https://fasster.tidyverts.org/reference/fasster-package.html</loc></url>
-<url><loc>https://fasster.tidyverts.org/reference/index.html</loc></url>
-<url><loc>https://fasster.tidyverts.org/reference/refit.FASSTER.html</loc></url>
-<url><loc>https://fasster.tidyverts.org/reference/tidy.FASSTER.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/dev/CODE_OF_CONDUCT.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/dev/CONTRIBUTING.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/dev/ISSUE_TEMPLATE.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/dev/SUPPORT.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/dev/authors.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/dev/index.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/dev/news/index.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/dev/reference/components.FASSTER.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/dev/reference/fasster-model.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/dev/reference/fasster-package.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/dev/reference/fitted.FASSTER.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/dev/reference/forecast.FASSTER.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/dev/reference/glance.FASSTER.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/dev/reference/index.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/dev/reference/interpolate.FASSTER.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/dev/reference/refit.FASSTER.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/dev/reference/report.FASSTER.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/dev/reference/residuals.FASSTER.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/dev/reference/stream.FASSTER.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/dev/reference/tidy.FASSTER.html</loc></url>
 </urlset>
 
