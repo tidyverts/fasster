@@ -1,15 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://fasster.tidyverts.org/index.html</loc>
-  </url>
-  <url>
-    <loc>https://fasster.tidyverts.org/reference/fasster-model.html</loc>
-  </url>
-  <url>
-    <loc>https://fasster.tidyverts.org/reference/fasster-package.html</loc>
-  </url>
-  <url>
-    <loc>https://fasster.tidyverts.org/reference/tidy.FASSTER.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://fasster.tidyverts.org/CODE_OF_CONDUCT.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/CONTRIBUTING.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/ISSUE_TEMPLATE.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/SUPPORT.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/authors.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/index.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/reference/fasster-model.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/reference/fasster-package.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/reference/index.html</loc></url>
+<url><loc>https://fasster.tidyverts.org/reference/tidy.FASSTER.html</loc></url>
 </urlset>
+
