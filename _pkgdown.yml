@@ -53,43 +53,36 @@ reference:
   - FASSTER
   - fasster
 
-- title: Methods for model extraction
+- title: Model extraction
   desc: >
     Functions to extract information from fitted FASSTER models
   contents:
   - tidy.FASSTER
   - glance.FASSTER
-  - components.FASSTER
-
-- title: Methods for model fitting
-  desc: >
-    Functions for generating fitted values and residuals
-  contents:
   - fitted.FASSTER
   - residuals.FASSTER
 
-- title: Methods for forecasting
+  - components.FASSTER
+
+- title: Forecasting and prediction
   desc: >
     Functions for generating forecasts and streaming new data
   contents:
   - forecast.FASSTER
   - interpolate.FASSTER
 
-- title: Methods for model updating
+- title: Model re-estimation
   desc: >
     Functions for refitting and updating models with new data
   contents:
   - refit.FASSTER
   - stream.FASSTER
 
-- title: Methods for reporting
+- title: Reporting
   desc: >
     Functions for displaying model information
   contents:
   - report.FASSTER
-  - format.FASSTER
-  - print.FASSTER
-  - model_sum.FASSTER
 
 footer:
   structure:
