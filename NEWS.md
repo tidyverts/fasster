@@ -1,4 +1,4 @@
-# fasster (development version)
+# fasster 0.2.0
 
 Fast Additive Switching of Seasonality, Trend and Exogenous Regressors
 (FASSTER) is a state space model designed for forecasting time series with
