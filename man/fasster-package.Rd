@@ -5,12 +5,15 @@
 \alias{fasster-package}
 \title{fasster: Fast Additive Switching of Seasonality, Trend, and Exogenous Regressors}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 Implementation of the FASSTER (Forecasting with Additive Switching of Seasonality, Trend, and Exogenous Regressors) model for forecasting time series with multiple seasonal patterns. The model combines state space methodology with a switching component in the observation equation to allow flexible modeling of complex seasonal patterns, including time-varying effects and multiple seasonalities.
 }
 \seealso{
 Useful links:
 \itemize{
   \item \url{https://github.com/tidyverts/fasster}
+  \item \url{https://fasster.tidyverts.org/}
   \item Report bugs at \url{https://github.com/tidyverts/fasster/issues}
 }
 

@@ -148,18 +148,18 @@ Obtain measurement noise variance from smoothed variance of \eqn{v_t}: \eqn{V=Va
 
 \examples{
 # Basic model with trend and seasonality
-cbind(mdeaths, fdeaths) \%>\%
-  as_tsibble(pivot_longer = FALSE) \%>\%
+cbind(mdeaths, fdeaths) |>
+  as_tsibble(pivot_longer = FALSE) |>
   model(FASSTER(mdeaths ~ trend(1) + fourier(12)))
 
 # Model with exogenous regressor
-cbind(mdeaths, fdeaths) \%>\%
-  as_tsibble(pivot_longer = FALSE) \%>\%
+cbind(mdeaths, fdeaths) |>
+  as_tsibble(pivot_longer = FALSE) |>
   model(FASSTER(mdeaths ~ fdeaths + trend(1) + fourier(12)))
 
 # Switching model with different trends for different periods
-cbind(mdeaths, fdeaths) \%>\%
-  as_tsibble(pivot_longer = FALSE) \%>\%
+cbind(mdeaths, fdeaths) |>
+  as_tsibble(pivot_longer = FALSE) |>
   model(
     FASSTER(mdeaths ~ (lubridate::year(index) > 1977) \%S\% trend(1) + fourier(12))
   )

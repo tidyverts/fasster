@@ -29,7 +29,7 @@ Applies a fitted FASSTER model to a new dataset.
 library(tsibble)
 
 # Fit model to male deaths
-fit_male <- as_tsibble(mdeaths) \%>\%
+fit_male <- as_tsibble(mdeaths) |>
   model(FASSTER(value ~ trend(1) + fourier(12)))
 
 # Refit to female deaths without re-estimating parameters
