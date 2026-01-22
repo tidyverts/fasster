@@ -7,10 +7,8 @@
 [![R-CMD-check](https://github.com/tidyverts/fasster/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tidyverts/fasster/actions/workflows/R-CMD-check.yaml)
 [![Lifecycle:
 stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/fasster)](https://cran.r-project.org/package=fasster)
-[![Downloads](http://cranlogs.r-pkg.org/badges/fasster?color=brightgreen)](https://cran.r-project.org/package=fasster)
-[![Coverage
-status](https://codecov.io/gh/tidyverts/fasster/branch/master/graph/badge.svg)](https://codecov.io/github/tidyverts/fasster?branch=master)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/fasster)](https://github.com/tidyverts/fasster)
+[![Downloads](http://cranlogs.r-pkg.org/badges/fasster?color=brightgreen)](https://github.com/tidyverts/fasster)
 <!-- badges: end -->
 
 An implementation of the FASSTER (Forecasting with Additive Switching of
@@ -25,9 +23,9 @@ time-series.
 
 This model was developed in 2017 for an honours thesis, and the clearest
 description with examples of using fasster can be found in my useR! 2018
-talk: [slides](https://slides.mitchelloharawild.com/user2018/#1),
+talk: [slides](https://slides.mitchelloharawild.com/user2018/),
 [video](https://www.youtube.com/watch?v=6YlboftSalY),
-[source](https://github.com/mitchelloharawild/fasster_user2018).
+[source](https://github.com/mitchelloharawild/talk-user2018-fasster).
 
 The model uses a forward filtering backward smoothing heuristic for
 estimating the initial states in the model. It is essentially an
