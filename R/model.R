@@ -336,29 +336,64 @@ FASSTER <- function(formula, include = NULL, ...){
 #' @usage NULL
 fasster <- FASSTER
 
+#' Extract fitted values from a FASSTER model
+#'
+#' Returns the one-step-ahead fitted values from a FASSTER model, calculated
+#' during the Kalman filtering process. These represent the model's predictions
+#' at each time point using only information available up to that point.
+#'
+#' @param object A fitted FASSTER model object.
+#' @param ... Additional arguments (currently unused).
+#'
+#' @return A numeric vector of fitted values with the same length as the
+#'   training data.
+#'
+#' @examples
+#' library(tsibble)
+#' fit <- as_tsibble(mdeaths) |>
+#'   model(FASSTER(value ~ trend(1) + fourier(12)))
+#' 
+#' # Extract fitted values
+#' fitted(fit)
+#'
 #' @export
 fitted.FASSTER <- function(object, ...){
   object$est[[".fitted"]]
 }
 
+#' Extract residuals from a FASSTER model
+#'
+#' Returns the one-step-ahead forecast errors (residuals) from a FASSTER model.
+#'
+#' @param object A fitted FASSTER model object.
+#' @param ... Additional arguments (currently unused).
+#'
+#' @return A numeric vector of residuals with the same length as the training
+#'   data.
+#'
+#' @examples
+#' library(tsibble)
+#' fit <- as_tsibble(mdeaths) |>
+#'   model(FASSTER(value ~ trend(1) + fourier(12)))
+#' 
+#' # Extract residuals
+#' residuals(fit)
+#'
 #' @export
 residuals.FASSTER <- function(object, ...){
   object$est[[".resid"]]
 }
 
+#' @keywords internal
 #' @export
 model_sum.FASSTER <- function(x){
   "FASSTER"
 }
 
+#' @keywords internal
 #' @export
 format.FASSTER <- function(x, ...){
   "FASSTER Model"
-}
-
-#' @export
-print.FASSTER <- function(x, ...){
-  cat(format(x))
 }
 
 #' Extract coefficients from a FASSTER model
@@ -379,6 +414,33 @@ tidy.FASSTER <- function(x, ...){
   )
 }
 
+#' Glance at a FASSTER model
+#'
+#' Constructs a single-row summary of the model's goodness-of-fit statistics.
+#' This method follows the broom package conventions and is used by fabletools
+#' to provide model selection metrics.
+#'
+#' @param x A FASSTER model object.
+#' @param ... Additional arguments (currently unused).
+#'
+#' @return A one-row tibble containing:
+#' \describe{
+#'   \item{sigma2}{The estimated observation variance (V). If the model has
+#'     multivariate observations, this is a list containing the variance matrix.}
+#'   \item{log_lik}{The log-likelihood of the model.}
+#'   \item{AIC}{Akaike Information Criterion.}
+#'   \item{AICc}{Corrected AIC for small sample sizes.}
+#'   \item{BIC}{Bayesian Information Criterion.}
+#' }
+#'
+#' @examples
+#' library(tsibble)
+#' fit <- as_tsibble(mdeaths) |>
+#'   model(FASSTER(value ~ trend(1) + fourier(12)))
+#' 
+#' # Get model fit statistics
+#' glance(fit)
+#'
 #' @export
 glance.FASSTER <- function(x, ...){
   logL <- -dlmLL(x$est$.resid + x$est$.fitted, x$dlm)
@@ -394,6 +456,34 @@ glance.FASSTER <- function(x, ...){
   )
 }
 
+#' Report on a FASSTER model
+#'
+#' Prints a detailed report of the estimated variance parameters for a FASSTER
+#' model. This includes the state noise variances (W) for each model component
+#' and the observation noise variance (V).
+#'
+#' @param object A FASSTER model object.
+#' @param ... Additional arguments (currently unused).
+#'
+#' @return Invisibly returns NULL. Called for its side effect of printing the
+#'   variance report to the console.
+#'
+#' @details
+#' The report displays:
+#' \itemize{
+#'   \item State noise variances (W): The variance of the random innovations
+#'     for each state component, grouped by model term.
+#'   \item Observation noise variance (V): The variance of the measurement error.
+#' }
+#'
+#' @examples
+#' library(tsibble)
+#' fit <- as_tsibble(mdeaths) |>
+#'   model(FASSTER(value ~ trend(1) + fourier(12)))
+#' 
+#' # Print variance report
+#' report(fit)
+#'
 #' @export
 #' @importFrom rlang as_quosure sym
 report.FASSTER <- function(object, ...){
@@ -410,6 +500,41 @@ report.FASSTER <- function(object, ...){
   cat(paste(" Observation noise variance (V):\n ", format(object$dlm$V, digits=5, scientific = TRUE)))
 }
 
+#' Interpolate missing values in a FASSTER model
+#'
+#' Fills in missing values in the response variable using the model's fitted
+#' values. This method only works for interpolating data used to estimate the
+#' model and cannot be used for new data.
+#'
+#' @param object A fitted FASSTER model object.
+#' @param new_data A tsibble containing the data to interpolate. Must be the
+#'   same data used to fit the model.
+#' @param specials A list of special terms (passed by fabletools).
+#' @param ... Additional arguments (currently unused).
+#'
+#' @return A tsibble with missing values in the response variable replaced by
+#'   fitted values.
+#'
+#' @details
+#' This method identifies missing values (NAs) in the response variable and
+#' replaces them with the corresponding fitted values from the model. It only
+#' works when `new_data` has the same length as the data used to fit the model.
+#'
+#' @examples
+#' library(tsibble)
+#' library(dplyr)
+#' 
+#' # Create data with missing values
+#' deaths_na <- as_tsibble(mdeaths) |>
+#'   mutate(value = if_else(row_number() %in% c(10, 20, 30), NA_real_, value))
+#' 
+#' # Fit model
+#' fit <- deaths_na |>
+#'   model(FASSTER(value ~ trend(1) + fourier(12)))
+#' 
+#' # Interpolate missing values
+#' interpolate(fit, deaths_na)
+#'
 #' @export
 interpolate.FASSTER <- function(object, new_data, specials, ...) {
   # Get missing values

@@ -1,3 +1,51 @@
+#' Stream new data through a FASSTER model
+#'
+#' Extends a fitted FASSTER model by filtering new observations through the
+#' existing state space model. The model's states and parameters are updated
+#' sequentially as new data arrives, allowing for online learning without
+#' refitting from scratch.
+#'
+#' @param object A fitted FASSTER model object
+#' @param new_data A tsibble containing new observations to stream through the model
+#' @param specials A list of special terms (switching variables, etc.) parsed from the model formula
+#' @param ... Additional arguments (currently unused)
+#'
+#' @return An updated FASSTER model object with:
+#' \itemize{
+#'   \item Extended state estimates incorporating the new data
+#'   \item Updated model variance
+#'   \item Appended fitted values and residuals
+#'   \item Updated DLM components for future forecasting
+#' }
+#'
+#' @details
+#' The streaming process:
+#' \enumerate{
+#'   \item Constructs the design matrix from new data
+#'   \item Applies the Kalman filter to sequentially update states
+#'   \item Updates model variance based on all residuals
+#'   \item Prepares the model for subsequent forecasting or streaming
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' library(tsibble)
+#' library(fasster)
+#'
+#' # Fit initial model on training data
+#' fit <- as_tsibble(head(USAccDeaths, -12)) |>
+#'   model(fasster = FASSTER(value ~ trend() + season("year")))
+#' tidy(fit)
+#' tail(fitted(fit), 20)
+#' 
+#' # Stream new data through the model
+#' fit_updated <- fit |>
+#'   stream(as_tsibble(tail(USAccDeaths, 12)))
+#' tidy(fit_updated)
+#' tail(fitted(fit_updated), 20)
+#' 
+#' }
+#'
 #' @export
 stream.FASSTER <- function(object, new_data, specials = NULL, ...){
   # Extend model

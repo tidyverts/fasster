@@ -1,3 +1,33 @@
+#' Extract Components from a FASSTER Model
+#'
+#' Decomposes a FASSTER model into its individual components, allowing you to
+#' examine the contribution of each term to the fitted values. This is useful
+#' for understanding which components drive the model's predictions and how
+#' well different aspects of the model fit the data.
+#'
+#' @param object A FASSTER model object.
+#' @param ... Additional arguments (currently unused).
+#'
+#' @return A dable (decomposition table) containing the response variable and
+#'   each model component as separate columns. The components sum to the
+#'   response variable.
+#'
+#' @examples
+#' \dontrun{
+#' # Fit a FASSTER model and extract components
+#' library(tsibble)
+#' library(dplyr)
+#' fit <- tsibbledata::aus_retail |>
+#'   filter(
+#'     State == "Victoria",
+#'     Industry == "Cafes, restaurants and catering services"
+#'   ) |>
+#'   model(fasster = FASSTER(Turnover ~ trend(1) + season("year")))
+#'
+#' # Extract and view components
+#' components(fit)
+#' }
+#'
 #' @importFrom purrr map_dfc
 #' @export
 components.FASSTER <- function(object, ...) {

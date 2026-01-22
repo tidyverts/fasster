@@ -1,3 +1,37 @@
+#' Forecast a FASSTER model
+#'
+#' Produces forecasts from a trained FASSTER model using the Kalman filter
+#' framework. This method generates point forecasts and prediction intervals
+#' by propagating the state space forward through time.
+#'
+#' @param object A trained FASSTER model object.
+#' @param new_data A tsibble containing future time points to forecast. Must be
+#'   regularly spaced and contain any required exogenous regressors.
+#' @param specials A list of special formulations generated from the model
+#'   formula, used to construct the design matrix for time-varying components.
+#' @param ... Additional arguments (currently unused).
+#'
+#' @return A distribution vector (from the distributional package) containing
+#'   normal distributions with forecasted means and standard errors for each
+#'   future time point. This integrates with fable's forecast distribution
+#'   structure.
+#'
+#' @details
+#' The forecast method implements a Kalman filter to propagate the state space
+#' model forward in time:
+#' \enumerate{
+#'   \item For each forecast horizon, constructs time-varying system matrices
+#'     (FF, GG, V, W) using exogenous variables from \code{new_data}
+#'   \item Computes the state forecast: \eqn{a_{t+1} = G_t a_t}
+#'   \item Computes the state covariance: \eqn{R_{t+1} = G_t R_t G_t' + W_t}
+#'   \item Computes the observation forecast: \eqn{f_t = F_t a_{t+1}}
+#'   \item Computes the forecast variance: \eqn{Q_t = F_t R_{t+1} F_t' + V_t}
+#' }
+#'
+#' The method handles switching components by matching exogenous variables
+#' in \code{new_data} with the model's design matrix, adding zero columns
+#' for any missing levels.
+#'
 #' @importFrom dlm dlmSvd2var
 #' @importFrom utils tail
 #' @export
