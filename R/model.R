@@ -262,12 +262,12 @@ train_fasster <- function(.data, specials, include = NULL, ...){
 #'   `...` \tab Arguments passed to [`dlm::dlm()`] to create a custom DLM component. \cr
 #' }
 #' }
-#'
-#' \subsection{\%S\% (Switching operator)}{
-#' The `\%S\%` operator creates switching models where different model structures
+#' 
+#' \subsection{`%S%` (Switching operator)}{
+#' The `%S%` operator creates switching models where different model structures
 #' apply to different groups defined by a factor variable.
 #' \preformatted{
-#' group \%S\% model
+#' group %S% model
 #' }
 #'
 #' \tabular{ll}{
@@ -275,15 +275,15 @@ train_fasster <- function(.data, specials, include = NULL, ...){
 #'   `spec` \tab The model specifications to replicate for each group. This can be any combination of `trend()`, `season()`, `fourier()`, etc. \cr
 #' }
 #'
-#' For example, `group \%S\% trend(1)` creates a separate level for each value of `group`,
+#' For example, `group %S% trend(1)` creates a separate level for each value of `group`,
 #' allowing the mean to switch between groups.
 #' }
 #'
-#' \subsection{\%?\% (Conditional operator)}{
-#' The `\%?\%` operator creates conditional models where a component is only active
+#' \subsection{`%?%` (Conditional operator)}{
+#' The `%?%` operator creates conditional models where a component is only active
 #' when a logical condition is TRUE.
 #' \preformatted{
-#' condition \%?\% model
+#' condition %?% model
 #' }
 #'
 #' \tabular{ll}{
@@ -291,7 +291,7 @@ train_fasster <- function(.data, specials, include = NULL, ...){
 #'   `spec`     \tab The model component to conditionally include. \cr
 #' }
 #'
-#' For example, `(year > 2000) \%?\% trend(1)` includes a level component only for observations after 2000.
+#' For example, `(year > 2000) %?% trend(1)` includes a level component only for observations after 2000.
 #' }
 #'
 #' @section Heuristic:
@@ -411,7 +411,7 @@ report.FASSTER <- function(object, ...){
 }
 
 #' @export
-interpolate.FASSTER <- function(object, new_data, specials) {
+interpolate.FASSTER <- function(object, new_data, specials, ...) {
   # Get missing values
   y <- unclass(new_data)[[measured_vars(new_data)]]
   miss_val <- which(is.na(y))

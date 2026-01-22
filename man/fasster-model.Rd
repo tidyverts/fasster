@@ -101,11 +101,11 @@ custom(...)
 }
 }
 
-\subsection{\\%S\\% (Switching operator)}{
-The \verb{\\\%S\\\%} operator creates switching models where different model structures
+\subsection{\verb{\%S\%} (Switching operator)}{
+The \verb{\%S\%} operator creates switching models where different model structures
 apply to different groups defined by a factor variable.
 \preformatted{
-group \%S\% model
+group %S% model
 }
 
 \tabular{ll}{
@@ -113,15 +113,15 @@ group \%S\% model
 \code{spec} \tab The model specifications to replicate for each group. This can be any combination of \code{trend()}, \code{season()}, \code{fourier()}, etc. \cr
 }
 
-For example, \verb{group \\\%S\\\% trend(1)} creates a separate level for each value of \code{group},
+For example, \code{group \%S\% trend(1)} creates a separate level for each value of \code{group},
 allowing the mean to switch between groups.
 }
 
-\subsection{\\%?\\% (Conditional operator)}{
-The \verb{\\\%?\\\%} operator creates conditional models where a component is only active
+\subsection{\verb{\%?\%} (Conditional operator)}{
+The \verb{\%?\%} operator creates conditional models where a component is only active
 when a logical condition is TRUE.
 \preformatted{
-condition \%?\% model
+condition %?% model
 }
 
 \tabular{ll}{
@@ -129,7 +129,7 @@ condition \%?\% model
 \code{spec}     \tab The model component to conditionally include. \cr
 }
 
-For example, \verb{(year > 2000) \\\%?\\\% trend(1)} includes a level component only for observations after 2000.
+For example, \code{(year > 2000) \%?\% trend(1)} includes a level component only for observations after 2000.
 }
 }
 
