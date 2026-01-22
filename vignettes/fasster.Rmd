@@ -119,7 +119,8 @@ FASSTER(y ~ day_type %S% (trend(1) + weather %S% fourier(24)))
 Let's demonstrate FASSTER using quarterly gas production data.
 
 ```{r}
-library(tidyverse)
+library(dplyr)
+library(lubridate)
 
 # Use Australian gas production data
 gas_data <- tsibbledata::aus_production |>
