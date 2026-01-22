@@ -145,7 +145,12 @@ train_fasster <- function(.data, specials, include = NULL, ...){
   fourier = function(period = NULL, K = floor(period/2), ...){
     period <- get_frequencies(period, self$data, .auto = "smallest")
     cl <- sys.call()
-    out <- dlmModTrig(period, q = K, ...)
+    # If period is integer
+    if(period == floor(period)) {
+      out <- dlmModTrig(period, q = K, ...)
+    } else {
+      out <- dlmModTrig(tau = period, q = K, ...)
+    }
     colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
     out
   },
