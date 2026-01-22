@@ -1,6 +1,7 @@
 url: https://fasster.tidyverts.org
 
 template:
+  bootstrap: 5
   params:
     bootswatch: cosmo
   includes:
@@ -15,3 +16,82 @@ authors:
     href: https://mitchelloharawild.com
   Rob Hyndman:
     href: http://robjhyndman.com
+home:
+  links:
+  - text: Ask a question
+    href: https://github.com/tidyverts/fasster/issues
+
+navbar:
+  structure:
+    left: [intro, reference, articles, news]
+    right: [search, github]
+  components:
+    home:
+      icon: fas fa-home fa-lg
+      href: index.html
+    reference:
+      text: Reference
+      href: reference/index.html
+    articles:
+      text: Articles
+      menu:
+      - text: All vignettes
+        href: articles/index.html
+    news:
+      text: News
+      href: news/index.html
+    github:
+      icon: fab fa-github fa-lg
+      href: https://github.com/tidyverts/fasster
+      aria-label: GitHub
+
+reference:
+- title: Model specification
+  desc: >
+    Functions for specifying and estimating FASSTER models
+  contents:
+  - FASSTER
+  - fasster
+
+- title: Methods for model extraction
+  desc: >
+    Functions to extract information from fitted FASSTER models
+  contents:
+  - tidy.FASSTER
+  - glance.FASSTER
+  - components.FASSTER
+
+- title: Methods for model fitting
+  desc: >
+    Functions for generating fitted values and residuals
+  contents:
+  - fitted.FASSTER
+  - residuals.FASSTER
+
+- title: Methods for forecasting
+  desc: >
+    Functions for generating forecasts and streaming new data
+  contents:
+  - forecast.FASSTER
+  - interpolate.FASSTER
+
+- title: Methods for model updating
+  desc: >
+    Functions for refitting and updating models with new data
+  contents:
+  - refit.FASSTER
+  - stream.FASSTER
+
+- title: Methods for reporting
+  desc: >
+    Functions for displaying model information
+  contents:
+  - report.FASSTER
+  - format.FASSTER
+  - print.FASSTER
+  - model_sum.FASSTER
+
+footer:
+  structure:
+    left: developed_by
+    right: built_with
