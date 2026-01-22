@@ -17,21 +17,19 @@ flexibility, computational speed and accuracy to provide convenient
 tools for modelling, predicting and understanding high frequency
 time-series.
 
-## Development cycle
+## Model information
 
-This package is early in development, and there are plans to make
-substantial changes in the future.
-
-The latest usage examples of using fasster can be found in my useR! 2018
+This model was developed in 2017 for an honours thesis, and the clearest
+description with examples of using fasster can be found in my useR! 2018
 talk: [slides](https://slides.mitchelloharawild.com/user2018/#1),
 [video](https://www.youtube.com/watch?v=6YlboftSalY),
 [source](https://github.com/mitchelloharawild/fasster_user2018).
 
-There are further plans to improve the heuristic optimisation techniques
-and better use sparse matrix algebra (removing the dlm package
-dependency) to make fasster even faster. Implementing this will likely
-result in a revision of the model object structure, but user directed
-functionality should remain the same.
+The model uses a forward filtering backward smoothing heuristic for
+estimating the initial states in the model. It is essentially an
+opinionated wrapper of the `{dlm}` package aimed at making it easier to
+specify a sophisticated model suitable for forecasting complex seasonal
+patterns.
 
 ## Installation
 
@@ -63,9 +61,9 @@ library(tsibble)
 library(fable)
 
 lung_deaths <- as_tsibble(cbind(mdeaths, fdeaths), pivot_longer = FALSE)
-fit <- lung_deaths %>%
+fit <- lung_deaths |>
   model(fasster = FASSTER(fdeaths ~ mdeaths))
-fit %>% report()
+fit |> report()
 #> Series: fdeaths 
 #> Model: FASSTER 
 #> 
@@ -76,26 +74,29 @@ fit %>% report()
 #> 
 #>  Observation noise variance (V):
 #>   1.6631e+03
+#> 
+#> Initial states (m0):
+#>   mdeaths: 3.7711e-01
 ```
 
 Commonly used state space components can be added using the following
 convenience functions:
 
--   `trend(n)` to include an n-th order polynomial
--   `season(s)` to include a seasonal factor of frequency s
--   `fourier(s, q)` to include seasonal fourier terms of frequency s
-    with q harmonics
--   `arma(ar, ma)` to include an ARMA term (where ar and ma are vectors
-    of coefficients)
--   Exogenous regressors can be added by referring to their name
+- `trend(n)` to include an n-th order polynomial
+- `season(s)` to include a seasonal factor of frequency s
+- `fourier(s, q)` to include seasonal fourier terms of frequency s with
+  q harmonics
+- `arma(ar, ma)` to include an ARMA term (where ar and ma are vectors of
+  coefficients)
+- Exogenous regressors can be added by referring to their name
 
 For example, to create a model with trend and monthly seasonality, you
 can use:
 
 ``` r
-fit <- as_tsibble(USAccDeaths) %>% 
+fit <- as_tsibble(USAccDeaths) |> 
   model(fasster = FASSTER(value ~ trend(1) + fourier(12)))
-fit %>% report()
+fit |> report()
 #> Series: value 
 #> Model: FASSTER 
 #> 
@@ -108,6 +109,20 @@ fit %>% report()
 #> 
 #>  Observation noise variance (V):
 #>   2.0543e+04
+#> 
+#> Initial states (m0):
+#>   fourier(12): -7.2510e+02
+#>   fourier(12): -7.4524e+02
+#>   fourier(12):  4.1713e+02
+#>   fourier(12):  8.1375e+01
+#>   fourier(12):  1.5506e+02
+#>   fourier(12): -1.9470e+02
+#>   fourier(12): -1.0038e+01
+#>   fourier(12):  1.5899e+02
+#>   fourier(12):  1.5997e+02
+#>   fourier(12):  2.0428e+02
+#>   fourier(12): -1.5165e+01
+#>   trend(1):  9.7398e+03
 ```
 
 The interface for creating a FASSTER model introduces a new formula
@@ -116,13 +131,13 @@ more complex patterns such as multiple seasonality by modelling the
 components for each group separately and switching between them.
 
 ``` r
-elec_tr <- tsibbledata::vic_elec %>%
+elec_tr <- tsibbledata::vic_elec |>
   filter(
     Time < lubridate::ymd("2012-03-01")
-  ) %>% 
+  ) |> 
   mutate(WorkDay = wday(Time) %in% 2:6 & !Holiday)
 
-elec_fit <- elec_tr %>%
+elec_fit <- elec_tr |>
   model(
     fasster = fasster(log(Demand) ~ 
       WorkDay %S% (fourier(48, 16) + trend(1)) + Temperature + I(Temperature^2)
@@ -140,7 +155,7 @@ These components can accessed from a fitted model using the
 `components()` function:
 
 ``` r
-fit %>% 
+fit |> 
   components()
 #> # A dable: 72 x 5 [1M]
 #> # Key:     .model [1]
@@ -161,7 +176,7 @@ fit %>%
 ```
 
 ``` r
-elec_fit %>%
+elec_fit |>
   components()
 #> # A dable: 2,880 x 9 [30m] <Australia/Melbourne>
 #> # Key:     .model [1]
@@ -197,12 +212,12 @@ allowing common visualisation and analysis tools to be applied on
 FASSTER models.
 
 ``` r
-fit %>% 
-  forecast(h=24) %>%
+fit |> 
+  forecast(h=24) |>
   autoplot(as_tsibble(USAccDeaths))
 ```
 
-![](man/figure/forecast-1.png)
+![](man/figure/forecast-1.png)<!-- -->
 
 Future index values are automatically produced and used where necessary
 in the model specification. If additional information is required by the
@@ -210,18 +225,18 @@ model (such as `WorkDay` and `Temperature`) they must be included in a
 `tsibble` of future values passed to `new_data`.
 
 ``` r
-elec_ts <- tsibbledata::vic_elec %>%
+elec_ts <- tsibbledata::vic_elec |>
   filter(
     yearmonth(Time) == yearmonth("2012 Mar")
-  ) %>% 
-  mutate(WorkDay = wday(Time) %in% 2:6 & !Holiday) %>% 
+  ) |> 
+  mutate(WorkDay = wday(Time) %in% 2:6 & !Holiday) |> 
   select(-Demand)
-elec_fit %>% 
-  forecast(new_data = elec_ts) %>% 
+elec_fit |> 
+  forecast(new_data = elec_ts) |> 
   autoplot(elec_tr)
 ```
 
-![](man/figure/complex_fc-1.png)
+![](man/figure/complex_fc-1.png)<!-- -->
 
 ------------------------------------------------------------------------
 

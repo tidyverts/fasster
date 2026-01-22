@@ -1,7 +1,7 @@
 ---
 output:
   md_document:
-    variant: markdown_github
+    variant: gfm
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -24,13 +24,11 @@ knitr::opts_chunk$set(
 
 An implementation of the FASSTER (Forecasting with Additive Switching of Seasonality, Trend and Exogenous Regressors) model in R. This model is designed to capture patterns of multiple seasonality in a state space framework by using state switching. The *fasster* package prioritizes flexibility, computational speed and accuracy to provide convenient tools for modelling, predicting and understanding high frequency time-series.
 
-## Development cycle
+## Model information
 
-This package is early in development, and there are plans to make substantial changes in the future. 
+This model was developed in 2017 for an honours thesis, and the clearest description with examples of using fasster can be found in my useR! 2018 talk: [slides](https://slides.mitchelloharawild.com/user2018/#1), [video](https://www.youtube.com/watch?v=6YlboftSalY), [source](https://github.com/mitchelloharawild/fasster_user2018).
 
-The latest usage examples of using fasster can be found in my useR! 2018 talk: [slides](https://slides.mitchelloharawild.com/user2018/#1), [video](https://www.youtube.com/watch?v=6YlboftSalY), [source](https://github.com/mitchelloharawild/fasster_user2018).
-
-There are further plans to improve the heuristic optimisation techniques and better use sparse matrix algebra (removing the dlm package dependency) to make fasster even faster. Implementing this will likely result in a revision of the model object structure, but user directed functionality should remain the same.
+The model uses a forward filtering backward smoothing heuristic for estimating the initial states in the model. It is essentially an opinionated wrapper of the `{dlm}` package aimed at making it easier to specify a sophisticated model suitable for forecasting complex seasonal patterns.
 
 ## Installation
 
@@ -61,9 +59,9 @@ library(tsibble)
 library(fable)
 
 lung_deaths <- as_tsibble(cbind(mdeaths, fdeaths), pivot_longer = FALSE)
-fit <- lung_deaths %>%
+fit <- lung_deaths |>
   model(fasster = FASSTER(fdeaths ~ mdeaths))
-fit %>% report()
+fit |> report()
 ```
 
 Commonly used state space components can be added using the following convenience functions:
@@ -76,21 +74,21 @@ Commonly used state space components can be added using the following convenienc
 
 For example, to create a model with trend and monthly seasonality, you can use:
 ```{r component}
-fit <- as_tsibble(USAccDeaths) %>% 
+fit <- as_tsibble(USAccDeaths) |> 
   model(fasster = FASSTER(value ~ trend(1) + fourier(12)))
-fit %>% report()
+fit |> report()
 ```
 
 The interface for creating a FASSTER model introduces a new formula construct, `%S%`, known as the switch operator. This allows modelling of more complex patterns such as multiple seasonality by modelling the components for each group separately and switching between them.
 
 ```{r complex}
-elec_tr <- tsibbledata::vic_elec %>%
+elec_tr <- tsibbledata::vic_elec |>
   filter(
     Time < lubridate::ymd("2012-03-01")
-  ) %>% 
+  ) |> 
   mutate(WorkDay = wday(Time) %in% 2:6 & !Holiday)
 
-elec_fit <- elec_tr %>%
+elec_fit <- elec_tr |>
   model(
     fasster = fasster(log(Demand) ~ 
       WorkDay %S% (fourier(48, 16) + trend(1)) + Temperature + I(Temperature^2)
@@ -104,12 +102,12 @@ Fitted FASSTER models can be decomposed to provide a description of how the unde
 
 These components can accessed from a fitted model using the `components()` function:
 ```{r decompose}
-fit %>% 
+fit |> 
   components()
 ```
 
 ```{r decompose-complex}
-elec_fit %>%
+elec_fit |>
   components()
 ```
 
@@ -120,22 +118,22 @@ The tools made available by *fasster* are designed to integrate seamlessly with 
   
 *fasster* conforms to the object structure from the *fable* package, allowing common visualisation and analysis tools to be applied on FASSTER models.
 ```{r forecast}
-fit %>% 
-  forecast(h=24) %>%
+fit |> 
+  forecast(h=24) |>
   autoplot(as_tsibble(USAccDeaths))
 ```
 
 Future index values are automatically produced and used where necessary in the model specification. If additional information is required by the model (such as `WorkDay` and `Temperature`) they must be included in a `tsibble` of future values passed to `new_data`.
 
 ```{r complex_fc}
-elec_ts <- tsibbledata::vic_elec %>%
+elec_ts <- tsibbledata::vic_elec |>
   filter(
     yearmonth(Time) == yearmonth("2012 Mar")
-  ) %>% 
-  mutate(WorkDay = wday(Time) %in% 2:6 & !Holiday) %>% 
+  ) |> 
+  mutate(WorkDay = wday(Time) %in% 2:6 & !Holiday) |> 
   select(-Demand)
-elec_fit %>% 
-  forecast(new_data = elec_ts) %>% 
+elec_fit |> 
+  forecast(new_data = elec_ts) |> 
   autoplot(elec_tr)
 ```
 
