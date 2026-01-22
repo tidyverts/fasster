@@ -380,6 +380,21 @@ tidy.FASSTER <- function(x, ...){
 }
 
 #' @export
+glance.FASSTER <- function(x, ...){
+  logL <- -dlmLL(x$est$.resid + x$est$.fitted, x$dlm)
+  nobs <- nrow(x$est)
+  k <- ncol(x[["dlm"]][["FF"]])
+  tibble(
+    sigma2 = if(is.matrix(x$dlm$V)) list(x$dlm$V) else x$dlm$V,
+    # "The function returns the negative of the loglikelihood."
+    log_lik = -logL,
+    AIC = -2 * logL + 2 * k,
+    AICc = -2 * logL + 2 * k * nobs / (nobs - k - 1),
+    BIC = -2 * logL + log(nobs) * k
+  )
+}
+
+#' @export
 #' @importFrom rlang as_quosure sym
 report.FASSTER <- function(object, ...){
   cat("\nEstimated variances:\n")
