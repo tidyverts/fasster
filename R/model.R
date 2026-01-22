@@ -51,49 +51,48 @@ train_fasster <- function(.data, formula, specials, include = NULL){
 }
 
 .specials <- new_specials(
-  `%S%` = function(group, rhs){
+  `%S%` = function(group, spec){
     group_expr <- enexpr(group)
-    lhs <- factor(eval_tidy(group_expr, data = self$data, env = env_parent(self$specials)))
-    groups <- levels(lhs) %>% map(~ as.numeric(lhs == .x)) %>% set_names(levels(lhs))
+    group_unique <- unique(group)
+    groups <- group_unique %>% map(~ as.numeric(group == .x)) %>% set_names(group_unique)
 
     groups %>%
       imap(function(X, groupVal){
-        if(is.null(rhs$JFF)){
-          rhs$JFF <- rhs$FF
-          rhs$X <- matrix(X, ncol = 1)
+        if(is.null(spec$JFF)){
+          spec$JFF <- spec$FF
+          spec$X <- matrix(X, ncol = 1)
         }
         else{
-          rhs$X <- rhs$X * X
-          if(any(new_X_pos <- rhs$FF!=0 & rhs$JFF==0)){
-            new_X_col <- NCOL(rhs$X) + 1
-            rhs$JFF[new_X_pos] <- new_X_col
-            rhs$X <- cbind(rhs$X, X)
+          spec$X <- spec$X * X
+          if(any(new_X_pos <- spec$FF!=0 & spec$JFF==0)){
+            new_X_col <- NCOL(spec$X) + 1
+            spec$JFF[new_X_pos] <- new_X_col
+            spec$X <- cbind(spec$X, X)
           }
         }
-        colnames(rhs$X) <- paste0(expr_text(group_expr), "_", groupVal, "/", colnames(rhs$X))
-        colnames(rhs$FF) <- paste0(expr_text(group_expr), "_", groupVal, "/", colnames(rhs$FF))
-        rhs
+        colnames(spec$X) <- paste0(expr_text(group_expr), "_", groupVal, "/", colnames(spec$X))
+        colnames(spec$FF) <- paste0(expr_text(group_expr), "_", groupVal, "/", colnames(spec$FF))
+        spec
       }) %>%
       reduce(`+`)
   },
-  `%?%` = function(group, spec){
-    group_expr <- enexpr(group)
-    group <- eval_tidy(group_expr, data = self$data, env = env_parent(self$specials))
+  `%?%` = function(condition, spec){
+    cond_expr <- enexpr(condition)
 
     if(is.null(spec$JFF)){
       spec$JFF <- spec$FF
-      spec$X <- matrix(as.numeric(group), ncol = 1)
+      spec$X <- matrix(as.numeric(condition), ncol = 1)
     }
     else{
-      spec$X <- spec$X * as.numeric(group)
+      spec$X <- spec$X * as.numeric(condition)
       if(any(new_X_pos <- spec$FF!=0 & spec$JFF==0)){
         new_X_col <- NCOL(spec$X) + 1
         spec$JFF[new_X_pos] <- new_X_col
-        spec$X <- cbind(spec$X, as.numeric(group))
+        spec$X <- cbind(spec$X, as.numeric(condition))
       }
     }
-    colnames(spec$X) <- paste0(expr_text(group_expr), "_TRUE/", colnames(spec$X))
-    colnames(spec$FF) <- paste0(expr_text(group_expr), "_TRUE/", colnames(spec$FF))
+    colnames(spec$X) <- paste0(expr_text(cond_expr), "_TRUE/", colnames(spec$X))
+    colnames(spec$FF) <- paste0(expr_text(cond_expr), "_TRUE/", colnames(spec$FF))
     spec
   },
   `(` = function(expr){
@@ -178,7 +177,7 @@ train_fasster <- function(.data, formula, specials, include = NULL){
 #'
 #' Implements FASSTER
 #'
-#' @param formula An object of class "formula" (refer to 'Formula' for usage)
+#' @param formula An object of class "formula" (refer to 'Specials' section for usage)
 #' @param include How many terms should be included to fit the model
 #' @param ... Not used
 #'
@@ -188,19 +187,112 @@ train_fasster <- function(.data, formula, specials, include = NULL){
 #' The fasster model extends commonly used state space models by introducing a switching component to the measurement equation.
 #' This is implemented using a time-varying DLM with the switching behaviour encoded in the measurement matrix.
 #'
-#' @section Formula:
-#' \code{fasster} inherits the standard formula specification from \code{\link[stats]{lm}} for specifying exogenous regressors, including interactions and \code{\link[base]{I}()} functionality as described in \code{\link[stats]{formula}}.
+#' @section Specials:
 #'
-#' Special DLM components can be specified using special functions defined below:
-#' \itemize{
-#'    \item season(s): Creates seasonal factors with seasonal period s
-#'    \item fourier(s, K): Creates seasonal fourier terms with seasonal period s and K harmonics
-#'    \item trend(n): Creates a polynomial of order n (poly(1) creates a level, poly(2) creates a trend)
-#'    \item ARMA(ar, ma): Creates ARMA terms with coefficient vectors ar and ma
-#'    \item custom(dlm): Creates a custom dlm structure, using \code{\link[dlm]{dlm}}
+#' The _specials_ define the model structure for `FASSTER`. The model can include
+#' trend, seasonal, ARMA, and exogenous regressor components, with optional
+#' switching behaviour controlled by grouping factors.
+#'
+#' \subsection{trend}{
+#' The `trend` special specifies polynomial trend components.
+#' \preformatted{
+#' trend(n, ...)
 #' }
 #'
-#' The switching operator, \code{\%S\%} requires the switching factor variable on the LHS, and the model to switch over on the RHS (as built using the above components)
+#' \tabular{ll}{
+#'   `n`   \tab The order of the polynomial trend. Use 1 for level, 2 for linear trend, etc. \cr
+#'   `...` \tab Additional arguments passed to [`dlm::dlmModPoly()`]. Common arguments include `dV` (observation variance) and `dW` (state variance, can be a scalar or vector). \cr
+#' }
+#' }
+#'
+#' \subsection{season}{
+#' The `season` special specifies seasonal factors using indicator variables.
+#' \preformatted{
+#' season(period = NULL, ...)
+#' }
+#'
+#' \tabular{ll}{
+#'   `period` \tab The seasonal period. If `NULL`, automatically detected from the data (uses the smallest frequency). Can be a number or text like "1 year". \cr
+#'   `...`    \tab Additional arguments passed to [`dlm::dlmModSeas()`]. Common arguments include `dV` and `dW`. \cr
+#' }
+#' }
+#'
+#' \subsection{fourier}{
+#' The `fourier` special specifies seasonal components using Fourier terms (trigonometric functions).
+#' \preformatted{
+#' fourier(period = NULL, K = floor(period/2), ...)
+#' }
+#'
+#' \tabular{ll}{
+#'   `period` \tab The seasonal period. If `NULL`, automatically detected from the data. \cr
+#'   `K`      \tab The number of Fourier terms (harmonics) to include. Maximum is `floor(period/2)`. More harmonics capture more complex seasonal patterns but increase model complexity. \cr
+#'   `...`    \tab Additional arguments passed to [`dlm::dlmModTrig()`]. \cr
+#' }
+#' }
+#'
+#' \subsection{ARMA}{
+#' The `ARMA` special includes autoregressive moving average components.
+#' \preformatted{
+#' ARMA(...)
+#' }
+#'
+#' \tabular{ll}{
+#'   `...` \tab Arguments passed to [`dlm::dlmModARMA()`]. Typically includes `ar` (vector of AR coefficients) and `ma` (vector of MA coefficients). \cr
+#' }
+#' }
+#'
+#' \subsection{xreg}{
+#' The `xreg` special includes exogenous regressors in the model.
+#' \preformatted{
+#' xreg(...)
+#' }
+#'
+#' \tabular{ll}{
+#'   `...` \tab Bare expressions for the exogenous regressors. These are evaluated in the context of the data, so you can use transformations like `log(x)` or interactions. \cr
+#' }
+#' }
+#'
+#' \subsection{custom}{
+#' The `custom` special allows you to specify custom DLM structures.
+#' \preformatted{
+#' custom(...)
+#' }
+#'
+#' \tabular{ll}{
+#'   `...` \tab Arguments passed to [`dlm::dlm()`] to create a custom DLM component. \cr
+#' }
+#' }
+#'
+#' \subsection{\%S\% (Switching operator)}{
+#' The `\%S\%` operator creates switching models where different model structures
+#' apply to different groups defined by a factor variable.
+#' \preformatted{
+#' group \%S\% model
+#' }
+#'
+#' \tabular{ll}{
+#'   `group` \tab A factor variable (or expression that evaluates to a factor) defining the groups. Each level of the factor will have its own version of the model component on the RHS. \cr
+#'   `spec` \tab The model specifications to replicate for each group. This can be any combination of `trend()`, `season()`, `fourier()`, etc. \cr
+#' }
+#'
+#' For example, `group \%S\% trend(1)` creates a separate level for each value of `group`,
+#' allowing the mean to switch between groups.
+#' }
+#'
+#' \subsection{\%?\% (Conditional operator)}{
+#' The `\%?\%` operator creates conditional models where a component is only active
+#' when a logical condition is TRUE.
+#' \preformatted{
+#' condition \%?\% model
+#' }
+#'
+#' \tabular{ll}{
+#'   `condition` \tab A logical variable or expression. The model component will only contribute when this is TRUE. \cr
+#'   `spec`     \tab The model component to conditionally include. \cr
+#' }
+#'
+#' For example, `(year > 2000) \%?\% trend(1)` includes a level component only for observations after 2000.
+#' }
 #'
 #' @section Heuristic:
 #' The model parameters are estimated using the following heuristic:
@@ -214,9 +306,22 @@ train_fasster <- function(.data, formula, specials, include = NULL){
 #' }
 #'
 #' @examples
+#' # Basic model with trend and seasonality
+#' cbind(mdeaths, fdeaths) %>%
+#'   as_tsibble(pivot_longer = FALSE) %>%
+#'   model(FASSTER(mdeaths ~ trend(1) + fourier(12)))
+#'
+#' # Model with exogenous regressor
 #' cbind(mdeaths, fdeaths) %>%
 #'   as_tsibble(pivot_longer = FALSE) %>%
 #'   model(FASSTER(mdeaths ~ fdeaths + trend(1) + fourier(12)))
+#'
+#' # Switching model with different trends for different periods
+#' cbind(mdeaths, fdeaths) %>%
+#'   as_tsibble(pivot_longer = FALSE) %>%
+#'   model(
+#'     FASSTER(mdeaths ~ (lubridate::year(index) > 1977) %S% trend(1) + fourier(12))
+#'   )
 #'
 #' @rdname fasster-model
 #' @importFrom purrr reduce imap map_chr map
