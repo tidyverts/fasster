@@ -136,7 +136,7 @@ test <- gas_data |> filter(year(Quarter) >= 2008)
 A simple model with switching trend to capture the structural break that occurred around 1970:
 
 ```{r}
-# Fit model with era-specific trends
+# Fit model with pre/post 1970 trends
 fit <- train |>
   model(
     fasster = FASSTER(log(Gas) ~ (year(Quarter) < 1970) %S% trend(2) + fourier("year"))
