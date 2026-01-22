@@ -51,18 +51,10 @@ train_fasster <- function(.data, formula, specials, include = NULL){
 }
 
 .specials <- new_specials(
-  `%S%` = function(group, expr){
+  `%S%` = function(group, rhs){
     group_expr <- enexpr(group)
     lhs <- factor(eval_tidy(group_expr, data = self$data, env = env_parent(self$specials)))
     groups <- levels(lhs) %>% map(~ as.numeric(lhs == .x)) %>% set_names(levels(lhs))
-
-    formula <- self$formula
-    on.exit(self$formula <- formula)
-    f_rhs(self$formula) <- enexpr(expr)
-
-    rhs <- parse_model_rhs(self) %>%
-      unlist(recursive = FALSE) %>%
-      reduce(`+`)
 
     groups %>%
       imap(function(X, groupVal){
@@ -105,13 +97,7 @@ train_fasster <- function(.data, formula, specials, include = NULL){
     spec
   },
   `(` = function(expr){
-    formula <- self$formula
-    on.exit(self$formula <- formula)
-    f_rhs(self$formula) <- enexpr(expr)
-
-    parse_model_rhs(self) %>%
-      unlist(recursive = FALSE) %>%
-      reduce(`+`)
+    expr
   },
   poly = function(...){
     .Deprecated("trend")
