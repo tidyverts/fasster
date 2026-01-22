@@ -39,10 +39,12 @@ functionality should remain the same.
 Installation
 ------------
 
-<!-- The **stable** version can be installed from CRAN: -->
-<!-- ```{r, eval = FALSE} -->
-<!-- install.packages("fasster") -->
-<!-- ``` -->
+The **stable** version can be installed from CRAN:
+
+``` r
+install.packages("fasster")
+```
+
 The **development** version can be installed from GitHub using:
 
 ``` r
