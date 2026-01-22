@@ -101,7 +101,7 @@ train_fasster <- function(.data, specials, include = NULL, ...){
   poly = function(...){
     cl <- sys.call()
     out <- dlmModPoly(...)
-    colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
+    colnames(out$FF) <- paste0(deparse(cl), seq_len(NCOL(out$FF)))
     out
   },
   trend = function(...){
