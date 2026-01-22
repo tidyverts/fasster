@@ -1,5 +1,5 @@
 globalVariables("self")
-train_fasster <- function(.data, formula, specials, include = NULL){
+train_fasster <- function(.data, specials, include = NULL, ...){
   if(length(measured_vars(.data)) > 1){
     abort("Only univariate responses are supported by FASSTER.")
   }
@@ -424,4 +424,72 @@ interpolate.FASSTER <- function(object, new_data, specials) {
   y[miss_val] <- fits[miss_val]
   new_data[[measured_vars(new_data)]] <- y
   new_data
+}
+
+#' Refit a FASSTER model
+#'
+#' Applies a fitted FASSTER model to a new dataset.
+#'
+#' @param object A fitted FASSTER model.
+#' @param new_data A tsibble containing the new data.
+#' @param specials (passed by [`fabletools::refit.mdl_df()`]).
+#' @param reestimate If `TRUE`, the model parameters will be re-estimated to suit 
+#'   the new data using the heuristic approach. If `FALSE`, the existing model 
+#'   structure and parameters are applied to the new data without modification.
+#' @param ... Additional arguments passed to the training function.
+#'
+#' @return A refitted FASSTER model.
+#'
+#' @examples
+#' library(tsibble)
+#' 
+#' # Fit model to male deaths
+#' fit_male <- as_tsibble(mdeaths) %>%
+#'   model(FASSTER(value ~ trend(1) + fourier(12)))
+#' 
+#' # Refit to female deaths without re-estimating parameters
+#' refit(fit_male, as_tsibble(fdeaths), reestimate = FALSE)
+#' 
+#' # Refit to female deaths with re-estimated parameters
+#' refit(fit_male, as_tsibble(fdeaths), reestimate = TRUE)
+#'
+#' @export
+refit.FASSTER <- function(object, new_data, specials = NULL, reestimate = FALSE, ...) {
+  if (reestimate) {
+    # Re-estimate the model with new data
+    return(train_fasster(new_data, specials = specials, ...))
+  }
+  
+  # Apply existing model to new data without re-estimation
+  response <- new_data[[measured_vars(new_data)]]
+  
+  # Use the existing DLM structure
+  dlmModel <- object$dlm
+  
+  # Filter new data with existing model
+  filtered <- dlmFilter(response, dlmModel)
+  
+  if(!is.matrix(filtered$a)){
+    filtered$a <- matrix(filtered$a)
+  }
+  
+  # Calculate residuals
+  resid <- filtered$y - filtered$f
+  
+  # Model to start forecasting from
+  modFuture <- filtered$mod
+  lastObsIndex <- NROW(filtered$m)
+  modFuture$C0 <- with(filtered, dlmSvd2var(
+    U.C[[lastObsIndex]],
+    D.C[lastObsIndex, ]
+  ))
+  wt <- filtered$a[seq_len(NROW(filtered$a) - 1) + 1, ] - filtered$a[seq_len(NROW(filtered$a) - 1), ]%*%t(dlmModel$GG)
+  modFuture$W <- var(wt)
+  modFuture$m0 <- filtered$m %>% tail(1) %>% as.numeric()
+  
+  structure(
+    list(dlm = dlmModel, dlm_future = modFuture,
+         est = new_data %>% mutate(.fitted = filtered$f, .resid = resid),
+         states = filtered$a),
+    class = "FASSTER")
 }
