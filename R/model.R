@@ -99,7 +99,6 @@ train_fasster <- function(.data, specials, include = NULL, ...){
     expr
   },
   poly = function(...){
-    .Deprecated("trend")
     cl <- sys.call()
     out <- dlmModPoly(...)
     colnames(out$FF) <- rep(deparse(cl), NCOL(out$FF))
