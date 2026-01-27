@@ -1,3 +1,5 @@
+Fixed and resubmitted for missing \value Rd-tag and removal of \dontrun{} tags in examples.
+
 ## Test environments
 
 * GitHub Actions (ubuntu-latest): R-devel, R-release, R-oldrel-1, R-oldrel-2, R-oldrel-3, R-oldrel-4
