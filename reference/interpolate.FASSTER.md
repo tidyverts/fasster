@@ -47,14 +47,6 @@ the model.
 ``` r
 library(tsibble)
 library(dplyr)
-#> 
-#> Attaching package: ‘dplyr’
-#> The following objects are masked from ‘package:stats’:
-#> 
-#>     filter, lag
-#> The following objects are masked from ‘package:base’:
-#> 
-#>     intersect, setdiff, setequal, union
 
 # Create data with missing values
 deaths_na <- as_tsibble(mdeaths) |>

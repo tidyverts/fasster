@@ -21,3 +21,19 @@ tidy(x, ...)
 - ...:
 
   Unused.
+
+## Value
+
+A tibble with three columns:
+
+- term:
+
+  The name of each state variable in the model.
+
+- estimate:
+
+  The mean of the estimated initial state for each term.
+
+- std.error:
+
+  The standard deviation of the estimated initial state for each term.

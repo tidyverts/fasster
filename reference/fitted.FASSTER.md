@@ -31,11 +31,6 @@ data.
 
 ``` r
 library(tsibble)
-#> 
-#> Attaching package: ‘tsibble’
-#> The following objects are masked from ‘package:base’:
-#> 
-#>     intersect, setdiff, union
 fit <- as_tsibble(mdeaths) |>
   model(FASSTER(value ~ trend(1) + fourier(12)))
 
