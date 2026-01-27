@@ -11,6 +11,14 @@
 
 \item{...}{Unused.}
 }
+\value{
+A tibble with three columns:
+\describe{
+\item{term}{The name of each state variable in the model.}
+\item{estimate}{The mean of the estimated initial state for each term.}
+\item{std.error}{The standard deviation of the estimated initial state for each term.}
+}
+}
 \description{
 Obtains the mean and variance of the estimated initial states from a FASSTER
 model. Values in the \code{estimate} column are contains the mean, and the

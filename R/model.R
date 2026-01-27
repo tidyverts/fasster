@@ -386,6 +386,13 @@ format.FASSTER <- function(x, ...){
 #' @param x An object containing a FASSTER model.
 #' @param ... Unused.
 #'
+#' @return A tibble with three columns:
+#' \describe{
+#'   \item{term}{The name of each state variable in the model.}
+#'   \item{estimate}{The mean of the estimated initial state for each term.}
+#'   \item{std.error}{The standard deviation of the estimated initial state for each term.}
+#' }
+#'
 #' @export
 tidy.FASSTER <- function(x, ...){
   tibble(
