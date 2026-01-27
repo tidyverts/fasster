@@ -28,7 +28,6 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
 #' library(tsibble)
 #' library(fasster)
 #'
@@ -44,8 +43,6 @@
 #' tidy(fit_updated)
 #' tail(fitted(fit_updated), 20)
 #' 
-#' }
-#'
 #' @export
 stream.FASSTER <- function(object, new_data, specials = NULL, ...){
   # Extend model

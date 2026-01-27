@@ -13,7 +13,7 @@
 #'   response variable.
 #'
 #' @examples
-#' \dontrun{
+#' if (requireNamespace("tsibbledata", quietly = TRUE)) {
 #' # Fit a FASSTER model and extract components
 #' library(tsibble)
 #' library(dplyr)

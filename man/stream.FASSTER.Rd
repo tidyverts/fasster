@@ -40,7 +40,6 @@ The streaming process:
 }
 }
 \examples{
-\dontrun{
 library(tsibble)
 library(fasster)
 
@@ -55,7 +54,5 @@ fit_updated <- fit |>
   stream(as_tsibble(tail(USAccDeaths, 12)))
 tidy(fit_updated)
 tail(fitted(fit_updated), 20)
-
-}
 
 }

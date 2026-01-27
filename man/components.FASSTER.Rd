@@ -23,7 +23,7 @@ for understanding which components drive the model's predictions and how
 well different aspects of the model fit the data.
 }
 \examples{
-\dontrun{
+if (requireNamespace("tsibbledata", quietly = TRUE)) {
 # Fit a FASSTER model and extract components
 library(tsibble)
 library(dplyr)
