@@ -3,7 +3,7 @@
 ## Authors
 
 - **[Mitchell O'Hara-Wild](https://mitchelloharawild.com)**. Author,
-  maintainer.
+  maintainer. [](https://orcid.org/0000-0001-6729-7695)
 
 - **[Rob Hyndman](http://robjhyndman.com)**. Author, thesis advisor.
 
