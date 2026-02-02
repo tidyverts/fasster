@@ -1,3 +1,5 @@
+# fasster (development version)
+
 # fasster 0.2.0
 
 Fast Additive Switching of Seasonality, Trend and Exogenous Regressors

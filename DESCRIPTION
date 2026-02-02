@@ -1,5 +1,5 @@
 Package: fasster
-Version: 0.2.0
+Version: 0.2.0.9000
 Title: Fast Additive Switching of Seasonality, Trend, and Exogenous Regressors
 Description: Implementation of the FASSTER (Forecasting with Additive Switching 
     of Seasonality, Trend, and Exogenous Regressors) model for forecasting time 
